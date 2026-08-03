@@ -1,59 +1,134 @@
 :root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f0f8ff; /* Crisp Alice Blue */
-  --accent-light: #d0e8f2;
-  --text-main: #2c3e50;
-  --text-muted: #7a93ac;
-  --border-color: #b3d4e0;
+  --bg: #ffffff;
+  --light-blue: #e6f2ff;
+  --mid-blue: #b3d9ff;
+  --border: #cce6ff;
+  --text: #4a5568;
+  --shadow: rgba(179, 217, 255, 0.4);
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Courier New', Courier, monospace;
-  background-color: var(--bg-primary);
-  color: var(--text-main);
-  padding-bottom: 60px; /* Space for bottom nav */
+  font-family: 'Quicksand', 'Nunito', 'Comic Sans MS', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  padding-bottom: 80px; 
 }
 
-.clinical-header {
-  background-color: var(--bg-secondary);
-  padding: 25px 20px;
-  border-bottom: 2px solid var(--border-color);
+/* View Logic */
+.view {
+  display: none;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+.view.active {
+  display: block;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Typography */
+h1 {
+  font-size: 1.1rem;
   text-align: center;
+  color: var(--text);
+}
+h2 {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+}
+h3 {
+  font-size: 1.1rem;
+  margin: 0 0 5px 0;
+}
+p {
+  margin: 0;
 }
 
-.info-card {
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 4px; /* Sharp, clean edges */
+/* UI Components */
+.hero {
+  background-color: var(--light-blue);
+  border-radius: 20px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 15px var(--shadow);
+  border: 2px solid var(--border);
+  margin-bottom: 20px;
+}
+.date-card {
+  margin-top: 15px;
+  background: var(--bg);
+  border-radius: 20px;
   padding: 15px;
-  margin: 15px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.card {
+  background-color: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 15px var(--shadow);
 }
 
-/* Bottom Navigation Bar */
+/* Inputs & Forms */
+.settings-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  box-sizing: border-box;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+  background-color: var(--bg);
+}
+.settings-input:focus {
+  border-color: var(--mid-blue);
+}
+label {
+  display: block;
+  margin-top: 15px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.archive-list {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 15px;
+}
+.archive-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Bottom Nav */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   width: 100%;
+  background-color: var(--bg);
   display: flex;
-  background-color: var(--bg-secondary);
-  border-top: 1px solid var(--border-color);
+  justify-content: space-evenly;
+  padding: 15px 0;
+  box-shadow: 0 -4px 15px var(--shadow);
+  border-top: 2px solid var(--border);
+  z-index: 100;
 }
-
 .nav-btn {
-  flex: 1;
-  padding: 18px 0;
   background: none;
   border: none;
-  color: var(--text-muted);
-  font-weight: bold;
-  font-size: 14px;
+  font-family: inherit;
+  font-weight: 700;
+  color: var(--text);
+  padding: 10px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
-
 .nav-btn.active {
-  color: var(--text-main);
-  background-color: var(--accent-light);
+  background-color: var(--light-blue);
+  color: var(--text);
 }
-
