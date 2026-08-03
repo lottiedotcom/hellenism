@@ -7,16 +7,25 @@
   --shadow: rgba(179, 217, 255, 0.4);
 }
 
+.theme-yami {
+  --bg: #1a1a24;
+  --light-blue: #2d2a3b;
+  --mid-blue: #c4a1ff;
+  --border: #524b6b;
+  --text: #e2d9f3;
+  --shadow: rgba(196, 161, 255, 0.2);
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Quicksand', 'Nunito', 'Comic Sans MS', sans-serif;
+  font-family: 'Quicksand', sans-serif;
   background-color: var(--bg);
   color: var(--text);
-  padding-bottom: 80px; 
+  padding-bottom: 80px;
+  cursor: crosshair; 
 }
 
-/* View Logic */
 .view {
   display: none;
   padding: 20px;
@@ -30,40 +39,21 @@ body {
   to { opacity: 1; }
 }
 
-/* Typography */
-h1 {
-  font-size: 1.1rem;
+h1, h2, h3 {
   text-align: center;
   color: var(--text);
-}
-h2 {
-  font-size: 1.4rem;
-  margin-bottom: 10px;
-}
-h3 {
-  font-size: 1.1rem;
-  margin: 0 0 5px 0;
-}
-p {
-  margin: 0;
+  font-weight: 700;
 }
 
-/* UI Components */
 .hero {
   background-color: var(--light-blue);
   border-radius: 20px;
   padding: 20px;
-  text-align: center;
   box-shadow: 0 4px 15px var(--shadow);
   border: 2px solid var(--border);
   margin-bottom: 20px;
 }
-.date-card {
-  margin-top: 15px;
-  background: var(--bg);
-  border-radius: 20px;
-  padding: 15px;
-}
+
 .card {
   background-color: var(--bg);
   border: 2px solid var(--border);
@@ -73,8 +63,7 @@ p {
   box-shadow: 0 4px 15px var(--shadow);
 }
 
-/* Inputs & Forms */
-.settings-input {
+.settings-input, textarea {
   width: 100%;
   padding: 12px;
   border: 2px solid var(--border);
@@ -85,26 +74,13 @@ p {
   outline: none;
   background-color: var(--bg);
 }
-.settings-input:focus {
-  border-color: var(--mid-blue);
-}
+
 label {
   display: block;
   margin-top: 15px;
-  cursor: pointer;
   font-weight: 600;
 }
-.archive-list {
-  list-style-type: none;
-  padding: 0;
-  margin-top: 15px;
-}
-.archive-list li {
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-}
 
-/* Bottom Nav */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -117,9 +93,10 @@ label {
   border-top: 2px solid var(--border);
   z-index: 100;
 }
+
 .nav-btn {
-  background: none;
-  border: none;
+  background: var(--bg);
+  border: 2px solid var(--border);
   font-family: inherit;
   font-weight: 700;
   color: var(--text);
@@ -128,7 +105,50 @@ label {
   cursor: pointer;
   transition: all 0.2s;
 }
-.nav-btn.active {
+.nav-btn.active, .nav-btn:hover {
   background-color: var(--light-blue);
-  color: var(--text);
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.libation-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px dashed var(--border);
+}
+.delete-btn {
+  background: none;
+  border: none;
+  color: var(--mid-blue);
+  cursor: pointer;
+}
+
+.hymn-text {
+  font-style: italic;
+  text-align: center;
+  padding: 10px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  margin-top: 15px;
+}
+.trading-card {
+  border: 2px solid var(--mid-blue);
+  background: var(--light-blue);
+  border-radius: 15px;
+  padding: 15px;
+  text-align: center;
+}
+.hidden {
+  display: none;
+}
+.center-content {
+  text-align: center;
 }
