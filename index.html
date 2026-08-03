@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hellenism</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Main Display Area -->
+  <main id="app-content">
+    
+    <!-- Home / Calendar View -->
+    <div id="calendar-view" class="tab-content active">
+      <header class="clinical-header">
+        <h1 id="attic-month">1 Hekatombaion</h1>
+        <h2 id="attic-festival">Noumenia</h2>
+      </header>
+      
+      <section class="daily-info">
+        <div class="info-card">
+          <h3>Daily Dedications</h3>
+          <p id="daily-deity">Loading deities...</p>
+        </div>
+        <div class="info-card">
+          <h3>Theoi.com Archives</h3>
+          <p id="theoi-snippet">Fetching mythos and epithets...</p>
+          <a href="#" id="theoi-link">Read full entry</a>
+        </div>
+      </section>
+    </div>
+
+    <!-- Other tabs would go here (Planner, Theoi, Settings) -->
+    
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('calendar')">Calendar</button>
+    <button class="nav-btn" onclick="switchTab('planner')">Planner</button>
+    <button class="nav-btn" onclick="switchTab('theoi')">Theoi</button>
+    <button class="nav-btn" onclick="switchTab('settings')">Settings</button>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
