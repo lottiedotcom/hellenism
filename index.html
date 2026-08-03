@@ -3,63 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hellenic Practice App</title>
+  <title>Hellenic Practice (✧ω✧)</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="theme-pastel">
+  <audio id="action-sound" src="sound.jpg" preload="auto"></audio>
+
   <main id="app">
     
-    <!-- Calendar View (Default) -->
+    <!-- Calendar View -->
     <section id="calendar-view" class="view active">
       <header class="hero">
-        <h1>(✧ω✧) Welcome back, Plum! Let's see what today holds. (✧ω✧)</h1>
-        <div class="date-card">
-          <h2>Gamelion 15</h2>
-          <p>Active Festival: Lenaia</p>
-        </div>
+        <h1>Welcome (´｡• ᵕ •｡`)</h1>
       </header>
       <div class="card">
-        <h3>Daily Dedications</h3>
-        <p>Monthly cycle focus: Hestia & The Household</p>
+        <h3>Moon Phase & Sundown</h3>
+        <p id="moon-phase-name">Calculating...</p>
+        <p id="moon-percentage"></p>
+        <p id="moon-age"></p>
+        <p id="sundown-time">Locating sundown...</p>
       </div>
       <div class="card">
-        <h3>Theoi.com Snippet</h3>
-        <p>Reading: Myths of Apollo (Excerpt)</p>
+        <h3>Household Cycle Countdowns</h3>
+        <p>Hekate's Deipnon: <span id="countdown-deipnon">...</span></p>
+        <p>Noumenia: <span id="countdown-noumenia">...</span></p>
+        <p>Agathos Daimon: <span id="countdown-agathos">...</span></p>
       </div>
+    </section>
+
+    <!-- Altar View -->
+    <section id="altar-view" class="view">
+      <header>
+        <h2>Digital Altar ( ˘▽˘)っ♨</h2>
+      </header>
+      <div class="card">
+        <h3>Deity Focus</h3>
+        <input type="text" id="deity-focus-input" placeholder="Who are you honoring today?" class="settings-input">
+      </div>
+      <div class="card">
+        <h3>Khernips Cleansing</h3>
+        <button id="khernips-btn" class="nav-btn">Wash Hands (0)</button>
+      </div>
+      <div class="card">
+        <h3>Libations & Offerings</h3>
+        <div id="libation-list"></div>
+        <div class="input-group">
+          <input type="text" id="new-libation" placeholder="New offering..." class="settings-input">
+          <button id="add-libation-btn" class="nav-btn">Add</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Daily Hymn</h3>
+        <p id="daily-hymn" class="hymn-text">Loading...</p>
+      </div>
+      <div class="card">
+        <h3>Kharis Tracker</h3>
+        <button id="kharis-btn" class="nav-btn">Log Devotion (≧◡≦)</button>
+        <p>Total logs: <span id="kharis-count">0</span></p>
+      </div>
+    </section>
+
+    <!-- Tarot View -->
+    <section id="tarot-view" class="view">
+      <header>
+        <h2>Daily Draw (✯◡✯)</h2>
+      </header>
+      <div class="card center-content">
+        <button id="draw-card-btn" class="nav-btn">Draw Single Card</button>
+        <div id="card-display" class="hidden">
+          <h3 id="card-name"></h3>
+          <p id="card-meaning"></p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Reading Journal</h3>
+        <textarea id="journal-entry" class="settings-input" rows="5" placeholder="Type reflections here..."></textarea>
+        <button id="save-journal-btn" class="nav-btn" style="margin-top: 10px;">Save to Cloud</button>
+      </div>
+    </section>
+
+    <!-- Archive View -->
+    <section id="archive-view" class="view">
+      <header>
+        <h2>Theoi Archive (★ω★)</h2>
+      </header>
+      <div class="card">
+        <h3>Create Deity Card</h3>
+        <input type="text" id="card-name-input" placeholder="Deity Name" class="settings-input">
+        <input type="text" id="card-epithet-input" placeholder="Epithets" class="settings-input" style="margin-top: 5px;">
+        <input type="text" id="card-offerings-input" placeholder="Offerings" class="settings-input" style="margin-top: 5px;">
+        <button id="save-card-btn" class="nav-btn" style="margin-top: 10px;">Save to Archive</button>
+      </div>
+      <div id="archive-grid" class="card-grid"></div>
     </section>
 
     <!-- Planner View -->
     <section id="planner-view" class="view">
       <header>
-        <h2>Cycle Tracking (｡♥‿♥｡)</h2>
+        <h2>Deipnon Prep (u_u)</h2>
       </header>
       <div class="card">
-        <h3>Hekate's Deipnon</h3>
-        <p>Timing: Dark Moon</p>
-      </div>
-      <div class="card">
-        <h3>Noumenia</h3>
-        <p>Timing: New Moon</p>
-      </div>
-      <div class="card">
-        <h3>Agathos Daimon</h3>
-        <p>Timing: 2nd Day of Lunar Month</p>
-      </div>
-    </section>
-
-    <!-- Theoi View -->
-    <section id="theoi-view" class="view">
-      <header>
-        <h2>Theoi Archive ＼(＾▽＾)／</h2>
-      </header>
-      <div class="card">
-        <input type="text" placeholder="Search epithets, myths, deities..." class="settings-input">
-        <ul class="archive-list">
-          <li>Zeus (Jupiter) - Epithets</li>
-          <li>Athena (Minerva) - Myths</li>
-          <li>Hekate - Cultus</li>
-        </ul>
+        <label><input type="checkbox"> Clear the shrine</label>
+        <label><input type="checkbox"> Sweep thresholds</label>
+        <label><input type="checkbox"> Dispose of old offerings</label>
+        <label><input type="checkbox"> Leave crossroad offering</label>
       </div>
     </section>
 
@@ -69,25 +117,27 @@
         <h2>Settings ( ◡‿◡ )</h2>
       </header>
       <div class="card">
-        <h3>Location & Timezone</h3>
-        <input type="text" placeholder="City or Zip Code for Sundown Math" class="settings-input">
+        <h3>Theme</h3>
+        <select id="theme-selector" class="settings-input">
+          <option value="theme-pastel">Pastel Blue</option>
+          <option value="theme-yami">Yami Kawaii</option>
+        </select>
       </div>
       <div class="card">
-        <h3>Observation Toggles</h3>
-        <label><input type="checkbox" checked> Monthly Household Cycle</label>
-        <label><input type="checkbox" checked> Athenian State Festivals</label>
-        <label><input type="checkbox"> Agricultural Observances</label>
+        <h3>Audio</h3>
+        <label><input type="checkbox" id="sound-toggle"> Enable Sound Effects</label>
       </div>
     </section>
 
   </main>
 
-  <!-- Bottom Navigation -->
   <nav class="bottom-nav">
-    <button class="nav-btn active" data-target="calendar-view">Calendar</button>
-    <button class="nav-btn" data-target="planner-view">Planner</button>
-    <button class="nav-btn" data-target="theoi-view">Theoi</button>
-    <button class="nav-btn" data-target="settings-view">Settings</button>
+    <button class="nav-btn active" data-target="calendar-view">Moon</button>
+    <button class="nav-btn" data-target="altar-view">Altar</button>
+    <button class="nav-btn" data-target="tarot-view">Tarot</button>
+    <button class="nav-btn" data-target="archive-view">Archive</button>
+    <button class="nav-btn" data-target="planner-view">Prep</button>
+    <button class="nav-btn" data-target="settings-view">Set</button>
   </nav>
 
   <script src="app.js"></script>
