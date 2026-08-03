@@ -3,46 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hellenism</title>
+  <title>Hellenic Practice App</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Main Display Area -->
-  <main id="app-content">
+  <main id="app">
     
-    <!-- Home / Calendar View -->
-    <div id="calendar-view" class="tab-content active">
-      <header class="clinical-header">
-        <h1 id="attic-month">1 Hekatombaion</h1>
-        <h2 id="attic-festival">Noumenia</h2>
+    <!-- Calendar View (Default) -->
+    <section id="calendar-view" class="view active">
+      <header class="hero">
+        <h1>(✧ω✧) Welcome back, Plum! Let's see what today holds. (✧ω✧)</h1>
+        <div class="date-card">
+          <h2>Gamelion 15</h2>
+          <p>Active Festival: Lenaia</p>
+        </div>
       </header>
-      
-      <section class="daily-info">
-        <div class="info-card">
-          <h3>Daily Dedications</h3>
-          <p id="daily-deity">Loading deities...</p>
-        </div>
-        <div class="info-card">
-          <h3>Theoi.com Archives</h3>
-          <p id="theoi-snippet">Fetching mythos and epithets...</p>
-          <a href="#" id="theoi-link">Read full entry</a>
-        </div>
-      </section>
-    </div>
+      <div class="card">
+        <h3>Daily Dedications</h3>
+        <p>Monthly cycle focus: Hestia & The Household</p>
+      </div>
+      <div class="card">
+        <h3>Theoi.com Snippet</h3>
+        <p>Reading: Myths of Apollo (Excerpt)</p>
+      </div>
+    </section>
 
-    <!-- Other tabs would go here (Planner, Theoi, Settings) -->
-    
+    <!-- Planner View -->
+    <section id="planner-view" class="view">
+      <header>
+        <h2>Cycle Tracking (｡♥‿♥｡)</h2>
+      </header>
+      <div class="card">
+        <h3>Hekate's Deipnon</h3>
+        <p>Timing: Dark Moon</p>
+      </div>
+      <div class="card">
+        <h3>Noumenia</h3>
+        <p>Timing: New Moon</p>
+      </div>
+      <div class="card">
+        <h3>Agathos Daimon</h3>
+        <p>Timing: 2nd Day of Lunar Month</p>
+      </div>
+    </section>
+
+    <!-- Theoi View -->
+    <section id="theoi-view" class="view">
+      <header>
+        <h2>Theoi Archive ＼(＾▽＾)／</h2>
+      </header>
+      <div class="card">
+        <input type="text" placeholder="Search epithets, myths, deities..." class="settings-input">
+        <ul class="archive-list">
+          <li>Zeus (Jupiter) - Epithets</li>
+          <li>Athena (Minerva) - Myths</li>
+          <li>Hekate - Cultus</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Settings View -->
+    <section id="settings-view" class="view">
+      <header>
+        <h2>Settings ( ◡‿◡ )</h2>
+      </header>
+      <div class="card">
+        <h3>Location & Timezone</h3>
+        <input type="text" placeholder="City or Zip Code for Sundown Math" class="settings-input">
+      </div>
+      <div class="card">
+        <h3>Observation Toggles</h3>
+        <label><input type="checkbox" checked> Monthly Household Cycle</label>
+        <label><input type="checkbox" checked> Athenian State Festivals</label>
+        <label><input type="checkbox"> Agricultural Observances</label>
+      </div>
+    </section>
+
   </main>
 
   <!-- Bottom Navigation -->
   <nav class="bottom-nav">
-    <button class="nav-btn active" onclick="switchTab('calendar')">Calendar</button>
-    <button class="nav-btn" onclick="switchTab('planner')">Planner</button>
-    <button class="nav-btn" onclick="switchTab('theoi')">Theoi</button>
-    <button class="nav-btn" onclick="switchTab('settings')">Settings</button>
+    <button class="nav-btn active" data-target="calendar-view">Calendar</button>
+    <button class="nav-btn" data-target="planner-view">Planner</button>
+    <button class="nav-btn" data-target="theoi-view">Theoi</button>
+    <button class="nav-btn" data-target="settings-view">Settings</button>
   </nav>
 
   <script src="app.js"></script>
 </body>
 </html>
-
