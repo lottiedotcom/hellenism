@@ -1,0 +1,59 @@
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f0f8ff; /* Crisp Alice Blue */
+  --accent-light: #d0e8f2;
+  --text-main: #2c3e50;
+  --text-muted: #7a93ac;
+  --border-color: #b3d4e0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Courier New', Courier, monospace;
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  padding-bottom: 60px; /* Space for bottom nav */
+}
+
+.clinical-header {
+  background-color: var(--bg-secondary);
+  padding: 25px 20px;
+  border-bottom: 2px solid var(--border-color);
+  text-align: center;
+}
+
+.info-card {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px; /* Sharp, clean edges */
+  padding: 15px;
+  margin: 15px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Bottom Navigation Bar */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+}
+
+.nav-btn {
+  flex: 1;
+  padding: 18px 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.nav-btn.active {
+  color: var(--text-main);
+  background-color: var(--accent-light);
+}
+
