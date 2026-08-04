@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Navigation
   const navButtons = document.querySelectorAll(".nav-btn[data-target]");
   const views = document.querySelectorAll(".view");
 
@@ -13,18 +12,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Sound Logic
   const soundToggle = document.getElementById("sound-toggle");
   const sfx = document.getElementById("action-sound");
   
   function playSound() {
-    if (soundToggle.checked) {
+    if (soundToggle && soundToggle.checked) {
       sfx.currentTime = 0;
       sfx.play().catch(e => console.log("Audio blocked", e));
     }
   }
 
-  // Moon Logic
   function updateMoon() {
     const date = new Date();
     const cycle = 29.53058770576;
@@ -47,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   updateMoon();
 
-  // Sundown Math (Geolocation)
   if ("geolocation" in navigator) {
     navigator.geolocation.getCurrentPosition(async pos => {
       const { latitude, longitude } = pos.coords;
@@ -62,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Altar: Khernips
   let khernipsCount = 0;
   document.getElementById("khernips-btn").addEventListener("click", (e) => {
     playSound();
@@ -70,7 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
     e.target.innerText = `Wash Hands (${khernipsCount})`;
   });
 
-  // Altar: Libations
   let libations = JSON.parse(localStorage.getItem("libations")) || ["Honey", "Spring Water"];
   const renderLibations = () => {
     const list = document.getElementById("libation-list");
@@ -103,7 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Altar: Daily Hymn
   const hymns = [
     "Homeric Hymn to Hestia: 'Hestia, you who tend the holy house...'",
     "Orphic Hymn to the Stars: 'With holy voice I call the sacred stars...'",
@@ -112,7 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
   document.getElementById("daily-hymn").innerText = hymns[new Date().getDay() % hymns.length];
 
-  // Altar: Kharis
   let kharisLogs = parseInt(localStorage.getItem("kharisLogs") || "0");
   document.getElementById("kharis-count").innerText = kharisLogs;
   document.getElementById("kharis-btn").addEventListener("click", () => {
@@ -122,16 +114,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("kharis-count").innerText = kharisLogs;
   });
 
-  // Tarot (Placeholder for JSON fetch)
   document.getElementById("draw-card-btn").addEventListener("click", async () => {
     playSound();
-    // fetch('tarot.json').then(...) 
     document.getElementById("card-display").classList.remove("hidden");
     document.getElementById("card-name").innerText = "Data file pending (x_x)";
     document.getElementById("card-meaning").innerText = "Will connect to tarot.json soon.";
   });
 
-  // Archive Trading Cards
   let cards = JSON.parse(localStorage.getItem("tradingCards")) || [];
   const renderCards = () => {
     const grid = document.getElementById("archive-grid");
@@ -157,22 +146,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Vercel Cloud Save (API Stub)
   document.getElementById("save-journal-btn").addEventListener("click", async () => {
     playSound();
     const entry = document.getElementById("journal-entry").value;
+    const btn = document.getElementById("save-journal-btn");
+    
+    if (!entry) return;
+    btn.innerText = "Saving... (O_O)";
+    
     try {
       const res = await fetch('/api/saveJournal', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ entry })
       });
-      alert("Saved to cloud (^_^)");
+      const data = await res.json();
+      
+      if (res.ok) {
+        btn.innerText = "Saved to Neon! (^_^)";
+        setTimeout(() => btn.innerText = "Save to Cloud", 2000);
+      } else {
+        btn.innerText = "Error (>_<)";
+        console.error(data.error);
+      }
     } catch (e) {
-      alert("Requires Vercel setup. Saved locally for now (>_<)");
+      btn.innerText = "Failed (>_<)";
+      console.error(e);
     }
   });
 
-  // Theme Toggler
   document.getElementById("theme-selector").addEventListener("change", (e) => {
     document.body.className = e.target.value;
   });
