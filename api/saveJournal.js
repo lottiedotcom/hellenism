@@ -8,7 +8,6 @@ export default async function handler(req, res) {
   try {
     const { entry } = JSON.parse(req.body);
     
-    // Creates the table if it doesn't exist yet
     await sql`
       CREATE TABLE IF NOT EXISTS journal_entries (
         id SERIAL PRIMARY KEY,
@@ -17,7 +16,6 @@ export default async function handler(req, res) {
       );
     `;
 
-    // Inserts the tarot reading
     await sql`INSERT INTO journal_entries (entry) VALUES (${entry});`;
 
     return res.status(200).json({ success: true, message: 'Saved to cloud (^_^)' });
