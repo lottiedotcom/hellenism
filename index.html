@@ -5,139 +5,182 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hellenic Practice (✧ω✧)</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body class="theme-pastel">
   <audio id="action-sound" src="sound.jpg" preload="auto"></audio>
 
   <main id="app">
     
-    <!-- Calendar View -->
-    <section id="calendar-view" class="view active">
+    <!-- 1. MOON TAB -->
+    <section id="moon-view" class="view active">
       <header class="hero">
         <h1>Welcome (´｡• ᵕ •｡`)</h1>
       </header>
+      
       <div class="card">
         <h3>Moon Phase & Sundown</h3>
-        <p id="moon-phase-name">Calculating...</p>
-        <p id="moon-percentage"></p>
-        <p id="moon-age"></p>
-        <p id="sundown-time">Locating sundown...</p>
+        <div class="stats-grid">
+          <div class="stat-pill">
+            <span class="stat-label">Phase</span>
+            <span id="moon-phase-name" class="stat-value">...</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-label">Illumination</span>
+            <span id="moon-percentage" class="stat-value">...</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-label">Moon Age</span>
+            <span id="moon-age" class="stat-value">...</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-label">Sundown</span>
+            <span id="sundown-time" class="stat-value">...</span>
+          </div>
+        </div>
       </div>
+
       <div class="card">
         <h3>Household Cycle Countdowns</h3>
-        <p>Hekate's Deipnon: <span id="countdown-deipnon">...</span></p>
-        <p>Noumenia: <span id="countdown-noumenia">...</span></p>
-        <p>Agathos Daimon: <span id="countdown-agathos">...</span></p>
+        <div class="cycle-list">
+          <p><strong>Hekate's Deipnon:</strong> <span id="countdown-deipnon">Dark Moon</span></p>
+          <p><strong>Noumenia:</strong> <span id="countdown-noumenia">New Moon</span></p>
+          <p><strong>Agathos Daimon:</strong> <span id="countdown-agathos">Day 2</span></p>
+        </div>
       </div>
     </section>
 
-    <!-- Altar View -->
+    <!-- 2. ALTAR TAB -->
     <section id="altar-view" class="view">
-      <header>
+      <header class="hero">
         <h2>Digital Altar ( ˘▽˘)っ♨</h2>
       </header>
+      
       <div class="card">
         <h3>Deity Focus</h3>
-        <input type="text" id="deity-focus-input" placeholder="Who are you honoring today?" class="settings-input">
+        <input type="text" id="deity-focus-input" placeholder="Who are you honoring today?" class="cute-input">
       </div>
+
       <div class="card">
         <h3>Khernips Cleansing</h3>
-        <button id="khernips-btn" class="nav-btn">Wash Hands (0)</button>
+        <button id="khernips-btn" class="cute-btn full-width">Wash Hands (0)</button>
       </div>
+
       <div class="card">
         <h3>Libations & Offerings</h3>
         <div id="libation-list"></div>
         <div class="input-group">
-          <input type="text" id="new-libation" placeholder="New offering..." class="settings-input">
-          <button id="add-libation-btn" class="nav-btn">Add</button>
+          <input type="text" id="new-libation" placeholder="New offering..." class="cute-input">
+          <button id="add-libation-btn" class="cute-btn">Add</button>
         </div>
       </div>
+
       <div class="card">
         <h3>Daily Hymn</h3>
         <p id="daily-hymn" class="hymn-text">Loading...</p>
       </div>
+
       <div class="card">
         <h3>Kharis Tracker</h3>
-        <button id="kharis-btn" class="nav-btn">Log Devotion (≧◡≦)</button>
-        <p>Total logs: <span id="kharis-count">0</span></p>
+        <button id="kharis-btn" class="cute-btn full-width">Log Devotion (≧◡≦)</button>
+        <p class="center-text margin-top">Total logs: <span id="kharis-count">0</span></p>
       </div>
     </section>
 
-    <!-- Tarot View -->
-    <section id="tarot-view" class="view">
-      <header>
-        <h2>Daily Draw (✯◡✯)</h2>
+    <!-- 3. DIVINATION TAB -->
+    <section id="divination-view" class="view">
+      <header class="hero">
+        <h2>Divination & Lore (✯◡✯)</h2>
       </header>
-      <div class="card center-content">
-        <button id="draw-card-btn" class="nav-btn">Draw Single Card</button>
-        <div id="card-display" class="hidden">
-          <h3 id="card-name"></h3>
+
+      <div class="card center-text">
+        <h3>Daily Card Draw</h3>
+        <button id="draw-card-btn" class="cute-btn">Draw Single Card</button>
+        <div id="card-display" class="hidden card-result">
+          <h4 id="card-name"></h4>
           <p id="card-meaning"></p>
         </div>
       </div>
+
       <div class="card">
         <h3>Reading Journal</h3>
-        <textarea id="journal-entry" class="settings-input" rows="5" placeholder="Type reflections here..."></textarea>
-        <button id="save-journal-btn" class="nav-btn" style="margin-top: 10px;">Save to Cloud</button>
+        <textarea id="journal-entry" class="cute-input" rows="4" placeholder="Type reflections here..."></textarea>
+        <button id="save-journal-btn" class="cute-btn full-width margin-top">Save to Cloud</button>
       </div>
-    </section>
 
-    <!-- Archive View -->
-    <section id="archive-view" class="view">
-      <header>
-        <h2>Theoi Archive (★ω★)</h2>
-      </header>
       <div class="card">
-        <h3>Create Deity Card</h3>
-        <input type="text" id="card-name-input" placeholder="Deity Name" class="settings-input">
-        <input type="text" id="card-epithet-input" placeholder="Epithets" class="settings-input" style="margin-top: 5px;">
-        <input type="text" id="card-offerings-input" placeholder="Offerings" class="settings-input" style="margin-top: 5px;">
-        <button id="save-card-btn" class="nav-btn" style="margin-top: 10px;">Save to Archive</button>
+        <h3>Create Deity Profile Card</h3>
+        <input type="text" id="card-name-input" placeholder="Deity Name" class="cute-input">
+        <input type="text" id="card-epithet-input" placeholder="Epithets" class="cute-input margin-top">
+        <input type="text" id="card-offerings-input" placeholder="Offerings" class="cute-input margin-top">
+        <button id="save-card-btn" class="cute-btn full-width margin-top">Save to Archive</button>
       </div>
+
       <div id="archive-grid" class="card-grid"></div>
     </section>
 
-    <!-- Planner View -->
-    <section id="planner-view" class="view">
-      <header>
-        <h2>Deipnon Prep (u_u)</h2>
+    <!-- 4. PREP & SET TAB -->
+    <section id="prep-view" class="view">
+      <header class="hero">
+        <h2>Prep & Settings (u_u)</h2>
       </header>
-      <div class="card">
-        <label><input type="checkbox"> Clear the shrine</label>
-        <label><input type="checkbox"> Sweep thresholds</label>
-        <label><input type="checkbox"> Dispose of old offerings</label>
-        <label><input type="checkbox"> Leave crossroad offering</label>
-      </div>
-    </section>
 
-    <!-- Settings View -->
-    <section id="settings-view" class="view">
-      <header>
-        <h2>Settings ( ◡‿◡ )</h2>
-      </header>
       <div class="card">
-        <h3>Theme</h3>
-        <select id="theme-selector" class="settings-input">
-          <option value="theme-pastel">Pastel Blue</option>
-          <option value="theme-yami">Yami Kawaii</option>
-        </select>
+        <h3>Deipnon Prep Checklist</h3>
+        <div class="checkbox-group">
+          <label class="custom-checkbox">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            Clear the shrine
+          </label>
+          <label class="custom-checkbox">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            Sweep thresholds
+          </label>
+          <label class="custom-checkbox">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            Dispose of old offerings
+          </label>
+          <label class="custom-checkbox">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            Leave crossroad offering
+          </label>
+        </div>
       </div>
+
       <div class="card">
-        <h3>Audio</h3>
-        <label><input type="checkbox" id="sound-toggle"> Enable Sound Effects</label>
+        <h3>Audio Settings</h3>
+        <label class="custom-checkbox">
+          <input type="checkbox" id="sound-toggle">
+          <span class="checkmark"></span>
+          Enable Sound Effects
+        </label>
       </div>
     </section>
 
   </main>
 
+  <!-- Clean Floating Bottom Navigation -->
   <nav class="bottom-nav">
-    <button class="nav-btn active" data-target="calendar-view">Moon</button>
-    <button class="nav-btn" data-target="altar-view">Altar</button>
-    <button class="nav-btn" data-target="tarot-view">Tarot</button>
-    <button class="nav-btn" data-target="archive-view">Archive</button>
-    <button class="nav-btn" data-target="planner-view">Prep</button>
-    <button class="nav-btn" data-target="settings-view">Set</button>
+    <button class="nav-btn active" data-target="moon-view">
+      <span class="nav-icon">(☽°ˊ3ˋ°)</span>
+      <span class="nav-label">Moon</span>
+    </button>
+    <button class="nav-btn" data-target="altar-view">
+      <span class="nav-icon">( ˘▽˘)</span>
+      <span class="nav-label">Altar</span>
+    </button>
+    <button class="nav-btn" data-target="divination-view">
+      <span class="nav-icon">(✯◡✯)</span>
+      <span class="nav-label">Divination</span>
+    </button>
+    <button class="nav-btn" data-target="prep-view">
+      <span class="nav-icon">(u_u)</span>
+      <span class="nav-label">Prep & Set</span>
+    </button>
   </nav>
 
   <script src="app.js"></script>
