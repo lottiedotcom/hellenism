@@ -24,6 +24,73 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Phase Data: Image File Mapping & Energy Keywords
+  const phaseDetails = {
+    "New Moon": { img: "new-moon.png", keywords: "Intentions • Beginnings • Clarity" },
+    "Waxing Crescent": { img: "waxing-crescent.png", keywords: "Growth • Action • Momentum" },
+    "First Quarter": { img: "first-quarter.png", keywords: "Challenge • Decisions • Strength" },
+    "Waxing Gibbous": { img: "waxing-gibbous.png", keywords: "Refinement • Patience • Adjustment" },
+    "Full Moon": { img: "full-moon.png", keywords: "Power • Culmination • Gratitude" },
+    "Waning Gibbous": { img: "waning-gibbous.png", keywords: "Release • Reflection • Introspection" },
+    "Last Quarter": { img: "last-quarter.png", keywords: "Cleansing • Forgiveness • Letting Go" },
+    "Waning Crescent": { img: "waning-crescent.png", keywords: "Rest • Banishing • Preparation" }
+  };
+
+  // Rotating Quotes
+  const nightQuotes = [
+    "\"Mother of mysteries, Nyx, wrap the world in your starry cloak.\"",
+    "\"Selene’s silver light guides the path through the dark.\"",
+    "\"Hekate, keep my steps steady at the crossroads.\"",
+    "\"Hypnos, bring quiet rest to a weary soul.\"",
+    "\"Asteria, star-born, falling beautifully through the night sky.\"",
+    "\"Erebus, quiet the noise of the day in your gentle shadows.\""
+  ];
+
+  // Schedule-based Greeting Logic
+  function updateGreeting() {
+    const wakeTime = localStorage.getItem("wakeTime") || "18:00";
+    const sleepTime = localStorage.getItem("sleepTime") || "06:00";
+    
+    document.getElementById("wake-time").value = wakeTime;
+    document.getElementById("sleep-time").value = sleepTime;
+
+    const now = new Date();
+    const currentHour = now.getHours();
+    const wakeHour = parseInt(wakeTime.split(":")[0]);
+    const sleepHour = parseInt(sleepTime.split(":")[0]);
+
+    const greetingEl = document.getElementById("user-greeting");
+
+    if (currentHour >= wakeHour && currentHour < (wakeHour + 4) % 24) {
+      greetingEl.innerText = "Time to greet the day ( ˘▽˘)っ♨";
+    } else if (currentHour >= sleepHour - 2 || currentHour < (sleepHour + 1) % 24) {
+      greetingEl.innerText = "The stars are out, time to rest (u_u)";
+    } else {
+      greetingEl.innerText = "Welcome back (´｡• ᵕ •｡`)";
+    }
+  }
+
+  // Save Schedule Handler
+  document.getElementById("save-schedule-btn").addEventListener("click", () => {
+    playSound();
+    const wake = document.getElementById("wake-time").value;
+    const sleep = document.getElementById("sleep-time").value;
+    localStorage.setItem("wakeTime", wake);
+    localStorage.setItem("sleepTime", sleep);
+    updateGreeting();
+    alert("Schedule updated! (^_^)");
+  });
+
+  // Zodiac Sign Estimator for Moon
+  function getMoonZodiac(date) {
+    const zodiacs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+    const start = new Date(date.getFullYear(), 0, 0);
+    const diff = date - start;
+    const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const index = Math.floor(((dayOfYear * 13.368) / 30) % 12);
+    return zodiacs[index];
+  }
+
   // Real-time Moon Phase Math
   function updateMoon() {
     const date = new Date();
@@ -44,8 +111,27 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("moon-age").innerText = `${age.toFixed(1)} days`;
     document.getElementById("moon-phase-name").innerText = phaseName;
     document.getElementById("moon-percentage").innerText = `${Math.round((0.5 * (1 - Math.cos((age / cycle) * Math.PI * 2))) * 100)}%`;
+
+    // Dynamic Image & Keywords
+    const details = phaseDetails[phaseName] || phaseDetails["New Moon"];
+    document.getElementById("moon-phase-img").src = details.img;
+    document.getElementById("moon-keywords").innerText = details.keywords;
+
+    // Zodiac
+    document.getElementById("moon-zodiac").innerText = getMoonZodiac(date);
+
+    // Deipnon Progress Bar (% toward age 28.5/29.5)
+    const progressPercent = Math.min(100, Math.round((age / cycle) * 100));
+    document.getElementById("deipnon-progress").style.width = `${progressPercent}%`;
+    document.getElementById("deipnon-percent").innerText = `${progressPercent}%`;
+
+    // Rotating Quote Selection
+    const dayIndex = Math.floor(date.getTime() / 86400000) % nightQuotes.length;
+    document.getElementById("night-quote").innerText = nightQuotes[dayIndex];
   }
+
   updateMoon();
+  updateGreeting();
 
   // Sundown Geolocation
   if ("geolocation" in navigator) {
@@ -189,4 +275,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-
