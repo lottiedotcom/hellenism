@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Navigation Handler
   const navButtons = document.querySelectorAll(".nav-btn[data-target]");
   const views = document.querySelectorAll(".view");
 
@@ -12,16 +13,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Sound Handler
   const soundToggle = document.getElementById("sound-toggle");
   const sfx = document.getElementById("action-sound");
   
   function playSound() {
     if (soundToggle && soundToggle.checked) {
       sfx.currentTime = 0;
-      sfx.play().catch(e => console.log("Audio blocked", e));
+      sfx.play().catch(e => console.log("Audio play blocked", e));
     }
   }
 
+  // Real-time Moon Phase Math
   function updateMoon() {
     const date = new Date();
     const cycle = 29.53058770576;
@@ -29,21 +32,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const age = ((date.getTime() - knownNewMoon) / 86400000) % cycle;
     
     let phaseName = "";
-    if (age < 1 || age > 28.5) phaseName = "New Moon (Noumenia prep)";
+    if (age < 1 || age > 28.5) phaseName = "New Moon";
     else if (age < 7) phaseName = "Waxing Crescent";
     else if (age < 8.5) phaseName = "First Quarter";
     else if (age < 14) phaseName = "Waxing Gibbous";
     else if (age < 15.5) phaseName = "Full Moon";
     else if (age < 21) phaseName = "Waning Gibbous";
     else if (age < 23) phaseName = "Last Quarter";
-    else if (age < 28.5) phaseName = "Waning Crescent (Deipnon prep)";
+    else if (age < 28.5) phaseName = "Waning Crescent";
 
-    document.getElementById("moon-age").innerText = `Age: ${age.toFixed(1)} days`;
+    document.getElementById("moon-age").innerText = `${age.toFixed(1)} days`;
     document.getElementById("moon-phase-name").innerText = phaseName;
-    document.getElementById("moon-percentage").innerText = `Illumination: ${Math.round((0.5 * (1 - Math.cos((age / cycle) * Math.PI * 2))) * 100)}%`;
+    document.getElementById("moon-percentage").innerText = `${Math.round((0.5 * (1 - Math.cos((age / cycle) * Math.PI * 2))) * 100)}%`;
   }
   updateMoon();
 
+  // Sundown Geolocation
   if ("geolocation" in navigator) {
     navigator.geolocation.getCurrentPosition(async pos => {
       const { latitude, longitude } = pos.coords;
@@ -51,13 +55,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const res = await fetch(`https://api.sunrise-sunset.org/json?lat=${latitude}&lng=${longitude}&formatted=0`);
         const data = await res.json();
         const sunsetTime = new Date(data.results.sunset).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        document.getElementById("sundown-time").innerText = `Hellenic Day ends at: ${sunsetTime}`;
+        document.getElementById("sundown-time").innerText = sunsetTime;
       } catch (e) {
-        document.getElementById("sundown-time").innerText = "Failed to fetch sundown.";
+        document.getElementById("sundown-time").innerText = "Sunset N/A";
       }
     });
   }
 
+  // Khernips Cleansing Counter
   let khernipsCount = 0;
   document.getElementById("khernips-btn").addEventListener("click", (e) => {
     playSound();
@@ -65,7 +70,8 @@ document.addEventListener("DOMContentLoaded", () => {
     e.target.innerText = `Wash Hands (${khernipsCount})`;
   });
 
-  let libations = JSON.parse(localStorage.getItem("libations")) || ["Honey", "Spring Water"];
+  // Interactive Libations
+  let libations = JSON.parse(localStorage.getItem("libations")) || ["Honey", "Spring Water", "Barley"];
   const renderLibations = () => {
     const list = document.getElementById("libation-list");
     list.innerHTML = "";
@@ -97,6 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Daily Hymns
   const hymns = [
     "Homeric Hymn to Hestia: 'Hestia, you who tend the holy house...'",
     "Orphic Hymn to the Stars: 'With holy voice I call the sacred stars...'",
@@ -105,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
   document.getElementById("daily-hymn").innerText = hymns[new Date().getDay() % hymns.length];
 
+  // Kharis Counter
   let kharisLogs = parseInt(localStorage.getItem("kharisLogs") || "0");
   document.getElementById("kharis-count").innerText = kharisLogs;
   document.getElementById("kharis-btn").addEventListener("click", () => {
@@ -114,13 +122,15 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("kharis-count").innerText = kharisLogs;
   });
 
+  // Tarot Single Draw Placeholder
   document.getElementById("draw-card-btn").addEventListener("click", async () => {
     playSound();
     document.getElementById("card-display").classList.remove("hidden");
-    document.getElementById("card-name").innerText = "Data file pending (x_x)";
+    document.getElementById("card-name").innerText = "Data pending (x_x)";
     document.getElementById("card-meaning").innerText = "Will connect to tarot.json soon.";
   });
 
+  // Deity Profile Cards
   let cards = JSON.parse(localStorage.getItem("tradingCards")) || [];
   const renderCards = () => {
     const grid = document.getElementById("archive-grid");
@@ -128,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cards.forEach(c => {
       const div = document.createElement("div");
       div.className = "trading-card";
-      div.innerHTML = `<h3>${c.name}</h3><p><strong>Epithets:</strong> ${c.epithets}</p><p><strong>Offerings:</strong> ${c.offerings}</p>`;
+      div.innerHTML = `<h4>${c.name}</h4><p><strong>Epithets:</strong> ${c.epithets}</p><p><strong>Offerings:</strong> ${c.offerings}</p>`;
       grid.appendChild(div);
     });
   };
@@ -143,9 +153,13 @@ document.addEventListener("DOMContentLoaded", () => {
       cards.push({ name, epithets, offerings });
       localStorage.setItem("tradingCards", JSON.stringify(cards));
       renderCards();
+      document.getElementById("card-name-input").value = "";
+      document.getElementById("card-epithet-input").value = "";
+      document.getElementById("card-offerings-input").value = "";
     }
   });
 
+  // Vercel Postgres Journal Save
   document.getElementById("save-journal-btn").addEventListener("click", async () => {
     playSound();
     const entry = document.getElementById("journal-entry").value;
@@ -163,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       
       if (res.ok) {
-        btn.innerText = "Saved to Neon! (^_^)";
+        btn.innerText = "Saved to Cloud! (^_^)";
         setTimeout(() => btn.innerText = "Save to Cloud", 2000);
       } else {
         btn.innerText = "Error (>_<)";
@@ -174,8 +188,5 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error(e);
     }
   });
-
-  document.getElementById("theme-selector").addEventListener("change", (e) => {
-    document.body.className = e.target.value;
-  });
 });
+
