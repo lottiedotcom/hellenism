@@ -15,9 +15,21 @@
     <!-- 1. MOON TAB -->
     <section id="moon-view" class="view active">
       <header class="hero">
-        <h1>Welcome (´｡• ᵕ •｡`)</h1>
+        <h1 id="user-greeting">Welcome (´｡• ᵕ •｡`)</h1>
+        <div class="moon-display">
+          <img id="moon-phase-img" src="new-moon.png" alt="Moon Phase" class="moon-img">
+        </div>
+        <p id="night-quote" class="quote-box">"Selene’s silver light guides the path through the dark."</p>
       </header>
       
+      <div class="card">
+        <h3>Energy & Alignment</h3>
+        <div class="alignment-box">
+          <p><strong>Zodiac Sign:</strong> <span id="moon-zodiac">Calculating...</span></p>
+          <p><strong>Energy Focus:</strong> <span id="moon-keywords">...</span></p>
+        </div>
+      </div>
+
       <div class="card">
         <h3>Moon Phase & Sundown</h3>
         <div class="stats-grid">
@@ -38,6 +50,22 @@
             <span id="sundown-time" class="stat-value">...</span>
           </div>
         </div>
+      </div>
+
+      <div class="card">
+        <h3>Hekate's Deipnon Tracker</h3>
+        <div class="progress-bar-container">
+          <div id="deipnon-progress" class="progress-bar-fill"></div>
+        </div>
+        <p class="center-text margin-top">Cycle Progress to Dark Moon: <span id="deipnon-percent">0%</span></p>
+        
+        <details class="deipnon-info margin-top">
+          <summary class="cute-summary">What is Deipnon & How to Celebrate (★ω★)</summary>
+          <div class="deipnon-details">
+            <p><strong>What it is:</strong> The dark moon night marking the end of the lunar month to honor Hekate, appease restless spirits, and purify the home.</p>
+            <p><strong>How to celebrate:</strong> Sweep thresholds, physically clean your space, clear out old offerings, and leave a final offering (garlic, eggs, or leeks) at a crossroads.</p>
+          </div>
+        </details>
       </div>
 
       <div class="card">
@@ -149,6 +177,15 @@
             Leave crossroad offering
           </label>
         </div>
+      </div>
+
+      <div class="card">
+        <h3>Schedule Settings</h3>
+        <p class="margin-top">Wake Up Time:</p>
+        <input type="time" id="wake-time" class="cute-input" value="18:00">
+        <p class="margin-top">Sleep Time:</p>
+        <input type="time" id="sleep-time" class="cute-input" value="06:00">
+        <button id="save-schedule-btn" class="cute-btn full-width margin-top">Save Schedule</button>
       </div>
 
       <div class="card">
