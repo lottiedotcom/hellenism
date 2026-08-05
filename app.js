@@ -24,16 +24,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Phase Data: Image File Mapping & Energy Keywords
+  // Phase Data: Text-based Kaomojis & Energy Keywords
   const phaseDetails = {
-    "New Moon": { img: "new-moon.png", keywords: "Intentions • Beginnings • Clarity" },
-    "Waxing Crescent": { img: "waxing-crescent.png", keywords: "Growth • Action • Momentum" },
-    "First Quarter": { img: "first-quarter.png", keywords: "Challenge • Decisions • Strength" },
-    "Waxing Gibbous": { img: "waxing-gibbous.png", keywords: "Refinement • Patience • Adjustment" },
-    "Full Moon": { img: "full-moon.png", keywords: "Power • Culmination • Gratitude" },
-    "Waning Gibbous": { img: "waning-gibbous.png", keywords: "Release • Reflection • Introspection" },
-    "Last Quarter": { img: "last-quarter.png", keywords: "Cleansing • Forgiveness • Letting Go" },
-    "Waning Crescent": { img: "waning-crescent.png", keywords: "Rest • Banishing • Preparation" }
+    "New Moon": { kaomoji: "( ●_● )", keywords: "Intentions • Beginnings • Clarity" },
+    "Waxing Crescent": { kaomoji: "( ☽◡☾ )", keywords: "Growth • Action • Momentum" },
+    "First Quarter": { kaomoji: "( ◑‿◐ )", keywords: "Challenge • Decisions • Strength" },
+    "Waxing Gibbous": { kaomoji: "( ◖◡◗ )", keywords: "Refinement • Patience • Adjustment" },
+    "Full Moon": { kaomoji: "( ◯ ▽ ◯ )", keywords: "Power • Culmination • Gratitude" },
+    "Waning Gibbous": { kaomoji: "( ◗◡◖ )", keywords: "Release • Reflection • Introspection" },
+    "Last Quarter": { kaomoji: "( ◐‿◑ )", keywords: "Cleansing • Forgiveness • Letting Go" },
+    "Waning Crescent": { kaomoji: "( ☾◡☽ )", keywords: "Rest • Banishing • Preparation" }
   };
 
   // Rotating Quotes
@@ -112,9 +112,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("moon-phase-name").innerText = phaseName;
     document.getElementById("moon-percentage").innerText = `${Math.round((0.5 * (1 - Math.cos((age / cycle) * Math.PI * 2))) * 100)}%`;
 
-    // Dynamic Image & Keywords
+    // Dynamic Kaomoji & Keywords
     const details = phaseDetails[phaseName] || phaseDetails["New Moon"];
-    document.getElementById("moon-phase-img").src = details.img;
+    document.getElementById("moon-phase-kaomoji").innerText = details.kaomoji;
     document.getElementById("moon-keywords").innerText = details.keywords;
 
     // Zodiac
