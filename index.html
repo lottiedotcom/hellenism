@@ -1,147 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Personal Sanctuary</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hellenic Practice (✧ω✧)</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
 </head>
-<body>
-  <!-- Ambient Action Sound -->
-  <audio id="action-sound" src="chime.mp3" preload="auto"></audio>
+<body class="theme-pastel">
+<audio id="action-sound" src="sound.jpg" preload="auto"></audio>
 
-  <nav>
-    <button class="nav-btn active" data-target="home-view">Home</button>
-    <button class="nav-btn" data-target="moon-view">Moon</button>
-    <button class="nav-btn" data-target="altar-view">Altar</button>
-    <button class="nav-btn" data-target="tarot-view">Tarot</button>
-    <button class="nav-btn" data-target="archive-view">Archive</button>
-    <label class="sound-label">
-      <input type="checkbox" id="sound-toggle" checked> Sound
-    </label>
-  </nav>
+<main id="app">
 
-  <main>
-    <!-- Home View -->
-    <section id="home-view" class="view active">
-      <h1 id="user-greeting">Welcome back (´｡• ᵕ •｡`)</h1>
-      
-      <div class="panel">
-        <h3>Schedule</h3>
-        <label>Wake: <input type="time" id="wake-time"></label>
-        <label>Sleep: <input type="time" id="sleep-time"></label>
-        <button id="save-schedule-btn">Save (^_^)</button>
-        <p>Sundown today: <span id="sundown-time">Loading...</span></p>
-      </div>
+<!-- 1. MOON TAB -->
+<section id="moon-view" class="view active">
+<header class="hero">
+<h1 id="user-greeting">Welcome (´｡• ᵕ •｡`)</h1>
+<div class="moon-display">
+<div id="moon-phase-kaomoji" class="moon-kaomoji">( ◯ ▽ ◯ )</div>
+</div>
+<p id="night-quote" class="quote-box">"Selene’s silver light guides the path through the dark."</p>
+</header>
 
-      <div class="panel">
-        <h3>Daily Practices</h3>
-        <button id="khernips-btn">Wash Hands (0)</button>
-        <p id="daily-hymn"></p>
-        <div class="kharis-box">
-          Kharis Logs: <span id="kharis-count">0</span>
-          <button id="kharis-btn">Add Kharis (★ω★)</button>
-        </div>
-      </div>
+<div class="card">
+<h3>Energy & Alignment</h3>
+<div class="alignment-box">
+<p><strong>Zodiac Sign:</strong> <span id="moon-zodiac">Loading...</span></p>
+<p><strong>Energy Focus:</strong> <span id="moon-keywords">Loading...</span></p>
+</div>
+</div>
 
-      <div class="panel">
-        <h3>Libations</h3>
-        <div id="libation-list"></div>
-        <input type="text" id="new-libation" placeholder="New libation...">
-        <button id="add-libation-btn">Add (+)</button>
-      </div>
+<div class="card">
+<h3>Moon Phase & Sundown</h3>
+<div class="stats-grid">
+<div class="stat-pill">
+<span class="stat-label">Phase</span>
+<span id="moon-phase-name" class="stat-value">Loading...</span>
+</div>
+<div class="stat-pill">
+<span class="stat-label">Illumination</span>
+<span id="moon-percentage" class="stat-value">Loading...</span>
+</div>
+<div class="stat-pill">
+<span class="stat-label">Moon Age</span>
+<span id="moon-age" class="stat-value">Loading...</span>
+</div>
+<div class="stat-pill">
+<span class="stat-label">Sundown</span>
+<span id="sundown-time" class="stat-value">Loading...</span>
+</div>
+</div>
+</div>
 
-      <div class="panel">
-        <h3>Journal</h3>
-        <textarea id="journal-entry" placeholder="Thoughts for today..."></textarea>
-        <button id="save-journal-btn">Save to Cloud</button>
-      </div>
-    </section>
+<div class="card">
+<h3>Hekate's Deipnon Tracker</h3>
+<div class="progress-bar-container">
+<div id="deipnon-progress" class="progress-bar-fill"></div>
+</div>
+<p class="center-text margin-top">Cycle Progress to Dark Moon: <span id="deipnon-percent">0%</span></p>
 
-    <!-- Moon View -->
-    <section id="moon-view" class="view hidden">
-      <h2 id="moon-phase-name">Loading...</h2>
-      <div class="kaomoji-display" id="moon-phase-kaomoji">🌑</div>
-      <p id="moon-keywords"></p>
-      <p>Age: <span id="moon-age"></span> | Zodiac: <span id="moon-zodiac"></span></p>
-      <p>Illumination: <span id="moon-percentage"></span></p>
-      
-      <div class="panel">
-        <h3>Cycle Progress</h3>
-        <div class="progress-bar"><div id="deipnon-progress"></div></div>
-        <p>Cycle Completion: <span id="deipnon-percent"></span></p>
-        <p>Hekate's Deipnon: <span id="countdown-deipnon"></span></p>
-        <p>Noumenia: <span id="countdown-noumenia"></span></p>
-        <p>Agathos Daimon: <span id="countdown-agathos"></span></p>
-      </div>
+<details class="deipnon-info margin-top">
+<summary class="cute-summary">What is Deipnon & How to Celebrate (★ω★)</summary>
+<div class="deipnon-details">
+<p><strong>What it is:</strong> The dark moon night marking the end of the lunar month to honor Hekate, appease restless spirits, and purify the home.</p>
+<p><strong>How to celebrate:</strong> Sweep thresholds, physically clean your space, clear out old offerings, and leave a final offering (garlic, eggs, or leeks) at a crossroads.</p>
+</div>
+</details>
+</div>
 
-      <p class="quote" id="night-quote"></p>
-    </section>
+<div class="card">
+<h3>Household Cycle Countdowns</h3>
+<div class="cycle-list">
+<p><strong>Hekate's Deipnon:</strong> <span id="countdown-deipnon">Calculating...</span></p>
+<p><strong>Noumenia:</strong> <span id="countdown-noumenia">Calculating...</span></p>
+<p><strong>Agathos Daimon:</strong> <span id="countdown-agathos">Calculating...</span></p>
+</div>
+</div>
+</section>
 
-    <!-- Altar View (NEW & UPDATED) -->
-    <section id="altar-view" class="view hidden">
-      <div class="shrine-controls">
-        <label>Current Shrine: </label>
-        <select id="shrine-selector">
-          <option value="Hestia">Hestia</option>
-          <option value="Hekate">Hekate</option>
-          <option value="Apollo">Apollo</option>
-          <option value="Hermes">Hermes</option>
-        </select>
-        <button id="sweep-altar-btn">Sweep Altar ( ˘▽˘)っ彡</button>
-      </div>
+<!-- 2. ALTAR TAB -->
+<section id="altar-view" class="view">
+<header class="hero">
+<h2>Digital Altar ( ˘▽˘)っ♨</h2>
+</header>
 
-      <div class="altar-tools">
-        <label class="custom-file-upload">
-          <input type="file" id="upload-offering" accept="image/*">
-          Add Offering (+)
-        </label>
-        <label class="custom-file-upload">
-          <input type="file" id="upload-sketch" accept="image/*">
-          Update Sketch Frame (✎)
-        </label>
-      </div>
+<div class="card">
+<h3>Deity Shrine Switcher</h3>
+<select id="deity-focus-input" class="cute-input">
+  <option value="Hestia">Hestia</option>
+  <option value="Hekate">Hekate</option>
+  <option value="Apollo">Apollo</option>
+  <option value="Hermes">Hermes</option>
+</select>
+</div>
 
-      <!-- Drag and Drop Canvas -->
-      <div id="altar-canvas">
-        <div id="sketch-frame" class="hidden"></div>
-      </div>
+<div class="card">
+<h3>Interactive Canvas</h3>
+<div id="altar-canvas" class="altar-tabletop">
+  <div id="sketch-frame" class="sketch-frame-ui" onclick="document.getElementById('upload-sketch').click()">
+    <span id="sketch-placeholder">Frame<br>(Tap to set)</span>
+  </div>
+</div>
+<div class="input-group margin-top">
+  <input type="file" id="upload-offering" accept="image/png, image/jpeg" style="display:none;">
+  <button id="add-offering-btn" class="cute-btn full-width" onclick="document.getElementById('upload-offering').click()">+ Upload Offering</button>
+  <input type="file" id="upload-sketch" accept="image/png, image/jpeg" style="display:none;">
+</div>
+<button id="sweep-altar-btn" class="cute-btn full-width margin-top">Sweep the Altar ( ˘▽˘)っ🧹</button>
+</div>
 
-      <!-- Petition Journal -->
-      <div class="panel petition-panel">
-        <h3>Prayer & Petition</h3>
-        <div class="petition-controls">
-          <button id="petition-prompt-btn">Prompt (O_O)</button>
-        </div>
-        <div class="petition-wrapper">
-          <textarea id="petition-text" placeholder="Write your petition here..."></textarea>
-          <div id="sparkle-container"></div>
-        </div>
-        <button id="petition-send-btn">Send to the Gods (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</button>
-      </div>
-    </section>
+<div class="card">
+<h3>Prayer & Petition</h3>
+<button id="prompt-generator-btn" class="cute-btn full-width">Generate Time-Based Prompt</button>
+<p id="prompt-display" class="quote-box hidden margin-top"></p>
+<div style="position: relative;" class="margin-top">
+  <textarea id="petition-text" class="cute-input" rows="3" placeholder="Write your petition here..."></textarea>
+  <div id="sparkle-container"></div>
+</div>
+<button id="send-petition-btn" class="cute-btn full-width margin-top">Send to the Gods</button>
+</div>
 
-    <!-- Tarot View -->
-    <section id="tarot-view" class="view hidden">
-      <button id="draw-card-btn">Draw a Card (✧ω✧)</button>
-      <div id="card-display" class="hidden panel">
-        <h3 id="card-name"></h3>
-        <p id="card-meaning"></p>
-      </div>
-    </section>
+<div class="card">
+<h3>Khernips Cleansing</h3>
+<button id="khernips-btn" class="cute-btn full-width">Wash Hands (0)</button>
+</div>
 
-    <!-- Archive View -->
-    <section id="archive-view" class="view hidden">
-      <div class="panel">
-        <h3>Add Deity</h3>
-        <input type="text" id="card-name-input" placeholder="Name">
-        <input type="text" id="card-epithet-input" placeholder="Epithets">
-        <input type="text" id="card-offerings-input" placeholder="Offerings">
-        <button id="save-card-btn">Save Card</button>
-      </div>
-      <div id="archive-grid"></div>
-    </section>
-  </main>
-  <script src="app.js"></script>
+<div class="card">
+<h3>Libations & Offerings</h3>
+<div id="libation-list"></div>
+<div class="input-group">
+<input type="text" id="new-libation" placeholder="New offering..." class="cute-input">
+<button id="add-libation-btn" class="cute-btn">Add</button>
+</div>
+</div>
+
+<div class="card">
+<h3>Daily Hymn</h3>
+<p id="daily-hymn" class="hymn-text">Loading...</p>
+</div>
+
+<div class="card">
+<h3>Kharis Tracker</h3>
+<button id="kharis-btn" class="cute-btn full-width">Log Devotion (≧◡≦)</button>
+<p class="center-text margin-top">Total logs: <span id="kharis-count">0</span></p>
+</div>
+</section>
+
+<!-- 3. DIVINATION TAB -->
+<section id="divination-view" class="view">
+<header class="hero">
+<h2>Divination & Lore (✯◡✯)</h2>
+</header>
+
+<div class="card center-text">
+<h3>Daily Card Draw</h3>
+<button id="draw-card-btn" class="cute-btn">Draw Single Card</button>
+<div id="card-display" class="hidden card-result">
+<h4 id="card-name"></h4>
+<p id="card-meaning"></p>
+</div>
+</div>
+
+<div class="card">
+<h3>Reading Journal</h3>
+<textarea id="journal-entry" class="cute-input" rows="4" placeholder="Type reflections here..."></textarea>
+<button id="save-journal-btn" class="cute-btn full-width margin-top">Save to Cloud</button>
+</div>
+
+<div class="card">
+<h3>Create Deity Profile Card</h3>
+<input type="text" id="card-name-input" placeholder="Deity Name" class="cute-input">
+<input type="text" id="card-epithet-input" placeholder="Epithets" class="cute-input margin-top">
+<input type="text" id="card-offerings-input" placeholder="Offerings" class="cute-input margin-top">
+<button id="save-card-btn" class="cute-btn full-width margin-top">Save to Archive</button>
+</div>
+
+<div id="archive-grid" class="card-grid"></div>
+</section>
+
+<!-- 4. PREP & SET TAB -->
+<section id="prep-view" class="view">
+<header class="hero">
+<h2>Prep & Settings (u_u)</h2>
+</header>
+
+<div class="card">
+<h3>Deipnon Prep Checklist</h3>
+<div class="checkbox-group">
+<label class="custom-checkbox">
+<input type="checkbox">
+<span class="checkmark"></span>
+Clear the shrine
+</label>
+<label class="custom-checkbox">
+<input type="checkbox">
+<span class="checkmark"></span>
+Sweep thresholds
+</label>
+<label class="custom-checkbox">
+<input type="checkbox">
+<span class="checkmark"></span>
+Dispose of old offerings
+</label>
+<label class="custom-checkbox">
+<input type="checkbox">
+<span class="checkmark"></span>
+Leave crossroad offering
+</label>
+</div>
+</div>
+
+<div class="card">
+<h3>Schedule Settings</h3>
+<p class="margin-top">Wake Up Time:</p>
+<input type="time" id="wake-time" class="cute-input" value="18:00">
+<p class="margin-top">Sleep Time:</p>
+<input type="time" id="sleep-time" class="cute-input" value="06:00">
+<button id="save-schedule-btn" class="cute-btn full-width margin-top">Save Schedule</button>
+</div>
+
+<div class="card">
+<h3>Audio Settings</h3>
+<label class="custom-checkbox">
+<input type="checkbox" id="sound-toggle">
+<span class="checkmark"></span>
+Enable Sound Effects
+</label>
+</div>
+</section>
+
+</main>
+
+<nav class="bottom-nav">
+<button class="nav-btn active" data-target="moon-view">
+<span class="nav-icon">(☽°ˊ3ˋ°)</span>
+<span class="nav-label">Moon</span>
+</button>
+<button class="nav-btn" data-target="altar-view">
+<span class="nav-icon">( ˘▽˘)</span>
+<span class="nav-label">Altar</span>
+</button>
+<button class="nav-btn" data-target="divination-view">
+<span class="nav-icon">(✯◡✯)</span>
+<span class="nav-label">Divination</span>
+</button>
+<button class="nav-btn" data-target="prep-view">
+<span class="nav-icon">(u_u)</span>
+<span class="nav-label">Prep & Set</span>
+</button>
+</nav>
+
+<script src="app.js"></script>
 </body>
 </html>
