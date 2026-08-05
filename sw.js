@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hellenic-app-v1';
+const CACHE_NAME = 'hellenic-app-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -6,6 +6,7 @@ const ASSETS_TO_CACHE = [
   '/app.js',
   '/manifest.json',
   '/tarot.json',
+  '/sound.jpg'
 ];
 
 // Install Event
@@ -36,7 +37,6 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event
 self.addEventListener('fetch', (event) => {
-  // Skip cross-origin requests like sunrise-sunset API or Vercel database calls
   if (!event.request.url.startsWith(self.location.origin)) {
     return;
   }
@@ -52,7 +52,6 @@ self.addEventListener('fetch', (event) => {
           return response;
         });
       }).catch(() => {
-        // Fallback if offline and asset not in cache
         if (event.request.headers.get('accept').includes('text/html')) {
           return caches.match('/index.html');
         }
