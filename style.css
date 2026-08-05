@@ -48,6 +48,54 @@ font-size: 1.3rem;
 color: var(--text-dark);
 }
 
+/* Settings Gear Button in Top Right */
+.settings-gear-btn {
+position: absolute;
+top: 0;
+right: 0;
+background: var(--accent-blue);
+border: 2px solid var(--border-blue);
+border-radius: 50%;
+width: 36px;
+height: 36px;
+font-size: 1rem;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: 0 2px 8px var(--shadow-blue);
+transition: transform 0.2s;
+}
+.settings-gear-btn:active {
+transform: scale(0.92);
+}
+
+/* Settings Modal Popup */
+.settings-modal {
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+background: rgba(73, 46, 118, 0.4);
+z-index: 2000;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 16px;
+}
+.settings-content {
+width: 100%;
+max-width: 420px;
+max-height: 85vh;
+overflow-y: auto;
+background: var(--card-bg);
+border: 2px solid var(--border-blue);
+border-radius: 25px;
+padding: 20px;
+box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
 /* Text-Based Moon Graphic */
 .moon-display {
 display: flex;
@@ -480,4 +528,3 @@ margin-top: 2px;
   0% { transform: translateY(0) scale(1); opacity: 1; }
   100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
 }
-
