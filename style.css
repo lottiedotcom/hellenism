@@ -422,3 +422,4 @@ margin-top: 2px;
   0% { transform: translateY(0) scale(1); opacity: 1; }
   100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
 }
+
