@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-    // 3. EXPANDED DIVINATION (Tarot, Delphic Oracle, Homeromancy)
+    // 3. EXPANDED DIVINATION (Tarot, Delphic, Homeromancy)
     // ==========================================
     const drawBtn = document.getElementById("draw-card-btn");
     if(drawBtn) {
@@ -76,7 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Delphic Oracle Draw
     const delphicBtn = document.getElementById("draw-delphic-btn");
     if(delphicBtn) {
         delphicBtn.addEventListener("click", async () => {
@@ -96,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(maximEl) maximEl.innerText = randomMaxim.maxim;
                 if(adviceEl) adviceEl.innerHTML = `<strong>Guidance:</strong> ${randomMaxim.advice}`;
             } catch (error) {
-                // Fallback built-in maxims if json file is missing
                 const fallbacks = [
                     { maxim: "Know Thyself", advice: "Look inward before seeking answers from the outside world." },
                     { maxim: "Nothing in Excess", advice: "Seek balance and moderation in all things today." },
@@ -109,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Homeromancy Draw
     const homerBtn = document.getElementById("draw-homer-btn");
     if(homerBtn) {
         homerBtn.addEventListener("click", async () => {
@@ -141,22 +138,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 4. MULTI-DEITY SHRINE & SYNCED ARCHIVE
+    // 4. MULTI-DEITY SHRINE & GRIMOIRE ARCHIVE
     // ==========================================
     let deities = ["Hestia", "Hekate", "Apollo", "Hermes"];
     let shrineData = {};
+    let deityGrimoire = {}; // Stores custom tags: { [deityName]: { plants: [], animals: [], offerings: [] } }
     let currentShrine = "Hestia";
 
     async function initDeitiesAndShrines() {
         deities = await loadFromCloud('customDeitiesList', ["Hestia", "Hekate", "Apollo", "Hermes"]);
         shrineData = await loadFromCloud('shrineData', {});
+        deityGrimoire = await loadFromCloud('deityGrimoire', {});
 
         deities.forEach(d => {
             if(!shrineData[d]) shrineData[d] = { offerings: [], sketch: null, petitions: [] };
+            if(!deityGrimoire[d]) deityGrimoire[d] = { plants: [], animals: [], offerings: [] };
         });
 
         populateDeityDropdown();
-        renderDeityArchiveCards();
+        renderGrimoireArchive();
         
         const deityInput = document.getElementById('deity-focus-input');
         if(deityInput) {
@@ -182,49 +182,142 @@ document.addEventListener('DOMContentLoaded', () => {
         select.value = currentShrine;
     }
 
-    function renderDeityArchiveCards() {
+    // Render Illuminated Grimoire Manuscript Cards
+    function renderGrimoireArchive() {
         const grid = document.getElementById('archive-grid');
         if(!grid) return;
         grid.innerHTML = '';
 
         deities.forEach(d => {
+            const data = deityGrimoire[d] || { plants: [], animals: [], offerings: [] };
+            const shrine = shrineData[d] || { offerings: [], petitions: [] };
+
             const card = document.createElement('div');
-            card.className = 'trading-card';
+            card.className = 'grimoire-manuscript-card';
             card.innerHTML = `
-                <h4>🔥 ${d} Shrine Archive</h4>
-                <p><strong>Status:</strong> Active Sanctuary</p>
-                <p><strong>Offerings Count:</strong> ${shrineData[d] ? shrineData[d].offerings.length : 0} items</p>
-                <p><strong>Petitions Logged:</strong> ${shrineData[d] && shrineData[d].petitions ? shrineData[d].petitions.length : 0}</p>
+                <div class="manuscript-header">
+                    <h4>📖 Sanctuary of ${d}</h4>
+                    <span class="manuscript-badge">Active Shrine</span>
+                </div>
+                <div class="manuscript-section">
+                    <p class="manuscript-label">🌿 Sacred Plants</p>
+                    <div class="tag-container" id="plants-tags-${d}">
+                        ${data.plants.length ? data.plants.map(p => `<span class="cute-tag">${p}</span>`).join('') : '<span class="empty-tag">No plants added yet</span>'}
+                    </div>
+                </div>
+                <div class="manuscript-section">
+                    <p class="manuscript-label">🐾 Sacred Animals</p>
+                    <div class="tag-container" id="animals-tags-${d}">
+                        ${data.animals.length ? data.animals.map(a => `<span class="cute-tag">${a}</span>`).join('') : '<span class="empty-tag">No animals added yet</span>'}
+                    </div>
+                </div>
+                <div class="manuscript-section">
+                    <p class="manuscript-label">🍯 Standard Offerings</p>
+                    <div class="tag-container" id="offerings-tags-${d}">
+                        ${data.offerings.length ? data.offerings.map(o => `<span class="cute-tag">${o}</span>`).join('') : '<span class="empty-tag">No offerings added yet</span>'}
+                    </div>
+                </div>
+                <div class="manuscript-footer">
+                    <span>Canvas Items: ${shrine.offerings.length}</span>
+                    <span>Petitions: ${shrine.petitions.length}</span>
+                </div>
+                <button class="cute-btn full-width margin-top edit-grimoire-btn" data-deity="${d}">Edit Grimoire Associations ✨</button>
             `;
             grid.appendChild(card);
         });
+
+        // Wire up edit buttons
+        document.querySelectorAll('.edit-grimoire-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const deity = e.target.getAttribute('data-deity');
+                openGrimoireEditor(deity);
+            });
+        });
     }
 
+    // Inline Modal/Prompt to edit deity associations
+    function openGrimoireEditor(deity) {
+        const currentData = deityGrimoire[deity] || { plants: [], animals: [], offerings: [] };
+        
+        const pInput = prompt(`Enter sacred plants for ${deity} (comma separated):`, currentData.plants.join(', '));
+        if(pInput !== null) {
+            currentData.plants = pInput.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        const aInput = prompt(`Enter sacred animals for ${deity} (comma separated):`, currentData.animals.join(', '));
+        if(aInput !== null) {
+            currentData.animals = aInput.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        const oInput = prompt(`Enter standard offerings for ${deity} (comma separated):`, currentData.offerings.join(', '));
+        if(oInput !== null) {
+            currentData.offerings = oInput.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        deityGrimoire[deity] = currentData;
+        saveToCloud('deityGrimoire', deityGrimoire);
+        renderGrimoireArchive();
+    }
+
+    // Custom Deity Addition with Inline Form
     const addDeityBtn = document.getElementById('add-custom-deity-btn');
     const newDeityInput = document.getElementById('new-deity-input');
+    const customDeityForm = document.getElementById('custom-deity-form');
+    const saveNewDeityBtn = document.getElementById('save-new-deity-btn');
 
-    if(addDeityBtn && newDeityInput) {
-        addDeityBtn.addEventListener('click', async () => {
+    if(addDeityBtn && newDeityInput && customDeityForm) {
+        addDeityBtn.addEventListener('click', () => {
             const name = newDeityInput.value.trim();
+            if(name && !deities.includes(name)) {
+                customDeityForm.classList.remove('hidden');
+                customDeityForm.dataset.deityName = name;
+            } else if (!name) {
+                alert("Please enter a valid deity name!");
+            } else {
+                alert("This deity already exists in your shrine switcher!");
+            }
+        });
+    }
+
+    if(saveNewDeityBtn) {
+        saveNewDeityBtn.addEventListener('click', async () => {
+            const name = customDeityForm.dataset.deityName;
+            const plantsStr = document.getElementById('new-deity-plants').value;
+            const animalsStr = document.getElementById('new-deity-animals').value;
+            const offeringsStr = document.getElementById('new-deity-offerings').value;
+
             if(name && !deities.includes(name)) {
                 deities.push(name);
                 shrineData[name] = { offerings: [], sketch: null, petitions: [] };
+                deityGrimoire[name] = {
+                    plants: plantsStr.split(',').map(s => s.trim()).filter(Boolean),
+                    animals: animalsStr.split(',').map(s => s.trim()).filter(Boolean),
+                    offerings: offeringsStr.split(',').map(s => s.trim()).filter(Boolean)
+                };
+
                 currentShrine = name;
                 
                 await saveToCloud('customDeitiesList', deities);
                 await saveToCloud('shrineData', shrineData);
+                await saveToCloud('deityGrimoire', deityGrimoire);
                 
                 populateDeityDropdown();
-                renderDeityArchiveCards();
+                renderGrimoireArchive();
                 saveAndRenderShrine();
+
+                // Reset form
                 newDeityInput.value = '';
+                document.getElementById('new-deity-plants').value = '';
+                document.getElementById('new-deity-animals').value = '';
+                document.getElementById('new-deity-offerings').value = '';
+                customDeityForm.classList.add('hidden');
             }
         });
     }
 
     function saveAndRenderShrine() {
         saveToCloud('shrineData', shrineData);
-        renderDeityArchiveCards();
+        renderGrimoireArchive();
         const canvas = document.getElementById('altar-canvas');
         if(!canvas) return;
         
@@ -448,7 +541,6 @@ document.addEventListener('DOMContentLoaded', () => {
             shrineData[currentShrine].petitions.push(textArea.value);
             
             await saveToCloud('shrineData', shrineData);
-            // Save to cloud journal table via Vercel endpoint
             try {
                 await fetch('/api/storage', {
                     method: 'POST',
@@ -457,7 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             } catch(e) {}
 
-            renderDeityArchiveCards();
+            renderGrimoireArchive();
             textArea.classList.add('fade-out');
             
             const container = document.getElementById('sparkle-container');
@@ -665,3 +757,4 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDailyHymn();
 
 });
+
