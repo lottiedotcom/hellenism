@@ -24,6 +24,22 @@ meaningEl.innerText = "Could not load tarot.json. Make sure the file is in the s
 });
 
 // ==========================================
+// TAB NAVIGATION LOGIC ( ˘▽˘)っ
+// ==========================================
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Remove active class from all buttons and views
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+
+        // Add active class to clicked button and target view
+        btn.classList.add('active');
+        document.getElementById(btn.getAttribute('data-target')).classList.add('active');
+    });
+});
+
+// ==========================================
 // SHRINE & ALTAR FEATURES 
 // ==========================================
 
