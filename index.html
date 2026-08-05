@@ -4,9 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hellenic Practice (✧ω✧)</title>
-<link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
+
+<!-- PWA Manifest & iOS Support -->
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sanctuary">
+<link rel="apple-touch-icon" href="/sound.jpg">
 <meta name="theme-color" content="#c3b1e1">
+
+<link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body class="theme-pastel">
@@ -55,7 +62,7 @@
 <!-- 1. MOON TAB (HOMEPAGE) -->
 <section id="moon-view" class="view active">
 <header class="hero" style="position: relative;">
-<button class="settings-gear-btn" title="Settings">⚙️</button>
+<button class="settings-gear-btn" title="Settings">( ≡ )</button>
 <h1 id="user-greeting">Welcome (´｡• ᵕ •｡`)</h1>
 <div class="moon-display">
 <div id="moon-phase-kaomoji" class="moon-kaomoji">𐔌՞ ܸ.ˬ.ܸ՞𐦯</div>
@@ -64,8 +71,8 @@
 </header>
 
 <div class="card">
-<h3>🔥 Hearth of Hestia</h3>
-<button id="hestia-ritual-btn" class="cute-btn full-width">Light the Hearth of Hestia (🔥)</button>
+<h3>( ♨ ) Hearth of Hestia</h3>
+<button id="hestia-ritual-btn" class="cute-btn full-width">Light the Hearth of Hestia ( ♨ )</button>
 <div id="hestia-ritual-display" class="quote-box hidden margin-top full-width center-text"></div>
 </div>
 
@@ -100,7 +107,7 @@
 </div>
 
 <div class="card">
-<h3 id="toggle-lunar-events" class="cute-summary">✨ Upcoming Lunar Events ✨</h3>
+<h3 id="toggle-lunar-events" class="cute-summary">( ✧ ) Upcoming Lunar Events ( ✧ )</h3>
 <div id="lunar-events-list" class="hidden margin-top"></div>
 </div>
 
@@ -133,7 +140,7 @@
 <!-- 2. ALTAR TAB -->
 <section id="altar-view" class="view">
 <header class="hero" style="position: relative;">
-<button class="settings-gear-btn" title="Settings">⚙️</button>
+<button class="settings-gear-btn" title="Settings">( ≡ )</button>
 <h2>Digital Altar ( ˘▽˘)っ♨</h2>
 </header>
 
@@ -146,22 +153,22 @@
 </div>
 
 <div id="custom-deity-form" class="hidden margin-top card" style="background: var(--accent-blue);">
-  <h4 style="margin-top:0; text-align:center;">Configure Deity Associations ✨</h4>
+  <h4 style="margin-top:0; text-align:center;">Configure Deity Associations ( ✧ )</h4>
   <p style="font-size:0.8rem; text-align:center; color:var(--text-muted);">Separate items with commas</p>
   
-  <label style="font-size:0.8rem; font-weight:700;">🎨 Sacred Colors:</label>
+  <label style="font-size:0.8rem; font-weight:700;">( ⚲ ) Sacred Colors:</label>
   <input type="text" id="new-deity-colors" class="cute-input margin-top" placeholder="e.g., Gold, White, Saffron">
 
-  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">⚡ Sacred Symbols:</label>
+  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">( ϟ ) Sacred Symbols:</label>
   <input type="text" id="new-deity-symbols" class="cute-input margin-top" placeholder="e.g., Torch, Lyre, Caduceus">
 
-  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">🌿 Sacred Plants:</label>
+  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">( ⚚ ) Sacred Plants:</label>
   <input type="text" id="new-deity-plants" class="cute-input margin-top" placeholder="e.g., Laurel, Bay, Olive">
   
-  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">🐾 Sacred Animals:</label>
+  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">( ⑀ ) Sacred Animals:</label>
   <input type="text" id="new-deity-animals" class="cute-input margin-top" placeholder="e.g., Owl, Wolf, Dove">
   
-  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">🍯 Standard Offerings:</label>
+  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">( ☖ ) Standard Offerings:</label>
   <input type="text" id="new-deity-offerings" class="cute-input margin-top" placeholder="e.g., Honey, Wine, Frankincense">
 
   <button id="save-new-deity-btn" class="cute-btn full-width margin-top">Save Sanctuary & Associations</button>
@@ -190,7 +197,7 @@
   <button id="add-offering-btn" class="cute-btn full-width" onclick="document.getElementById('upload-offering').click()">+ Upload Offering</button>
   <input type="file" id="upload-sketch" accept="image/png, image/jpeg" style="display:none;">
 </div>
-<button id="sweep-altar-btn" class="cute-btn full-width margin-top">Sweep the Altar ( ˘▽˘)っ🧹</button>
+<button id="sweep-altar-btn" class="cute-btn full-width margin-top">Sweep the Altar ( ˘▽˘)っ彡</button>
 </div>
 
 <div class="card">
@@ -223,7 +230,7 @@
 <!-- 3. DIVINATION TAB -->
 <section id="divination-view" class="view">
 <header class="hero" style="position: relative;">
-<button class="settings-gear-btn" title="Settings">⚙️</button>
+<button class="settings-gear-btn" title="Settings">( ≡ )</button>
 <h2>Divination (✯◡✯)</h2>
 </header>
 
@@ -237,7 +244,7 @@
 </div>
 
 <div class="card center-text">
-<h3>🏛️ Delphic Oracle Maxim</h3>
+<h3>[ ⌂ ] Delphic Oracle Maxim</h3>
 <button id="draw-delphic-btn" class="cute-btn">Consult the Oracle</button>
 <div id="delphic-display" class="hidden card-result">
 <h4 id="delphic-maxim"></h4>
@@ -246,7 +253,7 @@
 </div>
 
 <div class="card center-text">
-<h3>📜 Homeromancy Epic Omen</h3>
+<h3>[ ≡ ] Homeromancy Epic Omen</h3>
 <button id="draw-homer-btn" class="cute-btn">Draw Homeric Verse</button>
 <div id="homer-display" class="hidden card-result">
 <h4 id="homer-verse"></h4>
@@ -264,12 +271,12 @@
 <!-- 4. GRIMOIRE & ARCHIVE TAB -->
 <section id="archive-view" class="view">
 <header class="hero" style="position: relative;">
-<button class="settings-gear-btn" title="Settings">⚙️</button>
-<h2>Grimoire & Archive (📖)</h2>
+<button class="settings-gear-btn" title="Settings">( ≡ )</button>
+<h2>Grimoire & Archive [ ≡ ]</h2>
 </header>
 
 <div class="card" style="background: #fbf9ff; border: 2px solid var(--border-blue);">
-<h3 style="margin-bottom: 4px;">📖 Illuminated Grimoire Archive</h3>
+<h3 style="margin-bottom: 4px;">[ ≡ ] Illuminated Grimoire Archive</h3>
 <p class="center-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Your quick-reference sacred associations synced with your shrines.</p>
 <div id="archive-grid" class="card-grid"></div>
 </div>
@@ -291,7 +298,7 @@
 <span class="nav-label">Divination</span>
 </button>
 <button class="nav-btn" data-target="archive-view">
-<span class="nav-icon">(📖)</span>
+<span class="nav-icon">[ ≡ ]</span>
 <span class="nav-label">Grimoire</span>
 </button>
 </nav>
