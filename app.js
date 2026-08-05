@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return zodiacs[index];
   }
 
-  // Real-time Moon Phase Math
+  // Real-time Moon Phase & Household Countdown Math
   function updateMoon() {
     const date = new Date();
     const cycle = 29.53058770576;
@@ -120,10 +120,25 @@ document.addEventListener("DOMContentLoaded", () => {
     // Zodiac
     document.getElementById("moon-zodiac").innerText = getMoonZodiac(date);
 
-    // Deipnon Progress Bar (% toward age 28.5/29.5)
+    // Deipnon Progress Bar (% toward age 29.5)
     const progressPercent = Math.min(100, Math.round((age / cycle) * 100));
     document.getElementById("deipnon-progress").style.width = `${progressPercent}%`;
     document.getElementById("deipnon-percent").innerText = `${progressPercent}%`;
+
+    // Real Household Countdowns Math
+    const daysToDeipnon = cycle - age;
+    const daysToNoumenia = (cycle - age + 1) % cycle;
+    const daysToAgathos = (cycle - age + 2) % cycle;
+
+    function formatDays(daysRemaining) {
+      if (daysRemaining < 1) return "Today! (★ω★)";
+      if (daysRemaining < 2) return "Tomorrow";
+      return `In ${Math.ceil(daysRemaining)} days`;
+    }
+
+    document.getElementById("countdown-deipnon").innerText = formatDays(daysToDeipnon);
+    document.getElementById("countdown-noumenia").innerText = formatDays(daysToNoumenia);
+    document.getElementById("countdown-agathos").innerText = formatDays(daysToAgathos);
 
     // Rotating Quote Selection
     const dayIndex = Math.floor(date.getTime() / 86400000) % nightQuotes.length;
@@ -143,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const sunsetTime = new Date(data.results.sunset).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         document.getElementById("sundown-time").innerText = sunsetTime;
       } catch (e) {
-        document.getElementById("sundown-time").innerText = "Sunset N/A";
+        document.getElementById("sundown-time").innerText = "Manual tracking needed";
       }
     });
   }
@@ -208,12 +223,29 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("kharis-count").innerText = kharisLogs;
   });
 
-  // Tarot Single Draw Placeholder
+  // Tarot Card Draw from JSON
   document.getElementById("draw-card-btn").addEventListener("click", async () => {
     playSound();
-    document.getElementById("card-display").classList.remove("hidden");
-    document.getElementById("card-name").innerText = "Data pending (x_x)";
-    document.getElementById("card-meaning").innerText = "Will connect to tarot.json soon.";
+    const display = document.getElementById("card-display");
+    const nameEl = document.getElementById("card-name");
+    const meaningEl = document.getElementById("card-meaning");
+    
+    display.classList.remove("hidden");
+    nameEl.innerText = "Shuffling... ( ˘▽˘)";
+    meaningEl.innerText = "";
+    
+    try {
+      const response = await fetch("tarot.json");
+      const tarotDeck = await response.json();
+      
+      const randomCard = tarotDeck[Math.floor(Math.random() * tarotDeck.length)];
+      
+      nameEl.innerText = randomCard.name;
+      meaningEl.innerHTML = `<strong>Keywords:</strong> ${randomCard.keywords.join(" • ")}<br><br>${randomCard.meaning}`;
+    } catch (error) {
+      nameEl.innerText = "Error (x_x)";
+      meaningEl.innerText = "Could not load tarot.json. Make sure the file is in the same folder!";
+    }
   });
 
   // Deity Profile Cards
