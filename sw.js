@@ -1,11 +1,11 @@
-const CACHE_NAME = 'hellenic-app-v2';
+const CACHE_NAME = 'hellenic-app-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/style.css',
   '/app.js',
   '/manifest.json',
-  '/tarot.json',
+  '/Tarot.json',
   '/sound.jpg'
 ];
 
