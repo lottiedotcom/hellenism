@@ -12,7 +12,7 @@
 
 <main id="app">
 
-<!-- SETTINGS MODAL (Replaces standalone Prep tab) -->
+<!-- SETTINGS MODAL -->
 <div id="settings-modal" class="settings-modal hidden">
   <div class="settings-content card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -61,7 +61,6 @@
 <p id="night-quote" class="quote-box">"Selene’s silver light guides the path through the dark."</p>
 </header>
 
-<!-- Hearth of Hestia moved to Homepage -->
 <div class="card">
 <h3>🔥 Hearth of Hestia</h3>
 <button id="hestia-ritual-btn" class="cute-btn full-width">Light the Hearth of Hestia (🔥)</button>
@@ -98,12 +97,9 @@
 </div>
 </div>
 
-<!-- Special Events Toggle Calendar -->
 <div class="card">
 <h3 id="toggle-lunar-events" class="cute-summary">✨ Upcoming Lunar Events ✨</h3>
-<div id="lunar-events-list" class="hidden margin-top">
-    <!-- Populated by JS -->
-</div>
+<div id="lunar-events-list" class="hidden margin-top"></div>
 </div>
 
 <div class="card">
@@ -141,15 +137,12 @@
 
 <div class="card">
 <h3>Deity Shrine Switcher</h3>
-<select id="deity-focus-input" class="cute-input">
-  <!-- Dynamic options populated by JS -->
-</select>
+<select id="deity-focus-input" class="cute-input"></select>
 <div class="input-group margin-top">
   <input type="text" id="new-deity-input" placeholder="New deity name..." class="cute-input">
   <button id="add-custom-deity-btn" class="cute-btn">+ Add Shrine</button>
 </div>
 
-<!-- Inline Form for Custom Deity Associations (Colors & Symbols added) -->
 <div id="custom-deity-form" class="hidden margin-top card" style="background: var(--accent-blue);">
   <h4 style="margin-top:0; text-align:center;">Configure Deity Associations ✨</h4>
   <p style="font-size:0.8rem; text-align:center; color:var(--text-muted);">Separate items with commas</p>
@@ -173,7 +166,12 @@
 </div>
 </div>
 
-<!-- Khernips Cleansing moved to where Hearth of Hestia was -->
+<!-- Daily Hymn moved directly under the Deity Switcher card -->
+<div class="card">
+<h3>Daily Hymn</h3>
+<p id="daily-hymn" class="hymn-text">Loading daily hymn...</p>
+</div>
+
 <div class="card">
 <h3>Khernips Cleansing</h3>
 <button id="khernips-btn" class="cute-btn full-width">Wash Hands (0)</button>
@@ -215,11 +213,6 @@
 </div>
 
 <div class="card">
-<h3>Daily Hymn</h3>
-<p id="daily-hymn" class="hymn-text">Loading daily hymn...</p>
-</div>
-
-<div class="card">
 <h3>Kharis Tracker</h3>
 <button id="kharis-btn" class="cute-btn full-width">Log Devotion (≧◡≦)</button>
 <p class="center-text margin-top">Total logs: <span id="kharis-count">0</span></p>
@@ -233,7 +226,6 @@
 <h2>Divination (✯◡✯)</h2>
 </header>
 
-<!-- Tarot Card Draw -->
 <div class="card center-text">
 <h3>Daily Tarot Draw</h3>
 <button id="draw-card-btn" class="cute-btn">Draw Single Card</button>
@@ -243,7 +235,6 @@
 </div>
 </div>
 
-<!-- Delphic Oracle Draw -->
 <div class="card center-text">
 <h3>🏛️ Delphic Oracle Maxim</h3>
 <button id="draw-delphic-btn" class="cute-btn">Consult the Oracle</button>
@@ -253,7 +244,6 @@
 </div>
 </div>
 
-<!-- Homeromancy Omens -->
 <div class="card center-text">
 <h3>📜 Homeromancy Epic Omen</h3>
 <button id="draw-homer-btn" class="cute-btn">Draw Homeric Verse</button>
@@ -270,7 +260,7 @@
 </div>
 </section>
 
-<!-- 4. GRIMOIRE & ARCHIVE TAB (Replaces Prep tab) -->
+<!-- 4. GRIMOIRE & ARCHIVE TAB -->
 <section id="archive-view" class="view">
 <header class="hero" style="position: relative;">
 <button class="settings-gear-btn" title="Settings">⚙️</button>
@@ -286,7 +276,6 @@
 
 </main>
 
-<!-- Updated 4-button Bottom Nav -->
 <nav class="bottom-nav">
 <button class="nav-btn active" data-target="moon-view">
 <span class="nav-icon">(☽°ˊ3ˋ°)</span>
@@ -309,3 +298,4 @@
 <script src="app.js"></script>
 </body>
 </html>
+
