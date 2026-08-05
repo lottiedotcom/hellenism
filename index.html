@@ -52,7 +52,7 @@
 </div>
 </div>
 
-<!-- NEW: Special Events Toggle Calendar -->
+<!-- Special Events Toggle Calendar -->
 <div class="card">
 <h3 id="toggle-lunar-events" class="cute-summary">✨ Upcoming Lunar Events ✨</h3>
 <div id="lunar-events-list" class="hidden margin-top">
@@ -95,11 +95,12 @@
 <div class="card">
 <h3>Deity Shrine Switcher</h3>
 <select id="deity-focus-input" class="cute-input">
-  <option value="Hestia">Hestia</option>
-  <option value="Hekate">Hekate</option>
-  <option value="Apollo">Apollo</option>
-  <option value="Hermes">Hermes</option>
+  <!-- Dynamic options populated by JS -->
 </select>
+<div class="input-group margin-top">
+  <input type="text" id="new-deity-input" placeholder="Add custom deity..." class="cute-input">
+  <button id="add-custom-deity-btn" class="cute-btn">+ Add Shrine</button>
+</div>
 </div>
 
 <div class="card">
@@ -144,7 +145,7 @@
 
 <div class="card">
 <h3>Daily Hymn</h3>
-<p id="daily-hymn" class="hymn-text">Loading...</p>
+<p id="daily-hymn" class="hymn-text">Loading daily hymn...</p>
 </div>
 
 <div class="card">
