@@ -98,8 +98,24 @@
   <!-- Dynamic options populated by JS -->
 </select>
 <div class="input-group margin-top">
-  <input type="text" id="new-deity-input" placeholder="Add custom deity..." class="cute-input">
+  <input type="text" id="new-deity-input" placeholder="New deity name..." class="cute-input">
   <button id="add-custom-deity-btn" class="cute-btn">+ Add Shrine</button>
+</div>
+
+<!-- Inline Form for Custom Deity Associations -->
+<div id="custom-deity-form" class="hidden margin-top card" style="background: var(--accent-blue);">
+  <h4 style="margin-top:0; text-align:center;">Configure Deity Associations ✨</h4>
+  <p style="font-size:0.8rem; text-align:center; color:var(--text-muted);">Separate items with commas</p>
+  <label style="font-size:0.8rem; font-weight:700;">🌿 Sacred Plants:</label>
+  <input type="text" id="new-deity-plants" class="cute-input margin-top" placeholder="e.g., Laurel, Bay, Olive">
+  
+  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">🐾 Sacred Animals:</label>
+  <input type="text" id="new-deity-animals" class="cute-input margin-top" placeholder="e.g., Owl, Wolf, Dove">
+  
+  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">🍯 Standard Offerings:</label>
+  <input type="text" id="new-deity-offerings" class="cute-input margin-top" placeholder="e.g., Honey, Wine, Frankincense">
+
+  <button id="save-new-deity-btn" class="cute-btn full-width margin-top">Save Sanctuary & Associations</button>
 </div>
 </div>
 
@@ -164,7 +180,7 @@
 <!-- 3. DIVINATION TAB -->
 <section id="divination-view" class="view">
 <header class="hero">
-<h2>Divination & Lore (✯◡✯)</h2>
+<h2>Divination & Grimoire (✯◡✯)</h2>
 </header>
 
 <!-- Tarot Card Draw -->
@@ -203,9 +219,9 @@
 <button id="save-journal-btn" class="cute-btn full-width margin-top">Save to Cloud</button>
 </div>
 
-<div class="card">
-<h3>Synced Deity Sanctuary Archive</h3>
-<p class="center-text" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Synced directly with your active shrine switcher.</p>
+<div class="card" style="background: #fbf9ff; border: 2px solid var(--border-blue);">
+<h3 style="margin-bottom: 4px;">📖 Illuminated Grimoire Archive</h3>
+<p class="center-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Your quick-reference sacred associations synced with your shrines.</p>
 <div id="archive-grid" class="card-grid"></div>
 </div>
 </section>
@@ -285,3 +301,4 @@ Enable Sound Effects
 <script src="app.js"></script>
 </body>
 </html>
+
