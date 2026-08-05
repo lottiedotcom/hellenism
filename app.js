@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Settings Gear Modal Logic
     const settingsModal = document.getElementById('settings-modal');
     document.querySelectorAll('.settings-gear-btn').forEach(gear => {
         gear.addEventListener('click', () => {
@@ -61,6 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 3. EXPANDED DIVINATION (Tarot, Delphic, Homeromancy)
     // ==========================================
+    
+    // Tarot (Still uses tarot.json)
     const drawBtn = document.getElementById("draw-card-btn");
     if(drawBtn) {
         drawBtn.addEventListener("click", async () => {
@@ -87,9 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Delphic Oracle (Hardcoded to fix the missing file crash)
     const delphicBtn = document.getElementById("draw-delphic-btn");
     if(delphicBtn) {
-        delphicBtn.addEventListener("click", async () => {
+        delphicBtn.addEventListener("click", () => {
             const display = document.getElementById("delphic-display");
             const maximEl = document.getElementById("delphic-maxim");
             const adviceEl = document.getElementById("delphic-advice");
@@ -98,29 +100,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if(maximEl) maximEl.innerText = "Consulting Apollo... ( ✧ω✧)";
             if(adviceEl) adviceEl.innerText = "";
 
-            try {
-                const response = await fetch("delphic.json");
-                const delphicDeck = await response.json();
-                const randomMaxim = delphicDeck[Math.floor(Math.random() * delphicDeck.length)];
-
-                if(maximEl) maximEl.innerText = randomMaxim.maxim;
-                if(adviceEl) adviceEl.innerHTML = `<strong>Guidance:</strong> ${randomMaxim.advice}`;
-            } catch (error) {
-                const fallbacks = [
+            setTimeout(() => {
+                const delphicDeck = [
                     { maxim: "Know Thyself", advice: "Look inward before seeking answers from the outside world." },
                     { maxim: "Nothing in Excess", advice: "Seek balance and moderation in all things today." },
-                    { maxim: "Pledge Surety and Ruin is Near", advice: "Exercise caution in commitments and contracts." }
+                    { maxim: "Pledge Surety and Ruin is Near", advice: "Exercise caution in commitments and contracts." },
+                    { maxim: "Observe the Limit", advice: "Respect boundaries, both yours and others'." },
+                    { maxim: "Fear Authority", advice: "Respect the natural order and those who maintain it." },
+                    { maxim: "Bow Before the Divine", advice: "Acknowledge that some things are out of your control." }
                 ];
-                const fb = fallbacks[Math.floor(Math.random() * fallbacks.length)];
-                if(maximEl) maximEl.innerText = fb.maxim;
-                if(adviceEl) adviceEl.innerHTML = `<strong>Guidance:</strong> ${fb.advice}`;
-            }
+                
+                const randomMaxim = delphicDeck[Math.floor(Math.random() * delphicDeck.length)];
+                if(maximEl) maximEl.innerText = randomMaxim.maxim;
+                if(adviceEl) adviceEl.innerHTML = `<strong>Guidance:</strong> ${randomMaxim.advice}`;
+            }, 400); // Small delay for aesthetic effect
         });
     }
 
+    // Homeromancy (Hardcoded to fix the missing file crash)
     const homerBtn = document.getElementById("draw-homer-btn");
     if(homerBtn) {
-        homerBtn.addEventListener("click", async () => {
+        homerBtn.addEventListener("click", () => {
             const display = document.getElementById("homer-display");
             const verseEl = document.getElementById("homer-verse");
             const omenEl = document.getElementById("homer-omen");
@@ -129,22 +129,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if(verseEl) verseEl.innerText = "Opening the Epics... ( 🏛️ )";
             if(omenEl) omenEl.innerText = "";
 
-            try {
-                const response = await fetch("homeromancy.json");
-                const homerDeck = await response.json();
+            setTimeout(() => {
+                const homerDeck = [
+                    { verse: "Even a fool is wise after the event.", source: "Iliad", omen: "Learn from past missteps without carrying regret." },
+                    { verse: "Endure my heart, even worse have you endured.", source: "Odyssey", omen: "Resilience will see you through your present trials." },
+                    { verse: "Any moment might be our last.", source: "Iliad", omen: "Do not delay what needs to be said or done today." },
+                    { verse: "There is a time for many words, and there is also a time for sleep.", source: "Odyssey", omen: "Rest is just as productive as action." }
+                ];
+                
                 const randomVerse = homerDeck[Math.floor(Math.random() * homerDeck.length)];
-
                 if(verseEl) verseEl.innerText = `"${randomVerse.verse}" — ${randomVerse.source}`;
                 if(omenEl) omenEl.innerHTML = `<strong>Omen:</strong> ${randomVerse.omen}`;
-            } catch (error) {
-                const fallbacks = [
-                    { verse: "Even a fool is wise after the event.", source: "Iliad", omen: "Learn from past missteps without carrying regret." },
-                    { verse: "Endure my heart, even worse have you endured.", source: "Odyssey", omen: "Resilience will see you through your present trials." }
-                ];
-                const fb = fallbacks[Math.floor(Math.random() * fallbacks.length)];
-                if(verseEl) verseEl.innerText = `"${fb.verse}" — ${fb.source}`;
-                if(omenEl) omenEl.innerHTML = `<strong>Omen:</strong> ${fb.omen}`;
-            }
+            }, 400);
         });
     }
 
@@ -153,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     let deities = ["Hestia", "Hekate", "Apollo", "Hermes"];
     let shrineData = {};
-    let deityGrimoire = {}; // { [deity]: { plants: [], animals: [], offerings: [], colors: [], symbols: [] } }
+    let deityGrimoire = {}; 
     let currentShrine = "Hestia";
 
     async function initDeitiesAndShrines() {
@@ -193,7 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
         select.value = currentShrine;
     }
 
-    // Render Illuminated Grimoire Manuscript Cards (Tab 4)
     function renderGrimoireArchive() {
         const grid = document.getElementById('archive-grid');
         if(!grid) return;
@@ -280,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderGrimoireArchive();
     }
 
-    // Custom Deity Addition with Inline Form
     const addDeityBtn = document.getElementById('add-custom-deity-btn');
     const newDeityInput = document.getElementById('new-deity-input');
     const customDeityForm = document.getElementById('custom-deity-form');
@@ -330,7 +324,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderGrimoireArchive();
                 saveAndRenderShrine();
 
-                // Reset form
                 newDeityInput.value = '';
                 document.getElementById('new-deity-colors').value = '';
                 document.getElementById('new-deity-symbols').value = '';
@@ -478,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 5. HEARTH OF HESTIA RITUAL TOGGLE (Moon View / Homepage)
+    // 5. HEARTH OF HESTIA RITUAL TOGGLE
     // ==========================================
     const hestiaToggleBtn = document.getElementById('hestia-ritual-btn');
     const hestiaDisplay = document.getElementById('hestia-ritual-display');
@@ -784,3 +777,4 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDailyHymn();
 
 });
+
