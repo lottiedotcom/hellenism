@@ -181,6 +181,7 @@ padding: 10px 16px;
 border-radius: 20px;
 cursor: pointer;
 transition: all 0.2s;
+white-space: nowrap;
 }
 .cute-btn:active {
 transform: scale(0.96);
@@ -333,10 +334,10 @@ margin-top: 2px;
 .margin-top { margin-top: 10px; }
 .hidden { display: none; }
 .card-result { margin-top: 10px; padding: 10px; background: var(--accent-blue); border-radius: 15px; }
-.hymn-text { font-style: italic; text-align: center; font-size: 0.9rem; }
+.hymn-text { font-style: italic; text-align: center; font-size: 0.9rem; line-height: 1.5; }
 
 /* =========================================
-   NEW FEATURE STYLES 
+   FEATURE STYLES 
    ========================================= */
 
 /* Altar Canvas Tabletop */
