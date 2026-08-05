@@ -266,23 +266,81 @@ background-color: var(--accent-blue);
 background-color: var(--border-blue);
 }
 
-/* Trading Cards */
+/* Illuminated Grimoire Manuscript Cards */
 .card-grid {
 display: grid;
 grid-template-columns: 1fr;
-gap: 12px;
+gap: 14px;
 margin-top: 12px;
 }
-.trading-card {
-border: 2px dashed var(--border-blue);
-background: var(--accent-blue);
+.grimoire-manuscript-card {
+background: #ffffff;
+border: 2px solid var(--border-blue);
 border-radius: 20px;
-padding: 14px;
-text-align: center;
+padding: 16px;
+box-shadow: 0 4px 12px rgba(174, 198, 207, 0.3);
+position: relative;
 }
-.trading-card h4 {
-margin: 0 0 6px 0;
+.manuscript-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+border-bottom: 1.5px dashed var(--border-blue);
+padding-bottom: 8px;
+margin-bottom: 10px;
+}
+.manuscript-header h4 {
+margin: 0;
 color: var(--text-dark);
+font-size: 1rem;
+}
+.manuscript-badge {
+background: var(--accent-blue);
+font-size: 0.65rem;
+font-weight: 700;
+padding: 4px 8px;
+border-radius: 10px;
+border: 1px solid var(--border-blue);
+color: var(--text-muted);
+}
+.manuscript-section {
+margin-bottom: 8px;
+}
+.manuscript-label {
+font-size: 0.75rem;
+font-weight: 700;
+color: var(--text-muted);
+margin: 0 0 4px 0;
+text-transform: uppercase;
+}
+.tag-container {
+display: flex;
+flex-wrap: wrap;
+gap: 6px;
+}
+.cute-tag {
+background: var(--accent-blue);
+border: 1px solid var(--border-blue);
+color: var(--text-dark);
+padding: 4px 10px;
+border-radius: 12px;
+font-size: 0.75rem;
+font-weight: 700;
+}
+.empty-tag {
+font-size: 0.75rem;
+font-style: italic;
+color: #9b8fae;
+}
+.manuscript-footer {
+display: flex;
+justify-content: space-between;
+font-size: 0.7rem;
+color: var(--text-muted);
+border-top: 1px solid #f0edf6;
+padding-top: 8px;
+margin-top: 10px;
+font-weight: 700;
 }
 
 /* Floating Navigation */
