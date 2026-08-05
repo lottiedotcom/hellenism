@@ -70,17 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Save Schedule Handler
-  document.getElementById("save-schedule-btn").addEventListener("click", () => {
-    playSound();
-    const wake = document.getElementById("wake-time").value;
-    const sleep = document.getElementById("sleep-time").value;
-    localStorage.setItem("wakeTime", wake);
-    localStorage.setItem("sleepTime", sleep);
-    updateGreeting();
-    alert("Schedule updated! (^_^)");
-  });
-
   // Zodiac Sign Estimator for Moon
   function getMoonZodiac(date) {
     const zodiacs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
@@ -112,20 +101,15 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("moon-phase-name").innerText = phaseName;
     document.getElementById("moon-percentage").innerText = `${Math.round((0.5 * (1 - Math.cos((age / cycle) * Math.PI * 2))) * 100)}%`;
 
-    // Dynamic Kaomoji & Keywords
     const details = phaseDetails[phaseName] || phaseDetails["New Moon"];
     document.getElementById("moon-phase-kaomoji").innerText = details.kaomoji;
     document.getElementById("moon-keywords").innerText = details.keywords;
-
-    // Zodiac
     document.getElementById("moon-zodiac").innerText = getMoonZodiac(date);
 
-    // Deipnon Progress Bar (% toward age 29.5)
     const progressPercent = Math.min(100, Math.round((age / cycle) * 100));
     document.getElementById("deipnon-progress").style.width = `${progressPercent}%`;
     document.getElementById("deipnon-percent").innerText = `${progressPercent}%`;
 
-    // Real Household Countdowns Math
     const daysToDeipnon = cycle - age;
     const daysToNoumenia = (cycle - age + 1) % cycle;
     const daysToAgathos = (cycle - age + 2) % cycle;
@@ -140,7 +124,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("countdown-noumenia").innerText = formatDays(daysToNoumenia);
     document.getElementById("countdown-agathos").innerText = formatDays(daysToAgathos);
 
-    // Rotating Quote Selection
     const dayIndex = Math.floor(date.getTime() / 86400000) % nightQuotes.length;
     document.getElementById("night-quote").innerText = nightQuotes[dayIndex];
   }
@@ -163,7 +146,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Khernips Cleansing Counter
+  // Home Screen Trackers
+  document.getElementById("save-schedule-btn").addEventListener("click", () => {
+    playSound();
+    localStorage.setItem("wakeTime", document.getElementById("wake-time").value);
+    localStorage.setItem("sleepTime", document.getElementById("sleep-time").value);
+    updateGreeting();
+    alert("Schedule updated! (^_^)");
+  });
+
   let khernipsCount = 0;
   document.getElementById("khernips-btn").addEventListener("click", (e) => {
     playSound();
@@ -171,7 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
     e.target.innerText = `Wash Hands (${khernipsCount})`;
   });
 
-  // Interactive Libations
   let libations = JSON.parse(localStorage.getItem("libations")) || ["Honey", "Spring Water", "Barley"];
   const renderLibations = () => {
     const list = document.getElementById("libation-list");
@@ -204,7 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Daily Hymns
   const hymns = [
     "Homeric Hymn to Hestia: 'Hestia, you who tend the holy house...'",
     "Orphic Hymn to the Stars: 'With holy voice I call the sacred stars...'",
@@ -213,15 +202,229 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
   document.getElementById("daily-hymn").innerText = hymns[new Date().getDay() % hymns.length];
 
-  // Kharis Counter
   let kharisLogs = parseInt(localStorage.getItem("kharisLogs") || "0");
   document.getElementById("kharis-count").innerText = kharisLogs;
-  document.getElementById("kharis-btn").addEventListener("click", () => {
+  document.getElementById("kharis-btn").addEventListener("click", () => addKharis());
+
+  function addKharis() {
     playSound();
     kharisLogs++;
     localStorage.setItem("kharisLogs", kharisLogs);
     document.getElementById("kharis-count").innerText = kharisLogs;
+  }
+
+  // ----------- NEW ALTAR TAB LOGIC ----------- //
+  
+  let altarData = JSON.parse(localStorage.getItem('altarData')) || {
+    Hestia: { items: [], sketch: null },
+    Hekate: { items: [], sketch: null },
+    Apollo: { items: [], sketch: null },
+    Hermes: { items: [], sketch: null }
+  };
+  let currentShrine = document.getElementById('shrine-selector').value;
+  const canvas = document.getElementById('altar-canvas');
+  const sketchFrame = document.getElementById('sketch-frame');
+
+  // Shrine Switcher
+  document.getElementById('shrine-selector').addEventListener('change', (e) => {
+    playSound();
+    currentShrine = e.target.value;
+    renderAltar();
   });
+
+  // Tiny Image Resizer (Keeps localStorage from filling up!)
+  function resizeImage(file, callback) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const tempCanvas = document.createElement('canvas');
+        const MAX_WIDTH = 100; // Cute small size
+        const scale = MAX_WIDTH / img.width;
+        tempCanvas.width = MAX_WIDTH;
+        tempCanvas.height = img.height * scale;
+        const ctx = tempCanvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+        callback(tempCanvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Upload Offering
+  document.getElementById('upload-offering').addEventListener('change', (e) => {
+    if (!e.target.files[0]) return;
+    playSound();
+    resizeImage(e.target.files[0], (base64) => {
+      altarData[currentShrine].items.push({
+        id: Date.now(),
+        src: base64,
+        x: 50,
+        y: 50
+      });
+      saveAndRenderAltar();
+    });
+  });
+
+  // Upload Sketch
+  document.getElementById('upload-sketch').addEventListener('change', (e) => {
+    if (!e.target.files[0]) return;
+    playSound();
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      altarData[currentShrine].sketch = event.target.result;
+      saveAndRenderAltar();
+    };
+    reader.readAsDataURL(e.target.files[0]);
+  });
+
+  function saveAndRenderAltar() {
+    try {
+      localStorage.setItem('altarData', JSON.stringify(altarData));
+    } catch (e) {
+      alert("Storage full! Try sweeping the altar first. (>_<)");
+    }
+    renderAltar();
+  }
+
+  function renderAltar() {
+    // Clear canvas except for sketch frame
+    Array.from(canvas.children).forEach(child => {
+      if (child.id !== 'sketch-frame') child.remove();
+    });
+
+    const data = altarData[currentShrine];
+
+    // Render Sketch
+    if (data.sketch) {
+      sketchFrame.style.backgroundImage = `url(${data.sketch})`;
+      sketchFrame.classList.remove('hidden');
+    } else {
+      sketchFrame.classList.add('hidden');
+    }
+
+    // Render Offerings
+    data.items.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className = 'draggable-item';
+      div.style.left = `${item.x}px`;
+      div.style.top = `${item.y}px`;
+      
+      const img = document.createElement('img');
+      img.src = item.src;
+      img.style.width = '100%';
+      
+      const delBtn = document.createElement('div');
+      delBtn.className = 'delete-overlay';
+      delBtn.innerText = 'x';
+      delBtn.onclick = () => {
+        playSound();
+        altarData[currentShrine].items.splice(index, 1);
+        saveAndRenderAltar();
+      };
+
+      div.appendChild(img);
+      div.appendChild(delBtn);
+      canvas.appendChild(div);
+
+      // Drag Logic
+      let isDragging = false;
+      let startX, startY;
+
+      const startDrag = (e) => {
+        isDragging = true;
+        startX = (e.clientX || e.touches[0].clientX) - div.offsetLeft;
+        startY = (e.clientY || e.touches[0].clientY) - div.offsetTop;
+        div.style.zIndex = 1000;
+      };
+
+      const doDrag = (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const clientX = e.clientX || e.touches[0].clientX;
+        const clientY = e.clientY || e.touches[0].clientY;
+        let newX = clientX - startX;
+        let newY = clientY - startY;
+        
+        // Boundaries
+        newX = Math.max(0, Math.min(newX, canvas.clientWidth - div.clientWidth));
+        newY = Math.max(0, Math.min(newY, canvas.clientHeight - div.clientHeight));
+        
+        div.style.left = `${newX}px`;
+        div.style.top = `${newY}px`;
+        item.x = newX;
+        item.y = newY;
+      };
+
+      const stopDrag = () => {
+        if (isDragging) {
+          isDragging = false;
+          div.style.zIndex = 1;
+          saveAndRenderAltar(); // Save new position silently
+        }
+      };
+
+      div.addEventListener('mousedown', startDrag);
+      div.addEventListener('touchstart', startDrag, {passive: false});
+      document.addEventListener('mousemove', doDrag);
+      document.addEventListener('touchmove', doDrag, {passive: false});
+      document.addEventListener('mouseup', stopDrag);
+      document.addEventListener('touchend', stopDrag);
+    });
+  }
+
+  // Sweep Routine
+  document.getElementById('sweep-altar-btn').addEventListener('click', () => {
+    playSound();
+    altarData[currentShrine].items = [];
+    saveAndRenderAltar();
+    addKharis();
+    alert("Make sure to clean your physical space as well! ( ˘▽˘)っ彡");
+  });
+
+  // Time-based Prompt Generator
+  document.getElementById('petition-prompt-btn').addEventListener('click', () => {
+    playSound();
+    const hour = new Date().getHours();
+    const textArea = document.getElementById('petition-text');
+    
+    if (hour >= 5 && hour < 12) {
+      textArea.value = "What energy are you bringing into today? ( ˘▽˘)";
+    } else if (hour >= 12 && hour < 18) {
+      textArea.value = "What challenges are you overcoming right now? (O_O)";
+    } else {
+      textArea.value = "What are you letting go of before you rest? (u_u)";
+    }
+  });
+
+  // Send to the Gods Animation
+  document.getElementById('petition-send-btn').addEventListener('click', () => {
+    playSound();
+    const textArea = document.getElementById('petition-text');
+    const sparkleContainer = document.getElementById('sparkle-container');
+    
+    if (textArea.value.trim() === "") return;
+
+    textArea.classList.add('fading');
+    setTimeout(() => {
+      sparkleContainer.innerText = "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧";
+      sparkleContainer.classList.add('animating');
+      textArea.value = "";
+      
+      setTimeout(() => {
+        textArea.classList.remove('fading');
+        sparkleContainer.classList.remove('animating');
+        sparkleContainer.innerText = "";
+      }, 2000);
+    }, 1000);
+  });
+
+  // Init Altar
+  renderAltar();
+
+
+  // ----------- END ALTAR LOGIC ----------- //
 
   // Tarot Card Draw from JSON
   document.getElementById("draw-card-btn").addEventListener("click", async () => {
@@ -295,7 +498,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       
       if (res.ok) {
-        btn.innerText = "Saved to Cloud! (^_^)";
+        btn.innerText = "Saved! (^_^)";
         setTimeout(() => btn.innerText = "Save to Cloud", 2000);
       } else {
         btn.innerText = "Error (>_<)";
