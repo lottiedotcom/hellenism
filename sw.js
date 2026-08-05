@@ -5,7 +5,7 @@ const ASSETS_TO_CACHE = [
   '/style.css',
   '/app.js',
   '/manifest.json',
-  '/Tarot.json',
+  '/tarot.json',
   '/sound.jpg'
 ];
 
