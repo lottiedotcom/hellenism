@@ -1,0 +1,392 @@
+[
+  {
+    "name": "The Fool",
+    "keywords": ["Beginnings", "Innocence", "Spontaneity"],
+    "meaning": "Take a leap of faith! A fresh new journey is starting."
+  },
+  {
+    "name": "The Magician",
+    "keywords": ["Willpower", "Creation", "Manifestation"],
+    "meaning": "You already have all the tools you need to succeed."
+  },
+  {
+    "name": "The High Priestess",
+    "keywords": ["Intuition", "Mystery", "Subconscious"],
+    "meaning": "Listen to your inner voice and trust your gut feelings."
+  },
+  {
+    "name": "The Empress",
+    "keywords": ["Abundance", "Nurturing", "Nature"],
+    "meaning": "Embrace beauty, creativity, and taking care of yourself."
+  },
+  {
+    "name": "The Emperor",
+    "keywords": ["Structure", "Authority", "Stability"],
+    "meaning": "Time to get organized and set some healthy boundaries."
+  },
+  {
+    "name": "The Hierophant",
+    "keywords": ["Tradition", "Beliefs", "Guidance"],
+    "meaning": "Stick to your established routines and spiritual practices."
+  },
+  {
+    "name": "The Lovers",
+    "keywords": ["Harmony", "Choices", "Connection"],
+    "meaning": "A beautiful alignment of values and meaningful relationships."
+  },
+  {
+    "name": "The Chariot",
+    "keywords": ["Drive", "Overcoming", "Focus"],
+    "meaning": "Keep moving forward! You can steer through these obstacles."
+  },
+  {
+    "name": "Strength",
+    "keywords": ["Courage", "Patience", "Compassion"],
+    "meaning": "Approach the situation with gentle, quiet confidence."
+  },
+  {
+    "name": "The Hermit",
+    "keywords": ["Introspection", "Solitude", "Wisdom"],
+    "meaning": "Take some cozy time alone to reflect and recharge."
+  },
+  {
+    "name": "Wheel of Fortune",
+    "keywords": ["Cycles", "Luck", "Destiny"],
+    "meaning": "Things are shifting! Trust the natural cycles of life."
+  },
+  {
+    "name": "Justice",
+    "keywords": ["Truth", "Fairness", "Balance"],
+    "meaning": "Seek truth and make decisions with a clear, objective mind."
+  },
+  {
+    "name": "The Hanged Man",
+    "keywords": ["Surrender", "Perspective", "Pause"],
+    "meaning": "Let go of control for a moment and look at things differently."
+  },
+  {
+    "name": "Death",
+    "keywords": ["Endings", "Transformation", "Transition"],
+    "meaning": "A necessary ending makes way for something beautiful and new."
+  },
+  {
+    "name": "Temperance",
+    "keywords": ["Balance", "Moderation", "Patience"],
+    "meaning": "Find your middle ground and blend your energies peacefully."
+  },
+  {
+    "name": "The Devil",
+    "keywords": ["Attachments", "Restriction", "Shadow"],
+    "meaning": "Break free from bad habits or negative thought patterns."
+  },
+  {
+    "name": "The Tower",
+    "keywords": ["Upheaval", "Awakening", "Sudden Change"],
+    "meaning": "Old structures are falling so better ones can be built."
+  },
+  {
+    "name": "The Star",
+    "keywords": ["Hope", "Healing", "Inspiration"],
+    "meaning": "A peaceful period of renewal and deep spiritual healing."
+  },
+  {
+    "name": "The Moon",
+    "keywords": ["Illusion", "Dreams", "Anxiety"],
+    "meaning": "Things might seem unclear. Let the moonlight guide you slowly."
+  },
+  {
+    "name": "The Sun",
+    "keywords": ["Joy", "Success", "Vitality"],
+    "meaning": "Warmth, happiness, and absolute clarity are coming your way!"
+  },
+  {
+    "name": "Judgement",
+    "keywords": ["Rebirth", "Absolution", "Calling"],
+    "meaning": "Forgive the past and step into your true self."
+  },
+  {
+    "name": "The World",
+    "keywords": ["Completion", "Integration", "Wholeness"],
+    "meaning": "A beautiful cycle has finished. Celebrate your achievements!"
+  },
+  {
+    "name": "Ace of Wands",
+    "keywords": ["Inspiration", "New Passion", "Energy"],
+    "meaning": "A spark of creative energy! Start that new project."
+  },
+  {
+    "name": "Two of Wands",
+    "keywords": ["Planning", "Decisions", "Discovery"],
+    "meaning": "You have choices to make. Start planning your next steps."
+  },
+  {
+    "name": "Three of Wands",
+    "keywords": ["Expansion", "Foresight", "Progress"],
+    "meaning": "Your plans are in motion. Look ahead with confidence."
+  },
+  {
+    "name": "Four of Wands",
+    "keywords": ["Celebration", "Home", "Joy"],
+    "meaning": "Take a moment to celebrate a milestone with loved ones!"
+  },
+  {
+    "name": "Five of Wands",
+    "keywords": ["Conflict", "Competition", "Tension"],
+    "meaning": "There might be some clashes or scattered energy right now."
+  },
+  {
+    "name": "Six of Wands",
+    "keywords": ["Victory", "Success", "Recognition"],
+    "meaning": "You did it! Enjoy the well-deserved recognition."
+  },
+  {
+    "name": "Seven of Wands",
+    "keywords": ["Defense", "Perseverance", "Protection"],
+    "meaning": "Stand your ground and protect what you have built."
+  },
+  {
+    "name": "Eight of Wands",
+    "keywords": ["Speed", "Action", "Movement"],
+    "meaning": "Things are moving fast! Keep up with the momentum."
+  },
+  {
+    "name": "Nine of Wands",
+    "keywords": ["Resilience", "Pushing Through", "Boundaries"],
+    "meaning": "You are tired, but you are almost there. Keep going!"
+  },
+  {
+    "name": "Ten of Wands",
+    "keywords": ["Burden", "Stress", "Hard Work"],
+    "meaning": "You are carrying too much. It is okay to put some things down."
+  },
+  {
+    "name": "Page of Wands",
+    "keywords": ["Exploration", "Excitement", "Free Spirit"],
+    "meaning": "Be curious and open to new, exciting ideas."
+  },
+  {
+    "name": "Knight of Wands",
+    "keywords": ["Action", "Adventure", "Impulsiveness"],
+    "meaning": "Charge forward with passion, but don't forget to plan!"
+  },
+  {
+    "name": "Queen of Wands",
+    "keywords": ["Confidence", "Warmth", "Vibrancy"],
+    "meaning": "Shine brightly and be unapologetically yourself."
+  },
+  {
+    "name": "King of Wands",
+    "keywords": ["Leadership", "Vision", "Honor"],
+    "meaning": "Lead with bold, creative vision and natural charisma."
+  },
+  {
+    "name": "Ace of Cups",
+    "keywords": ["Love", "Compassion", "New Feelings"],
+    "meaning": "Your heart is opening to new emotional experiences."
+  },
+  {
+    "name": "Two of Cups",
+    "keywords": ["Partnership", "Mutual Attraction", "Unity"],
+    "meaning": "A beautiful, equal connection is blooming."
+  },
+  {
+    "name": "Three of Cups",
+    "keywords": ["Friendship", "Community", "Happiness"],
+    "meaning": "Gather with your supportive friends and celebrate together!"
+  },
+  {
+    "name": "Four of Cups",
+    "keywords": ["Apathy", "Contemplation", "Disconnected"],
+    "meaning": "You might feel uninspired. Look around for missed opportunities."
+  },
+  {
+    "name": "Five of Cups",
+    "keywords": ["Grief", "Regret", "Disappointment"],
+    "meaning": "It is okay to be sad, but don't forget what you still have."
+  },
+  {
+    "name": "Six of Cups",
+    "keywords": ["Nostalgia", "Childhood", "Innocence"],
+    "meaning": "Sweet memories from the past are bringing you comfort."
+  },
+  {
+    "name": "Seven of Cups",
+    "keywords": ["Choices", "Daydreaming", "Illusion"],
+    "meaning": "You have many options! Make sure to stay grounded in reality."
+  },
+  {
+    "name": "Eight of Cups",
+    "keywords": ["Walking Away", "Seeking Truth", "Letting Go"],
+    "meaning": "It is time to quietly leave behind what no longer fulfills you."
+  },
+  {
+    "name": "Nine of Cups",
+    "keywords": ["Satisfaction", "Wishes Fulfilled", "Gratitude"],
+    "meaning": "Your wishes are coming true! Enjoy this moment of contentment."
+  },
+  {
+    "name": "Ten of Cups",
+    "keywords": ["Joy", "Peace", "Family"],
+    "meaning": "Absolute emotional fulfillment and peaceful harmony."
+  },
+  {
+    "name": "Page of Cups",
+    "keywords": ["Creativity", "Sensitivity", "Messages"],
+    "meaning": "A sweet, creative surprise or emotional message is coming."
+  },
+  {
+    "name": "Knight of Cups",
+    "keywords": ["Romance", "Charm", "Imagination"],
+    "meaning": "Follow your heart and let your imagination lead the way."
+  },
+  {
+    "name": "Queen of Cups",
+    "keywords": ["Empathy", "Intuition", "Care"],
+    "meaning": "Nurture yourself and others with deep, emotional understanding."
+  },
+  {
+    "name": "King of Cups",
+    "keywords": ["Balance", "Calm", "Wisdom"],
+    "meaning": "Keep a steady heart and stay emotionally balanced."
+  },
+  {
+    "name": "Ace of Swords",
+    "keywords": ["Clarity", "Breakthrough", "Truth"],
+    "meaning": "A sudden moment of mental clarity and new understanding."
+  },
+  {
+    "name": "Two of Swords",
+    "keywords": ["Indecision", "Stalemate", "Avoidance"],
+    "meaning": "You are putting off a choice. Look at the facts and decide."
+  },
+  {
+    "name": "Three of Swords",
+    "keywords": ["Heartbreak", "Sorrow", "Grief"],
+    "meaning": "A painful moment, but feeling it is the only way to heal."
+  },
+  {
+    "name": "Four of Swords",
+    "keywords": ["Rest", "Recovery", "Meditation"],
+    "meaning": "Take a deep breath and give your mind a break to recover."
+  },
+  {
+    "name": "Five of Swords",
+    "keywords": ["Conflict", "Defeat", "Tension"],
+    "meaning": "Choose your battles wisely. Winning isn't always everything."
+  },
+  {
+    "name": "Six of Swords",
+    "keywords": ["Transition", "Moving On", "Healing"],
+    "meaning": "You are slowly moving out of rough waters toward calmer shores."
+  },
+  {
+    "name": "Seven of Swords",
+    "keywords": ["Deception", "Strategy", "Sneakiness"],
+    "meaning": "Be careful! Make sure you are being honest with yourself."
+  },
+  {
+    "name": "Eight of Swords",
+    "keywords": ["Trapped", "Overthinking", "Restriction"],
+    "meaning": "You feel stuck, but you actually have the power to free yourself."
+  },
+  {
+    "name": "Nine of Swords",
+    "keywords": ["Anxiety", "Worry", "Nightmares"],
+    "meaning": "Your thoughts are racing. Try to bring your focus back to the present."
+  },
+  {
+    "name": "Ten of Swords",
+    "keywords": ["Endings", "Betrayal", "Rock Bottom"],
+    "meaning": "The worst is over. There is nowhere to go but up from here."
+  },
+  {
+    "name": "Page of Swords",
+    "keywords": ["Curiosity", "Communication", "Alertness"],
+    "meaning": "Ask questions and gather all the facts before moving forward."
+  },
+  {
+    "name": "Knight of Swords",
+    "keywords": ["Action", "Directness", "Ambition"],
+    "meaning": "You are charging ahead with your ideas! Just be mindful of your words."
+  },
+  {
+    "name": "Queen of Swords",
+    "keywords": ["Logic", "Boundaries", "Independence"],
+    "meaning": "Speak your truth clearly and don't compromise your boundaries."
+  },
+  {
+    "name": "King of Swords",
+    "keywords": ["Truth", "Intellect", "Authority"],
+    "meaning": "Make decisions based on logic, fairness, and clear thinking."
+  },
+  {
+    "name": "Ace of Pentacles",
+    "keywords": ["Opportunity", "Prosperity", "New Venture"],
+    "meaning": "A beautiful new beginning in your material or physical world!"
+  },
+  {
+    "name": "Two of Pentacles",
+    "keywords": ["Balance", "Adaptability", "Juggling"],
+    "meaning": "You are balancing a lot right now. Stay flexible and go with the flow."
+  },
+  {
+    "name": "Three of Pentacles",
+    "keywords": ["Teamwork", "Collaboration", "Skill"],
+    "meaning": "Working together with others will bring great results."
+  },
+  {
+    "name": "Four of Pentacles",
+    "keywords": ["Security", "Holding On", "Control"],
+    "meaning": "It is good to save, but make sure you aren't closing yourself off."
+  },
+  {
+    "name": "Five of Pentacles",
+    "keywords": ["Hardship", "Isolation", "Loss"],
+    "meaning": "Times are tough, but don't be afraid to ask for help."
+  },
+  {
+    "name": "Six of Pentacles",
+    "keywords": ["Generosity", "Charity", "Sharing"],
+    "meaning": "Give what you can, and gratefully receive what is offered to you."
+  },
+  {
+    "name": "Seven of Pentacles",
+    "keywords": ["Patience", "Assessment", "Waiting"],
+    "meaning": "Your hard work is growing. Be patient and trust the process."
+  },
+  {
+    "name": "Eight of Pentacles",
+    "keywords": ["Dedication", "Craftsmanship", "Focus"],
+    "meaning": "Keep practicing and honing your skills. It will pay off!"
+  },
+  {
+    "name": "Nine of Pentacles",
+    "keywords": ["Luxury", "Self-Sufficiency", "Success"],
+    "meaning": "Enjoy the beautiful, independent life you have built for yourself."
+  },
+  {
+    "name": "Ten of Pentacles",
+    "keywords": ["Legacy", "Wealth", "Foundations"],
+    "meaning": "Long-term success and stable, comfortable foundations."
+  },
+  {
+    "name": "Page of Pentacles",
+    "keywords": ["Manifestation", "Learning", "Goal Setting"],
+    "meaning": "A new practical goal or physical craft is catching your interest."
+  },
+  {
+    "name": "Knight of Pentacles",
+    "keywords": ["Hard Work", "Routine", "Reliability"],
+    "meaning": "Keep grinding steadily. Slow and steady wins the race."
+  },
+  {
+    "name": "Queen of Pentacles",
+    "keywords": ["Nurturing", "Comfort", "Practicality"],
+    "meaning": "Create a cozy, secure, and supportive environment for yourself."
+  },
+  {
+    "name": "King of Pentacles",
+    "keywords": ["Abundance", "Stability", "Security"],
+    "meaning": "Enjoy the solid, physical success you have achieved."
+  }
+]
