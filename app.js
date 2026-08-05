@@ -11,9 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key, value })
             });
-        } catch (err) {
-            // Fallback handled via local cache
-        }
+        } catch (err) {}
     }
 
     async function loadFromCloud(key, defaultValue) {
@@ -26,15 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     return data.value;
                 }
             }
-        } catch (err) {
-            // Fallback to local storage if offline
-        }
+        } catch (err) {}
         const local = localStorage.getItem(key);
         return local ? JSON.parse(local) : defaultValue;
     }
 
     // ==========================================
-    // 2. TAB NAVIGATION LOGIC
+    // 2. TAB NAVIGATION & SETTINGS MODAL
     // ==========================================
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -46,6 +42,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if(targetView) targetView.classList.add('active');
         });
     });
+
+    // Settings Gear Modal Logic
+    const settingsModal = document.getElementById('settings-modal');
+    document.querySelectorAll('.settings-gear-btn').forEach(gear => {
+        gear.addEventListener('click', () => {
+            if(settingsModal) settingsModal.classList.toggle('hidden');
+        });
+    });
+
+    const closeSettings = document.getElementById('close-settings-btn');
+    if(closeSettings && settingsModal) {
+        closeSettings.addEventListener('click', () => {
+            settingsModal.classList.add('hidden');
+        });
+    }
 
     // ==========================================
     // 3. EXPANDED DIVINATION (Tarot, Delphic, Homeromancy)
@@ -142,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     let deities = ["Hestia", "Hekate", "Apollo", "Hermes"];
     let shrineData = {};
-    let deityGrimoire = {}; // Stores custom tags: { [deityName]: { plants: [], animals: [], offerings: [] } }
+    let deityGrimoire = {}; // { [deity]: { plants: [], animals: [], offerings: [], colors: [], symbols: [] } }
     let currentShrine = "Hestia";
 
     async function initDeitiesAndShrines() {
@@ -152,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         deities.forEach(d => {
             if(!shrineData[d]) shrineData[d] = { offerings: [], sketch: null, petitions: [] };
-            if(!deityGrimoire[d]) deityGrimoire[d] = { plants: [], animals: [], offerings: [] };
+            if(!deityGrimoire[d]) deityGrimoire[d] = { plants: [], animals: [], offerings: [], colors: [], symbols: [] };
         });
 
         populateDeityDropdown();
@@ -182,14 +193,14 @@ document.addEventListener('DOMContentLoaded', () => {
         select.value = currentShrine;
     }
 
-    // Render Illuminated Grimoire Manuscript Cards
+    // Render Illuminated Grimoire Manuscript Cards (Tab 4)
     function renderGrimoireArchive() {
         const grid = document.getElementById('archive-grid');
         if(!grid) return;
         grid.innerHTML = '';
 
         deities.forEach(d => {
-            const data = deityGrimoire[d] || { plants: [], animals: [], offerings: [] };
+            const data = deityGrimoire[d] || { plants: [], animals: [], offerings: [], colors: [], symbols: [] };
             const shrine = shrineData[d] || { offerings: [], petitions: [] };
 
             const card = document.createElement('div');
@@ -200,21 +211,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="manuscript-badge">Active Shrine</span>
                 </div>
                 <div class="manuscript-section">
+                    <p class="manuscript-label">🎨 Sacred Colors</p>
+                    <div class="tag-container">
+                        ${data.colors.length ? data.colors.map(c => `<span class="cute-tag">${c}</span>`).join('') : '<span class="empty-tag">No colors added</span>'}
+                    </div>
+                </div>
+                <div class="manuscript-section">
+                    <p class="manuscript-label">⚡ Sacred Symbols</p>
+                    <div class="tag-container">
+                        ${data.symbols.length ? data.symbols.map(s => `<span class="cute-tag">${s}</span>`).join('') : '<span class="empty-tag">No symbols added</span>'}
+                    </div>
+                </div>
+                <div class="manuscript-section">
                     <p class="manuscript-label">🌿 Sacred Plants</p>
-                    <div class="tag-container" id="plants-tags-${d}">
-                        ${data.plants.length ? data.plants.map(p => `<span class="cute-tag">${p}</span>`).join('') : '<span class="empty-tag">No plants added yet</span>'}
+                    <div class="tag-container">
+                        ${data.plants.length ? data.plants.map(p => `<span class="cute-tag">${p}</span>`).join('') : '<span class="empty-tag">No plants added</span>'}
                     </div>
                 </div>
                 <div class="manuscript-section">
                     <p class="manuscript-label">🐾 Sacred Animals</p>
-                    <div class="tag-container" id="animals-tags-${d}">
-                        ${data.animals.length ? data.animals.map(a => `<span class="cute-tag">${a}</span>`).join('') : '<span class="empty-tag">No animals added yet</span>'}
+                    <div class="tag-container">
+                        ${data.animals.length ? data.animals.map(a => `<span class="cute-tag">${a}</span>`).join('') : '<span class="empty-tag">No animals added</span>'}
                     </div>
                 </div>
                 <div class="manuscript-section">
                     <p class="manuscript-label">🍯 Standard Offerings</p>
-                    <div class="tag-container" id="offerings-tags-${d}">
-                        ${data.offerings.length ? data.offerings.map(o => `<span class="cute-tag">${o}</span>`).join('') : '<span class="empty-tag">No offerings added yet</span>'}
+                    <div class="tag-container">
+                        ${data.offerings.length ? data.offerings.map(o => `<span class="cute-tag">${o}</span>`).join('') : '<span class="empty-tag">No offerings added</span>'}
                     </div>
                 </div>
                 <div class="manuscript-footer">
@@ -226,7 +249,6 @@ document.addEventListener('DOMContentLoaded', () => {
             grid.appendChild(card);
         });
 
-        // Wire up edit buttons
         document.querySelectorAll('.edit-grimoire-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const deity = e.target.getAttribute('data-deity');
@@ -235,24 +257,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Inline Modal/Prompt to edit deity associations
     function openGrimoireEditor(deity) {
-        const currentData = deityGrimoire[deity] || { plants: [], animals: [], offerings: [] };
+        const currentData = deityGrimoire[deity] || { plants: [], animals: [], offerings: [], colors: [], symbols: [] };
         
+        const colInput = prompt(`Enter sacred colors for ${deity} (comma separated):`, (currentData.colors || []).join(', '));
+        if(colInput !== null) currentData.colors = colInput.split(',').map(s => s.trim()).filter(Boolean);
+
+        const symInput = prompt(`Enter sacred symbols for ${deity} (comma separated):`, (currentData.symbols || []).join(', '));
+        if(symInput !== null) currentData.symbols = symInput.split(',').map(s => s.trim()).filter(Boolean);
+
         const pInput = prompt(`Enter sacred plants for ${deity} (comma separated):`, currentData.plants.join(', '));
-        if(pInput !== null) {
-            currentData.plants = pInput.split(',').map(s => s.trim()).filter(Boolean);
-        }
+        if(pInput !== null) currentData.plants = pInput.split(',').map(s => s.trim()).filter(Boolean);
 
         const aInput = prompt(`Enter sacred animals for ${deity} (comma separated):`, currentData.animals.join(', '));
-        if(aInput !== null) {
-            currentData.animals = aInput.split(',').map(s => s.trim()).filter(Boolean);
-        }
+        if(aInput !== null) currentData.animals = aInput.split(',').map(s => s.trim()).filter(Boolean);
 
         const oInput = prompt(`Enter standard offerings for ${deity} (comma separated):`, currentData.offerings.join(', '));
-        if(oInput !== null) {
-            currentData.offerings = oInput.split(',').map(s => s.trim()).filter(Boolean);
-        }
+        if(oInput !== null) currentData.offerings = oInput.split(',').map(s => s.trim()).filter(Boolean);
 
         deityGrimoire[deity] = currentData;
         saveToCloud('deityGrimoire', deityGrimoire);
@@ -282,6 +303,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if(saveNewDeityBtn) {
         saveNewDeityBtn.addEventListener('click', async () => {
             const name = customDeityForm.dataset.deityName;
+            const colorsStr = document.getElementById('new-deity-colors').value;
+            const symbolsStr = document.getElementById('new-deity-symbols').value;
             const plantsStr = document.getElementById('new-deity-plants').value;
             const animalsStr = document.getElementById('new-deity-animals').value;
             const offeringsStr = document.getElementById('new-deity-offerings').value;
@@ -290,6 +313,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 deities.push(name);
                 shrineData[name] = { offerings: [], sketch: null, petitions: [] };
                 deityGrimoire[name] = {
+                    colors: colorsStr.split(',').map(s => s.trim()).filter(Boolean),
+                    symbols: symbolsStr.split(',').map(s => s.trim()).filter(Boolean),
                     plants: plantsStr.split(',').map(s => s.trim()).filter(Boolean),
                     animals: animalsStr.split(',').map(s => s.trim()).filter(Boolean),
                     offerings: offeringsStr.split(',').map(s => s.trim()).filter(Boolean)
@@ -307,6 +332,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Reset form
                 newDeityInput.value = '';
+                document.getElementById('new-deity-colors').value = '';
+                document.getElementById('new-deity-symbols').value = '';
                 document.getElementById('new-deity-plants').value = '';
                 document.getElementById('new-deity-animals').value = '';
                 document.getElementById('new-deity-offerings').value = '';
@@ -451,7 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 5. HEARTH OF HESTIA RITUAL TOGGLE
+    // 5. HEARTH OF HESTIA RITUAL TOGGLE (Moon View / Homepage)
     // ==========================================
     const hestiaToggleBtn = document.getElementById('hestia-ritual-btn');
     const hestiaDisplay = document.getElementById('hestia-ritual-display');
@@ -757,4 +784,3 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDailyHymn();
 
 });
-
