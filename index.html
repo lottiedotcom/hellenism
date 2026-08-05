@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hellenic Practice (✧ω✧)</title>
 <link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#c3b1e1">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body class="theme-pastel">
@@ -166,7 +168,6 @@
 </div>
 </div>
 
-<!-- Daily Hymn moved directly under the Deity Switcher card -->
 <div class="card">
 <h3>Daily Hymn</h3>
 <p id="daily-hymn" class="hymn-text">Loading daily hymn...</p>
@@ -296,6 +297,15 @@
 </nav>
 
 <script src="app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => console.log('Service Worker registered! Scope:', reg.scope))
+        .catch((err) => console.log('Service Worker registration failed:', err));
+    });
+  }
+</script>
 </body>
 </html>
 
