@@ -12,15 +12,61 @@
 
 <main id="app">
 
-<!-- 1. MOON TAB -->
+<!-- SETTINGS MODAL (Replaces standalone Prep tab) -->
+<div id="settings-modal" class="settings-modal hidden">
+  <div class="settings-content card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h3 style="margin:0;">Prep & Settings (u_u)</h3>
+      <button id="close-settings-btn" class="cute-btn" style="padding: 4px 10px;">✕</button>
+    </div>
+    
+    <div class="card" style="margin-bottom: 10px;">
+      <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Deipnon Prep Checklist</h4>
+      <div class="checkbox-group">
+        <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Clear the shrine</label>
+        <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Sweep thresholds</label>
+        <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Dispose of old offerings</label>
+        <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Leave crossroad offering</label>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 10px;">
+      <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Schedule Settings</h4>
+      <p style="margin:4px 0;">Wake Up Time:</p>
+      <input type="time" id="wake-time" class="cute-input" value="18:00">
+      <p style="margin:6px 0 4px 0;">Sleep Time:</p>
+      <input type="time" id="sleep-time" class="cute-input" value="06:00">
+      <button id="save-schedule-btn" class="cute-btn full-width margin-top">Save Schedule</button>
+    </div>
+
+    <div class="card" style="margin-bottom: 0;">
+      <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Audio Settings</h4>
+      <label class="custom-checkbox">
+        <input type="checkbox" id="sound-toggle">
+        <span class="checkmark"></span>
+        Enable Sound Effects
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- 1. MOON TAB (HOMEPAGE) -->
 <section id="moon-view" class="view active">
-<header class="hero">
+<header class="hero" style="position: relative;">
+<button class="settings-gear-btn" title="Settings">⚙️</button>
 <h1 id="user-greeting">Welcome (´｡• ᵕ •｡`)</h1>
 <div class="moon-display">
 <div id="moon-phase-kaomoji" class="moon-kaomoji">𐔌՞ ܸ.ˬ.ܸ՞𐦯</div>
 </div>
 <p id="night-quote" class="quote-box">"Selene’s silver light guides the path through the dark."</p>
 </header>
+
+<!-- Hearth of Hestia moved to Homepage -->
+<div class="card">
+<h3>🔥 Hearth of Hestia</h3>
+<button id="hestia-ritual-btn" class="cute-btn full-width">Light the Hearth of Hestia (🔥)</button>
+<div id="hestia-ritual-display" class="quote-box hidden margin-top full-width center-text"></div>
+</div>
 
 <div class="card">
 <h3>Energy & Alignment</h3>
@@ -88,7 +134,8 @@
 
 <!-- 2. ALTAR TAB -->
 <section id="altar-view" class="view">
-<header class="hero">
+<header class="hero" style="position: relative;">
+<button class="settings-gear-btn" title="Settings">⚙️</button>
 <h2>Digital Altar ( ˘▽˘)っ♨</h2>
 </header>
 
@@ -102,11 +149,18 @@
   <button id="add-custom-deity-btn" class="cute-btn">+ Add Shrine</button>
 </div>
 
-<!-- Inline Form for Custom Deity Associations -->
+<!-- Inline Form for Custom Deity Associations (Colors & Symbols added) -->
 <div id="custom-deity-form" class="hidden margin-top card" style="background: var(--accent-blue);">
   <h4 style="margin-top:0; text-align:center;">Configure Deity Associations ✨</h4>
   <p style="font-size:0.8rem; text-align:center; color:var(--text-muted);">Separate items with commas</p>
-  <label style="font-size:0.8rem; font-weight:700;">🌿 Sacred Plants:</label>
+  
+  <label style="font-size:0.8rem; font-weight:700;">🎨 Sacred Colors:</label>
+  <input type="text" id="new-deity-colors" class="cute-input margin-top" placeholder="e.g., Gold, White, Saffron">
+
+  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">⚡ Sacred Symbols:</label>
+  <input type="text" id="new-deity-symbols" class="cute-input margin-top" placeholder="e.g., Torch, Lyre, Caduceus">
+
+  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">🌿 Sacred Plants:</label>
   <input type="text" id="new-deity-plants" class="cute-input margin-top" placeholder="e.g., Laurel, Bay, Olive">
   
   <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">🐾 Sacred Animals:</label>
@@ -119,10 +173,10 @@
 </div>
 </div>
 
+<!-- Khernips Cleansing moved to where Hearth of Hestia was -->
 <div class="card">
-<h3>🔥 Hearth of Hestia</h3>
-<button id="hestia-ritual-btn" class="cute-btn full-width">Light the Hearth of Hestia (🔥)</button>
-<div id="hestia-ritual-display" class="quote-box hidden margin-top full-width center-text"></div>
+<h3>Khernips Cleansing</h3>
+<button id="khernips-btn" class="cute-btn full-width">Wash Hands (0)</button>
 </div>
 
 <div class="card">
@@ -152,11 +206,6 @@
 </div>
 
 <div class="card">
-<h3>Khernips Cleansing</h3>
-<button id="khernips-btn" class="cute-btn full-width">Wash Hands (0)</button>
-</div>
-
-<div class="card">
 <h3>Libations & Offerings</h3>
 <div id="libation-list"></div>
 <div class="input-group">
@@ -179,8 +228,9 @@
 
 <!-- 3. DIVINATION TAB -->
 <section id="divination-view" class="view">
-<header class="hero">
-<h2>Divination & Grimoire (✯◡✯)</h2>
+<header class="hero" style="position: relative;">
+<button class="settings-gear-btn" title="Settings">⚙️</button>
+<h2>Divination (✯◡✯)</h2>
 </header>
 
 <!-- Tarot Card Draw -->
@@ -218,6 +268,14 @@
 <textarea id="journal-entry" class="cute-input" rows="4" placeholder="Type reflections here..."></textarea>
 <button id="save-journal-btn" class="cute-btn full-width margin-top">Save to Cloud</button>
 </div>
+</section>
+
+<!-- 4. GRIMOIRE & ARCHIVE TAB (Replaces Prep tab) -->
+<section id="archive-view" class="view">
+<header class="hero" style="position: relative;">
+<button class="settings-gear-btn" title="Settings">⚙️</button>
+<h2>Grimoire & Archive (📖)</h2>
+</header>
 
 <div class="card" style="background: #fbf9ff; border: 2px solid var(--border-blue);">
 <h3 style="margin-bottom: 4px;">📖 Illuminated Grimoire Archive</h3>
@@ -226,59 +284,9 @@
 </div>
 </section>
 
-<!-- 4. PREP & SET TAB -->
-<section id="prep-view" class="view">
-<header class="hero">
-<h2>Prep & Settings (u_u)</h2>
-</header>
-
-<div class="card">
-<h3>Deipnon Prep Checklist</h3>
-<div class="checkbox-group">
-<label class="custom-checkbox">
-<input type="checkbox">
-<span class="checkmark"></span>
-Clear the shrine
-</label>
-<label class="custom-checkbox">
-<input type="checkbox">
-<span class="checkmark"></span>
-Sweep thresholds
-</label>
-<label class="custom-checkbox">
-<input type="checkbox">
-<span class="checkmark"></span>
-Dispose of old offerings
-</label>
-<label class="custom-checkbox">
-<input type="checkbox">
-<span class="checkmark"></span>
-Leave crossroad offering
-</label>
-</div>
-</div>
-
-<div class="card">
-<h3>Schedule Settings</h3>
-<p class="margin-top">Wake Up Time:</p>
-<input type="time" id="wake-time" class="cute-input" value="18:00">
-<p class="margin-top">Sleep Time:</p>
-<input type="time" id="sleep-time" class="cute-input" value="06:00">
-<button id="save-schedule-btn" class="cute-btn full-width margin-top">Save Schedule</button>
-</div>
-
-<div class="card">
-<h3>Audio Settings</h3>
-<label class="custom-checkbox">
-<input type="checkbox" id="sound-toggle">
-<span class="checkmark"></span>
-Enable Sound Effects
-</label>
-</div>
-</section>
-
 </main>
 
+<!-- Updated 4-button Bottom Nav -->
 <nav class="bottom-nav">
 <button class="nav-btn active" data-target="moon-view">
 <span class="nav-icon">(☽°ˊ3ˋ°)</span>
@@ -292,13 +300,12 @@ Enable Sound Effects
 <span class="nav-icon">(✯◡✯)</span>
 <span class="nav-label">Divination</span>
 </button>
-<button class="nav-btn" data-target="prep-view">
-<span class="nav-icon">(u_u)</span>
-<span class="nav-label">Prep & Set</span>
+<button class="nav-btn" data-target="archive-view">
+<span class="nav-icon">(📖)</span>
+<span class="nav-label">Grimoire</span>
 </button>
 </nav>
 
 <script src="app.js"></script>
 </body>
 </html>
-
