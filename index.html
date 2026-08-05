@@ -104,6 +104,12 @@
 </div>
 
 <div class="card">
+<h3>🔥 Hearth of Hestia</h3>
+<button id="hestia-ritual-btn" class="cute-btn full-width">Light the Hearth of Hestia (🔥)</button>
+<div id="hestia-ritual-display" class="quote-box hidden margin-top full-width center-text"></div>
+</div>
+
+<div class="card">
 <h3>Interactive Canvas</h3>
 <div id="altar-canvas" class="altar-tabletop">
   <div id="sketch-frame" class="sketch-frame-ui" onclick="document.getElementById('upload-sketch').click()">
@@ -161,12 +167,33 @@
 <h2>Divination & Lore (✯◡✯)</h2>
 </header>
 
+<!-- Tarot Card Draw -->
 <div class="card center-text">
-<h3>Daily Card Draw</h3>
+<h3>Daily Tarot Draw</h3>
 <button id="draw-card-btn" class="cute-btn">Draw Single Card</button>
 <div id="card-display" class="hidden card-result">
 <h4 id="card-name"></h4>
 <p id="card-meaning"></p>
+</div>
+</div>
+
+<!-- Delphic Oracle Draw -->
+<div class="card center-text">
+<h3>🏛️ Delphic Oracle Maxim</h3>
+<button id="draw-delphic-btn" class="cute-btn">Consult the Oracle</button>
+<div id="delphic-display" class="hidden card-result">
+<h4 id="delphic-maxim"></h4>
+<p id="delphic-advice"></p>
+</div>
+</div>
+
+<!-- Homeromancy Omens -->
+<div class="card center-text">
+<h3>📜 Homeromancy Epic Omen</h3>
+<button id="draw-homer-btn" class="cute-btn">Draw Homeric Verse</button>
+<div id="homer-display" class="hidden card-result">
+<h4 id="homer-verse"></h4>
+<p id="homer-omen"></p>
 </div>
 </div>
 
@@ -177,14 +204,10 @@
 </div>
 
 <div class="card">
-<h3>Create Deity Profile Card</h3>
-<input type="text" id="card-name-input" placeholder="Deity Name" class="cute-input">
-<input type="text" id="card-epithet-input" placeholder="Epithets" class="cute-input margin-top">
-<input type="text" id="card-offerings-input" placeholder="Offerings" class="cute-input margin-top">
-<button id="save-card-btn" class="cute-btn full-width margin-top">Save to Archive</button>
-</div>
-
+<h3>Synced Deity Sanctuary Archive</h3>
+<p class="center-text" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Synced directly with your active shrine switcher.</p>
 <div id="archive-grid" class="card-grid"></div>
+</div>
 </section>
 
 <!-- 4. PREP & SET TAB -->
