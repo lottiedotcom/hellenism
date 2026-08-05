@@ -1,6 +1,41 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. Tab Navigation Logic
+    // ==========================================
+    // 1. VERCEL CLOUD DB / PERSISTENCE LAYER
+    // ==========================================
+    async function saveToCloud(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+        try {
+            await fetch('/api/storage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key, value })
+            });
+        } catch (err) {
+            // Fallback handled via local cache
+        }
+    }
+
+    async function loadFromCloud(key, defaultValue) {
+        try {
+            const res = await fetch(`/api/storage?key=${encodeURIComponent(key)}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.value !== undefined) {
+                    localStorage.setItem(key, JSON.stringify(data.value));
+                    return data.value;
+                }
+            }
+        } catch (err) {
+            // Fallback to local storage if offline
+        }
+        const local = localStorage.getItem(key);
+        return local ? JSON.parse(local) : defaultValue;
+    }
+
+    // ==========================================
+    // 2. TAB NAVIGATION LOGIC
+    // ==========================================
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -12,7 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 2. Tarot Card Draw from JSON
+    // ==========================================
+    // 3. EXPANDED DIVINATION (Tarot, Delphic Oracle, Homeromancy)
+    // ==========================================
     const drawBtn = document.getElementById("draw-card-btn");
     if(drawBtn) {
         drawBtn.addEventListener("click", async () => {
@@ -22,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const meaningEl = document.getElementById("card-meaning");
 
             if(display) display.classList.remove("hidden");
-            if(nameEl) nameEl.innerText = "Shuffling... ( ˘▽˘)";
+            if(nameEl) nameEl.innerText = "Shuffling Tarot... ( ˘▽˘)";
             if(meaningEl) meaningEl.innerText = "";
 
             try {
@@ -34,31 +71,160 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(meaningEl) meaningEl.innerHTML = `<strong>Keywords:</strong> ${randomCard.keywords.join(" • ")}<br><br>${randomCard.meaning}`;
             } catch (error) {
                 if(nameEl) nameEl.innerText = "Error (x_x)";
-                if(meaningEl) meaningEl.innerText = "Could not load tarot.json. Make sure the file is in the same folder!";
+                if(meaningEl) meaningEl.innerText = "Could not load tarot.json.";
             }
         });
     }
 
-    // 3. Shrine & Altar Features 
-    const deities = ["Hestia", "Hekate", "Apollo", "Hermes"];
-    let shrineData = JSON.parse(localStorage.getItem('shrineData')) || {};
+    // Delphic Oracle Draw
+    const delphicBtn = document.getElementById("draw-delphic-btn");
+    if(delphicBtn) {
+        delphicBtn.addEventListener("click", async () => {
+            const display = document.getElementById("delphic-display");
+            const maximEl = document.getElementById("delphic-maxim");
+            const adviceEl = document.getElementById("delphic-advice");
 
-    deities.forEach(d => {
-        if(!shrineData[d]) shrineData[d] = { offerings: [], sketch: null, petitions: [] };
-    });
+            if(display) display.classList.remove("hidden");
+            if(maximEl) maximEl.innerText = "Consulting Apollo... ( ✧ω✧)";
+            if(adviceEl) adviceEl.innerText = "";
 
-    const deityInput = document.getElementById('deity-focus-input');
-    let currentShrine = deityInput ? deityInput.value : "Hestia";
+            try {
+                const response = await fetch("delphic.json");
+                const delphicDeck = await response.json();
+                const randomMaxim = delphicDeck[Math.floor(Math.random() * delphicDeck.length)];
 
-    if(deityInput) {
-        deityInput.addEventListener('change', (e) => {
-            currentShrine = e.target.value;
-            saveAndRenderShrine();
+                if(maximEl) maximEl.innerText = randomMaxim.maxim;
+                if(adviceEl) adviceEl.innerHTML = `<strong>Guidance:</strong> ${randomMaxim.advice}`;
+            } catch (error) {
+                // Fallback built-in maxims if json file is missing
+                const fallbacks = [
+                    { maxim: "Know Thyself", advice: "Look inward before seeking answers from the outside world." },
+                    { maxim: "Nothing in Excess", advice: "Seek balance and moderation in all things today." },
+                    { maxim: "Pledge Surety and Ruin is Near", advice: "Exercise caution in commitments and contracts." }
+                ];
+                const fb = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+                if(maximEl) maximEl.innerText = fb.maxim;
+                if(adviceEl) adviceEl.innerHTML = `<strong>Guidance:</strong> ${fb.advice}`;
+            }
+        });
+    }
+
+    // Homeromancy Draw
+    const homerBtn = document.getElementById("draw-homer-btn");
+    if(homerBtn) {
+        homerBtn.addEventListener("click", async () => {
+            const display = document.getElementById("homer-display");
+            const verseEl = document.getElementById("homer-verse");
+            const omenEl = document.getElementById("homer-omen");
+
+            if(display) display.classList.remove("hidden");
+            if(verseEl) verseEl.innerText = "Opening the Epics... ( 🏛️ )";
+            if(omenEl) omenEl.innerText = "";
+
+            try {
+                const response = await fetch("homeromancy.json");
+                const homerDeck = await response.json();
+                const randomVerse = homerDeck[Math.floor(Math.random() * homerDeck.length)];
+
+                if(verseEl) verseEl.innerText = `"${randomVerse.verse}" — ${randomVerse.source}`;
+                if(omenEl) omenEl.innerHTML = `<strong>Omen:</strong> ${randomVerse.omen}`;
+            } catch (error) {
+                const fallbacks = [
+                    { verse: "Even a fool is wise after the event.", source: "Iliad", omen: "Learn from past missteps without carrying regret." },
+                    { verse: "Endure my heart, even worse have you endured.", source: "Odyssey", omen: "Resilience will see you through your present trials." }
+                ];
+                const fb = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+                if(verseEl) verseEl.innerText = `"${fb.verse}" — ${fb.source}`;
+                if(omenEl) omenEl.innerHTML = `<strong>Omen:</strong> ${fb.omen}`;
+            }
+        });
+    }
+
+    // ==========================================
+    // 4. MULTI-DEITY SHRINE & SYNCED ARCHIVE
+    // ==========================================
+    let deities = ["Hestia", "Hekate", "Apollo", "Hermes"];
+    let shrineData = {};
+    let currentShrine = "Hestia";
+
+    async function initDeitiesAndShrines() {
+        deities = await loadFromCloud('customDeitiesList', ["Hestia", "Hekate", "Apollo", "Hermes"]);
+        shrineData = await loadFromCloud('shrineData', {});
+
+        deities.forEach(d => {
+            if(!shrineData[d]) shrineData[d] = { offerings: [], sketch: null, petitions: [] };
+        });
+
+        populateDeityDropdown();
+        renderDeityArchiveCards();
+        
+        const deityInput = document.getElementById('deity-focus-input');
+        if(deityInput) {
+            currentShrine = deityInput.value || deities[0];
+            deityInput.addEventListener('change', (e) => {
+                currentShrine = e.target.value;
+                saveAndRenderShrine();
+            });
+        }
+        saveAndRenderShrine();
+    }
+
+    function populateDeityDropdown() {
+        const select = document.getElementById('deity-focus-input');
+        if(!select) return;
+        select.innerHTML = '';
+        deities.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d;
+            opt.textContent = d;
+            select.appendChild(opt);
+        });
+        select.value = currentShrine;
+    }
+
+    function renderDeityArchiveCards() {
+        const grid = document.getElementById('archive-grid');
+        if(!grid) return;
+        grid.innerHTML = '';
+
+        deities.forEach(d => {
+            const card = document.createElement('div');
+            card.className = 'trading-card';
+            card.innerHTML = `
+                <h4>🔥 ${d} Shrine Archive</h4>
+                <p><strong>Status:</strong> Active Sanctuary</p>
+                <p><strong>Offerings Count:</strong> ${shrineData[d] ? shrineData[d].offerings.length : 0} items</p>
+                <p><strong>Petitions Logged:</strong> ${shrineData[d] && shrineData[d].petitions ? shrineData[d].petitions.length : 0}</p>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    const addDeityBtn = document.getElementById('add-custom-deity-btn');
+    const newDeityInput = document.getElementById('new-deity-input');
+
+    if(addDeityBtn && newDeityInput) {
+        addDeityBtn.addEventListener('click', async () => {
+            const name = newDeityInput.value.trim();
+            if(name && !deities.includes(name)) {
+                deities.push(name);
+                shrineData[name] = { offerings: [], sketch: null, petitions: [] };
+                currentShrine = name;
+                
+                await saveToCloud('customDeitiesList', deities);
+                await saveToCloud('shrineData', shrineData);
+                
+                populateDeityDropdown();
+                renderDeityArchiveCards();
+                saveAndRenderShrine();
+                newDeityInput.value = '';
+            }
         });
     }
 
     function saveAndRenderShrine() {
-        localStorage.setItem('shrineData', JSON.stringify(shrineData));
+        saveToCloud('shrineData', shrineData);
+        renderDeityArchiveCards();
         const canvas = document.getElementById('altar-canvas');
         if(!canvas) return;
         
@@ -191,22 +357,81 @@ document.addEventListener('DOMContentLoaded', () => {
         el.addEventListener('touchstart', dragStart, {passive: false});
     }
 
+    // ==========================================
+    // 5. HEARTH OF HESTIA RITUAL TOGGLE
+    // ==========================================
+    const hestiaToggleBtn = document.getElementById('hestia-ritual-btn');
+    const hestiaDisplay = document.getElementById('hestia-ritual-display');
+
+    if(hestiaToggleBtn && hestiaDisplay) {
+        let hestiaActive = false;
+        hestiaToggleBtn.addEventListener('click', () => {
+            hestiaActive = !hestiaActive;
+            if(hestiaActive) {
+                hestiaDisplay.classList.remove('hidden');
+                hestiaDisplay.innerHTML = `
+                    <strong>🔥 Hearth of Hestia Lit</strong><br>
+                    <em>"First and last to Hestia we pour the sacred honey-sweet libation."</em><br>
+                    Your sacred space is now opened and protected by the First Goddess.
+                `;
+                hestiaToggleBtn.textContent = "Extinguish / Close Hearth (🔥)";
+            } else {
+                hestiaDisplay.innerHTML = `
+                    <strong>🔥 Hearth Closed</strong><br>
+                    <em>"Farewell gentle Hestia, guardian of our home."</em>
+                `;
+                setTimeout(() => {
+                    hestiaDisplay.classList.add('hidden');
+                }, 2000);
+                hestiaToggleBtn.textContent = "Light the Hearth of Hestia (🔥)";
+            }
+        });
+    }
+
+    // ==========================================
+    // 6. MULTI-PROMPT GENERATOR
+    // ==========================================
+    const promptLibrary = {
+        morning: [
+            "Morning Reflection: What intentions are you setting for today's daylight?",
+            "Dawn Offering: What action can you take today to honor Phoebus Apollo or Helios?",
+            "Hearth Fire: How will you bring warmth and hospitality (Hestia) into your morning routine?",
+            "Fresh Start: What mindset or boundary do you wish to cultivate as the sun rises?"
+        ],
+        afternoon: [
+            "Afternoon Alignment: How are you maintaining your energy and spiritual focus today?",
+            "Midday Swiftness: What pressing task requires Hermes' focus and clear speech right now?",
+            "Zenith Reflection: How can you bring truth and clarity to a challenge you are facing?",
+            "Devotional Balance: What small act of gratitude can you perform before sundown?"
+        ],
+        night: [
+            "Nighttime Reflection: What burdens can you release to the dark, and what are you grateful for today?",
+            "Crossroads Meditation: What decision or transition are you contemplating under Hekate's gaze?",
+            "Selene's Light: What quiet truth or intuitive dream do you wish to invite tonight?",
+            "Hearth Restoration: How will you quiet your mind and rest your body in honor of Hestia's peace?"
+        ]
+    };
+
+    let lastPromptIndex = -1;
     const promptGenBtn = document.getElementById('prompt-generator-btn');
     if(promptGenBtn) {
         promptGenBtn.addEventListener('click', () => {
             const hour = new Date().getHours();
-            let prompt = "";
-            if (hour >= 5 && hour < 12) {
-                prompt = "Morning Reflection: What intentions are you setting for today's daylight?";
-            } else if (hour >= 12 && hour < 18) {
-                prompt = "Afternoon Check-in: How are you maintaining your energy and alignment?";
-            } else {
-                prompt = "Nighttime Reflection: What burdens can you release to the dark, and what are you grateful for today?";
-            }
+            let category = "night";
+            if (hour >= 5 && hour < 12) category = "morning";
+            else if (hour >= 12 && hour < 18) category = "afternoon";
+
+            const prompts = promptLibrary[category];
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * prompts.length);
+            } while (prompts.length > 1 && randomIndex === lastPromptIndex);
+
+            lastPromptIndex = randomIndex;
             
             const promptDisplay = document.getElementById('prompt-display');
             if(promptDisplay) {
-                promptDisplay.innerText = prompt;
+                promptDisplay.innerText = prompts[randomIndex];
                 promptDisplay.classList.remove('hidden');
             }
         });
@@ -214,14 +439,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sendPetitionBtn = document.getElementById('send-petition-btn');
     if(sendPetitionBtn) {
-        sendPetitionBtn.addEventListener('click', () => {
+        sendPetitionBtn.addEventListener('click', async () => {
             const textArea = document.getElementById('petition-text');
             if(!textArea || textArea.value.trim() === '') return;
             
             if(!shrineData[currentShrine]) shrineData[currentShrine] = { offerings: [], sketch: null, petitions: [] };
+            const entryText = `[${currentShrine} Petition]: ${textArea.value}`;
             shrineData[currentShrine].petitions.push(textArea.value);
-            localStorage.setItem('shrineData', JSON.stringify(shrineData));
+            
+            await saveToCloud('shrineData', shrineData);
+            // Save to cloud journal table via Vercel endpoint
+            try {
+                await fetch('/api/storage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: 'journal_entry_' + Date.now(), value: entryText })
+                });
+            } catch(e) {}
 
+            renderDeityArchiveCards();
             textArea.classList.add('fade-out');
             
             const container = document.getElementById('sparkle-container');
@@ -252,14 +488,38 @@ document.addEventListener('DOMContentLoaded', () => {
             if(kharisCountSpan) {
                 let count = parseInt(kharisCountSpan.innerText) || 0;
                 kharisCountSpan.innerText = count + 1;
+                saveToCloud('kharisCount', count + 1);
             }
 
             alert("Make sure to clean your physical space as well! ( ˘▽˘)っ🧹");
         });
     }
 
+    // ==========================================
+    // 7. DAILY HYMNS LOADER
+    // ==========================================
+    const dailyHymns = {
+        0: { title: "Orphic Hymn to Helios (Sunday)", text: "Hear, golden Helios, whose blessed light shines across the boundless earth... Bringer of daylight, eternal sun, guide our steps with radiant grace." },
+        1: { title: "Homeric Hymn to Selene (Monday)", text: "Sing of the Moon, sweet-voiced Muses! From her immortal head a glow is shown from heaven and embraces earth... Queen of the night, shining Selene." },
+        2: { title: "Orphic Hymn to Ares & Aphrodite (Tuesday)", text: "Magnanimous Ares, shield-bearer and strength of mortals... paired with Aphrodite's gentle grace, bring courage, passion, and harmony to our hearth." },
+        3: { title: "Homeric Hymn to Hermes (Wednesday)", text: "Sing, Muse, of Hermes, the guide and messenger! Swift-footed lord of paths and speech, watcher by night, bringer of luck, and friend to mortals." },
+        4: { title: "Orphic Hymn to Zeus (Thursday)", text: "Zeus, father of gods and mortals, thunderer high on Olympos! Dispenser of justice and order, grant us wisdom, strength, and shelter." },
+        5: { title: "Orphic Hymn to Aphrodite (Friday)", text: "Sea-born Aphrodite, queen of beauty and love! Weaver of joy, gentlest goddess, bless our shrine and hearth with unity and kindness." },
+        6: { title: "Homeric Hymn to Hestia & Apollo (Saturday)", text: "Hestia, keeper of the eternal flame in sacred Pytho and high Olympos... alongside Far-Shooting Apollo, bring light and warmth to our sacred sanctuary." }
+    };
 
-    // 4. Astronomical Live Moon & Location Data 
+    function loadDailyHymn() {
+        const day = new Date().getDay();
+        const hymn = dailyHymns[day];
+        const hymnEl = document.getElementById('daily-hymn');
+        if (hymnEl && hymn) {
+            hymnEl.innerHTML = `<strong>${hymn.title}</strong><br><br>"${hymn.text}"`;
+        }
+    }
+
+    // ==========================================
+    // 8. ASTRONOMICAL MOON & LOCATION DATA
+    // ==========================================
     const upcomingLunarEvents = [
         { date: "Aug 12, 2026", event: "Total Solar Eclipse 🌑" },
         { date: "Aug 28, 2026", event: "Partial Lunar Eclipse 🌕" },
@@ -398,10 +658,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Initialize everything safely
-    saveAndRenderShrine();
+    // Initialize modules safely
+    initDeitiesAndShrines();
     renderLunarEvents();
     loadMoonAndLocationData();
+    loadDailyHymn();
 
 });
-
