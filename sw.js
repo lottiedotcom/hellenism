@@ -6,8 +6,6 @@ const ASSETS_TO_CACHE = [
   '/app.js',
   '/manifest.json',
   '/tarot.json',
-  '/delphic.json',
-  '/homeromancy.json'
 ];
 
 // Install Event
