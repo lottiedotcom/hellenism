@@ -217,49 +217,85 @@ document.getElementById('sweep-altar-btn').addEventListener('click', () => {
 
 
 // ==========================================
-// LIVE MOON & LOCATION DATA SCRIPT
+// ASTRONOMICAL LIVE MOON & LOCATION DATA 
 // ==========================================
 
-async function loadMoonAndLocationData() {
-    // 1. Calculate Live Moon Data
-    const synodic = 29.53058770576;
-    const baseDate = new Date('2024-01-11T11:57:00Z'); // Known New Moon
-    const now = new Date();
-    const diff = (now - baseDate) / (1000 * 60 * 60 * 24);
-    let age = diff % synodic;
-    if (age < 0) age += synodic;
+// Future Special Events
+const upcomingLunarEvents = [
+    { date: "Aug 12, 2026", event: "Total Solar Eclipse 🌑" },
+    { date: "Aug 28, 2026", event: "Partial Lunar Eclipse 🌕" },
+    { date: "Dec 24, 2026", event: "Super Full Moon ✨" },
+    { date: "Feb 6, 2027", event: "Annular Solar Eclipse 🌒" },
+    { date: "Feb 20, 2027", event: "Penumbral Lunar Eclipse 🌗" },
+    { date: "Jul 18, 2027", event: "Supermoon ✨" },
+    { date: "Aug 2, 2027", event: "Total Solar Eclipse 🌑" }
+];
 
-    const illumination = (1 - Math.cos((age / synodic) * 2 * Math.PI)) / 2 * 100;
+document.getElementById('toggle-lunar-events').addEventListener('click', () => {
+    document.getElementById('lunar-events-list').classList.toggle('hidden');
+});
+
+function renderLunarEvents() {
+    const list = document.getElementById('lunar-events-list');
+    list.innerHTML = ""; // Clear
+    upcomingLunarEvents.forEach(e => {
+        const item = document.createElement('div');
+        item.className = 'libation-item';
+        item.innerHTML = `<span>${e.date}</span> <span>${e.event}</span>`;
+        list.appendChild(item);
+    });
+}
+
+async function loadMoonAndLocationData() {
+    // 1. Accurate Astronomical Moon Position & Phase (Meeus Algorithm)
+    const now = new Date();
+    const jd = (now.getTime() / 86400000) + 2440587.5;
+    const T = (jd - 2451545.0) / 36525;
+
+    // Mathematical parameters for orbital bodies
+    const M = (357.5291092 + 35999.0502909 * T) % 360; // Solar anomaly
+    const D = (297.8501921 + 445267.1114034 * T) % 360; // Lunar elongation
+    const Mprime = (134.9633964 + 477198.8675055 * T) % 360; // Lunar anomaly
+    const F = (93.2720950 + 483202.0175233 * T) % 360; // Lunar node
+    const Lprime = (218.3164477 + 481267.88123421 * T) % 360; // Lunar mean longitude
+
+    const rad = Math.PI / 180;
     
+    // Moon's exact ecliptic longitude
+    let moonLon = Lprime 
+        + 6.289 * Math.sin(Mprime * rad)
+        + 1.274 * Math.sin((2 * D - Mprime) * rad)
+        + 0.658 * Math.sin(2 * D * rad)
+        + 0.214 * Math.sin(2 * Mprime * rad)
+        - 0.186 * Math.sin(M * rad)
+        - 0.114 * Math.sin(2 * F * rad);
+    moonLon = (moonLon + 360) % 360;
+
+    // Sun's exact ecliptic longitude
+    const sunLon = (280.46646 + 36000.76983 * T + 1.914602 * Math.sin(M * rad)) % 360;
+
+    // True phase determination using exact geometric elongation
+    let elongation = (moonLon - sunLon + 360) % 360;
+    let illumination = (1 - Math.cos(elongation * rad)) / 2 * 100;
+    
+    // Convert elongation to exact phase name with strict degree thresholds
     let phase = "";
-    if (age < 1.84) phase = "New Moon";
-    else if (age < 5.53) phase = "Waxing Crescent";
-    else if (age < 9.22) phase = "First Quarter";
-    else if (age < 12.91) phase = "Waxing Gibbous";
-    else if (age < 16.61) phase = "Full Moon";
-    else if (age < 20.30) phase = "Waning Gibbous";
-    else if (age < 23.99) phase = "Third Quarter";
-    else if (age < 27.68) phase = "Waning Crescent";
-    else phase = "New Moon";
+    if (elongation < 3 || elongation > 357) phase = "New Moon";
+    else if (elongation >= 3 && elongation < 87) phase = "Waxing Crescent";
+    else if (elongation >= 87 && elongation < 93) phase = "First Quarter";
+    else if (elongation >= 93 && elongation < 177) phase = "Waxing Gibbous";
+    else if (elongation >= 177 && elongation < 183) phase = "Full Moon";
+    else if (elongation >= 183 && elongation < 267) phase = "Waning Gibbous";
+    else if (elongation >= 267 && elongation < 273) phase = "Third Quarter";
+    else phase = "Waning Crescent";
+
+    let moonAgeDays = (elongation / 360) * 29.530588;
 
     document.getElementById('moon-phase-name').innerText = phase;
     document.getElementById('moon-percentage').innerText = illumination.toFixed(1) + "%";
-    document.getElementById('moon-age').innerText = age.toFixed(1) + " days";
+    document.getElementById('moon-age').innerText = moonAgeDays.toFixed(1) + " days";
 
-    // Update Deipnon Progress & Countdowns
-    let progress = (age / synodic) * 100;
-    document.getElementById('deipnon-percent').innerText = progress.toFixed(1) + "%";
-    document.getElementById('deipnon-progress').style.width = progress + "%";
-
-    const daysToDeipnon = synodic - age;
-    const daysToNoumenia = (daysToDeipnon + 1) % synodic;
-    const daysToAgathos = (daysToDeipnon + 2) % synodic;
-
-    document.getElementById('countdown-deipnon').innerText = daysToDeipnon.toFixed(1) + " days";
-    document.getElementById('countdown-noumenia').innerText = daysToNoumenia.toFixed(1) + " days";
-    document.getElementById('countdown-agathos').innerText = daysToAgathos.toFixed(1) + " days";
-
-    // 2. Zodiac & Energy (Sidereal Estimation)
+    // Calculate exact Tropical Zodiac sign using moonLon (each sign is exactly 30 degrees)
     const zodiacSigns = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
     const energies = [
         "Initiation & Action", "Grounding & Senses", "Communication & Ideas", 
@@ -268,16 +304,24 @@ async function loadMoonAndLocationData() {
         "Structure & Ambition", "Innovation & Community", "Rest & Spirituality"
     ];
     
-    const sidereal = 27.321661;
-    const ariesBase = new Date('2024-01-15T00:00:00Z'); // Known Aries Moon
-    let siderealDiff = (now - ariesBase) / (1000 * 60 * 60 * 24);
-    let siderealAge = siderealDiff % sidereal;
-    if (siderealAge < 0) siderealAge += sidereal;
-    
-    const signIndex = Math.floor((siderealAge / sidereal) * 12);
+    const signIndex = Math.floor(moonLon / 30);
     
     document.getElementById('moon-zodiac').innerText = zodiacSigns[signIndex];
     document.getElementById('moon-keywords').innerText = energies[signIndex];
+
+    // Update Deipnon Progress & Countdowns
+    const synodic = 29.53058770576;
+    let progress = (moonAgeDays / synodic) * 100;
+    document.getElementById('deipnon-percent').innerText = progress.toFixed(1) + "%";
+    document.getElementById('deipnon-progress').style.width = progress + "%";
+
+    const daysToDeipnon = synodic - moonAgeDays;
+    const daysToNoumenia = (daysToDeipnon + 1) % synodic;
+    const daysToAgathos = (daysToDeipnon + 2) % synodic;
+
+    document.getElementById('countdown-deipnon').innerText = daysToDeipnon.toFixed(1) + " days";
+    document.getElementById('countdown-noumenia').innerText = daysToNoumenia.toFixed(1) + " days";
+    document.getElementById('countdown-agathos').innerText = daysToAgathos.toFixed(1) + " days";
 
     // 3. Get Accurate Sundown Time via Geolocation API
     if ("geolocation" in navigator) {
@@ -308,5 +352,6 @@ async function loadMoonAndLocationData() {
 // Ensure both Altar and Live Data render on load
 window.addEventListener('DOMContentLoaded', () => {
     saveAndRenderShrine();
+    renderLunarEvents();
     loadMoonAndLocationData();
 });
