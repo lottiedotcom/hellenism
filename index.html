@@ -281,35 +281,33 @@
 <div id="archive-grid" class="card-grid"></div>
 </div>
 
-<!-- EXPANDABLE PETITION ARCHIVE -->
-<div class="card accordion-card">
-  <button id="toggle-petition-accordion" class="accordion-header">
-    <span>( ˘▽˘) Prayers & Petitions Archive</span>
-    <span id="petition-arrow" class="accordion-icon">▼</span>
-  </button>
-  <div id="petition-accordion-body" class="accordion-body hidden">
-    <div class="margin-top">
-      <input type="text" id="filter-petitions-input" class="cute-input" placeholder="Search by date or keyword...">
+<!-- STANDARD PETITION ARCHIVE CARD -->
+<div class="card">
+  <h3>( ˘▽˘) Prayers & Petitions Archive</h3>
+  <div class="filter-box margin-top">
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <input type="date" id="filter-petitions-date" class="cute-input" style="flex: 1;">
+      <button id="clear-petitions-date-btn" class="cute-btn" style="padding: 8px 12px; font-size: 0.8rem;">Clear Date</button>
     </div>
-    <div id="cloud-petitions-list" class="archive-list margin-top">
-      <p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">Loading cloud petitions...</p>
-    </div>
+    <input type="text" id="filter-petitions-input" class="cute-input margin-top" placeholder="Search keywords...">
+  </div>
+  <div id="cloud-petitions-list" class="archive-list margin-top">
+    <p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">Loading cloud petitions...</p>
   </div>
 </div>
 
-<!-- EXPANDABLE TAROT ARCHIVE -->
-<div class="card accordion-card">
-  <button id="toggle-reading-accordion" class="accordion-header">
-    <span>(✯◡✯) Tarot Readings Archive</span>
-    <span id="reading-arrow" class="accordion-icon">▼</span>
-  </button>
-  <div id="reading-accordion-body" class="accordion-body hidden">
-    <div class="margin-top">
-      <input type="text" id="filter-readings-input" class="cute-input" placeholder="Search by date or keyword...">
+<!-- STANDARD TAROT ARCHIVE CARD -->
+<div class="card">
+  <h3>(✯◡✯) Tarot Readings Archive</h3>
+  <div class="filter-box margin-top">
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <input type="date" id="filter-readings-date" class="cute-input" style="flex: 1;">
+      <button id="clear-readings-date-btn" class="cute-btn" style="padding: 8px 12px; font-size: 0.8rem;">Clear Date</button>
     </div>
-    <div id="cloud-readings-list" class="archive-list margin-top">
-      <p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">Loading cloud readings...</p>
-    </div>
+    <input type="text" id="filter-readings-input" class="cute-input margin-top" placeholder="Search keywords...">
+  </div>
+  <div id="cloud-readings-list" class="archive-list margin-top">
+    <p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">Loading cloud readings...</p>
   </div>
 </div>
 
