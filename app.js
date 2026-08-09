@@ -7,7 +7,8 @@ navBtns.forEach(btn => {
     navBtns.forEach(b => b.classList.remove('active'));
     views.forEach(v => v.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById(btn.dataset.target).classList.add('active');
+    const target = document.getElementById(btn.dataset.target);
+    if (target) target.classList.add('active');
   });
 });
 
@@ -17,10 +18,12 @@ const closeSettingsBtn = document.getElementById('close-settings-btn');
 const settingsBtns = document.querySelectorAll('.settings-gear-btn');
 
 settingsBtns.forEach(btn => {
-  btn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+  btn.addEventListener('click', () => {
+    if (settingsModal) settingsModal.classList.remove('hidden');
+  });
 });
 
-if (closeSettingsBtn) {
+if (closeSettingsBtn && settingsModal) {
   closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
 }
 
@@ -33,7 +36,7 @@ function playSound() {
   }
 }
 
-// --- UI BUTTONS & COUNTERS ---
+// --- ALTAR COUNTERS & BUTTONS ---
 let khernipsCount = parseInt(localStorage.getItem('khernipsCount') || '0');
 let kharisCount = parseInt(localStorage.getItem('kharisCount') || '0');
 
@@ -105,9 +108,9 @@ const tarotCards = [
 if (drawCardBtn) {
   drawCardBtn.addEventListener('click', () => {
     const randomCard = tarotCards[Math.floor(Math.random() * tarotCards.length)];
-    cardName.innerText = randomCard.name;
-    cardMeaning.innerText = randomCard.meaning;
-    cardDisplay.classList.remove('hidden');
+    if (cardName) cardName.innerText = randomCard.name;
+    if (cardMeaning) cardMeaning.innerText = randomCard.meaning;
+    if (cardDisplay) cardDisplay.classList.remove('hidden');
     playSound();
   });
 }
@@ -127,9 +130,9 @@ const delphicMaxims = [
 if (drawDelphicBtn) {
   drawDelphicBtn.addEventListener('click', () => {
     const randomMaxim = delphicMaxims[Math.floor(Math.random() * delphicMaxims.length)];
-    delphicMaxim.innerText = randomMaxim.maxim;
-    delphicAdvice.innerText = randomMaxim.advice;
-    delphicDisplay.classList.remove('hidden');
+    if (delphicMaxim) delphicMaxim.innerText = randomMaxim.maxim;
+    if (delphicAdvice) delphicAdvice.innerText = randomMaxim.advice;
+    if (delphicDisplay) delphicDisplay.classList.remove('hidden');
     playSound();
   });
 }
@@ -148,9 +151,9 @@ const homerVerses = [
 if (drawHomerBtn) {
   drawHomerBtn.addEventListener('click', () => {
     const randomVerse = homerVerses[Math.floor(Math.random() * homerVerses.length)];
-    homerVerse.innerText = randomVerse.verse;
-    homerOmen.innerText = randomVerse.omen;
-    homerDisplay.classList.remove('hidden');
+    if (homerVerse) homerVerse.innerText = randomVerse.verse;
+    if (homerOmen) homerOmen.innerText = randomVerse.omen;
+    if (homerDisplay) homerDisplay.classList.remove('hidden');
     playSound();
   });
 }
@@ -158,8 +161,6 @@ if (drawHomerBtn) {
 // --- DYNAMIC DATA: MOON PHASE & ASTROLOGY ---
 function updateAstronomyData() {
   const now = new Date();
-  
-  // 1. Calculate Moon Phase mathematically
   const synodicMonth = 29.53058867;
   const knownNewMoon = new Date('2024-01-11T11:57:00Z'); 
   const diff = now - knownNewMoon;
@@ -180,12 +181,10 @@ function updateAstronomyData() {
 
   const illumination = Math.round((1 - Math.cos((age / synodicMonth) * 2 * Math.PI)) / 2 * 100);
 
-  // Update Moon HTML
   if (document.getElementById('moon-phase-name')) document.getElementById('moon-phase-name').innerText = phaseName;
   if (document.getElementById('moon-percentage')) document.getElementById('moon-percentage').innerText = illumination + "%";
   if (document.getElementById('moon-age')) document.getElementById('moon-age').innerText = Math.round(age) + " days";
 
-  // 2. Cycle Progress & Countdowns
   const progress = (age / synodicMonth) * 100;
   if (document.getElementById('deipnon-percent')) document.getElementById('deipnon-percent').innerText = Math.round(progress) + "%";
   if (document.getElementById('deipnon-progress')) document.getElementById('deipnon-progress').style.width = progress + "%";
@@ -197,7 +196,6 @@ function updateAstronomyData() {
   if (document.getElementById('countdown-noumenia')) document.getElementById('countdown-noumenia').innerText = (daysToDeipnon + 1) + " Days";
   if (document.getElementById('countdown-agathos')) document.getElementById('countdown-agathos').innerText = (daysToDeipnon + 2) + " Days";
 
-  // 3. Simple Zodiac Math (Sun Sign Based on Date)
   const month = now.getMonth() + 1;
   const day = now.getDate();
   let sign = "";
@@ -237,7 +235,7 @@ async function fetchSundown() {
         sundownText.innerText = "~ 6:00 PM";
       }
     }, () => {
-      sundownText.innerText = "Location Off";
+      sundownText.innerText = "~ 6:00 PM";
     });
   } else {
     sundownText.innerText = "~ 6:00 PM";
@@ -252,7 +250,7 @@ function loadDailyHymn() {
     "Goddess of the crossroads, guide my steps in the dark...",
     "Radiant Apollo, bringer of light, heal our spirits today."
   ];
-  const today = new Date().getDay(); // Gets a number 0-6
+  const today = new Date().getDay();
   const selectedHymn = hymns[today % hymns.length];
   if (document.getElementById('daily-hymn')) {
     document.getElementById('daily-hymn').innerText = selectedHymn;
@@ -263,7 +261,6 @@ function loadDailyHymn() {
 let allPetitions = [];
 let allReadings = [];
 
-// 1. Fetch Data
 async function fetchPetitions() {
   const container = document.getElementById('cloud-petitions-list');
   try {
@@ -273,7 +270,7 @@ async function fetchPetitions() {
     applyPetitionsFilter();
   } catch (err) {
     if (container) {
-      container.innerHTML = `<p style="text-align:center; color:#d9534f; font-size:0.8rem;">Ready to save your first petition locally or to cloud!</p>`;
+      container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:0.8rem;">Ready to save your first petition to the cloud!</p>`;
     }
   }
 }
@@ -287,12 +284,11 @@ async function fetchReadings() {
     applyReadingsFilter();
   } catch (err) {
     if (container) {
-      container.innerHTML = `<p style="text-align:center; color:#d9534f; font-size:0.8rem;">Ready to save your first reading locally or to cloud!</p>`;
+      container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:0.8rem;">Ready to save your first reading to the cloud!</p>`;
     }
   }
 }
 
-// 2. Render Data
 function renderPetitions(items) {
   const container = document.getElementById('cloud-petitions-list');
   if (!container) return;
@@ -303,11 +299,12 @@ function renderPetitions(items) {
 
   container.innerHTML = items.map(p => {
     const formattedDate = new Date(p.created_at).toLocaleString();
+    const itemId = p.id || `'${p.created_at}'`;
     return `
       <div class="archive-item">
         <p class="archive-date">${formattedDate}</p>
         <p class="archive-text">${p.text}</p>
-        <button class="cute-btn delete-btn" onclick="deletePetition(${p.id || `'${p.created_at}'`})">Delete ✕</button>
+        <button class="cute-btn delete-btn" onclick="deletePetition(${itemId})">Delete ✕</button>
       </div>
     `;
   }).join('');
@@ -323,23 +320,23 @@ function renderReadings(items) {
 
   container.innerHTML = items.map(r => {
     const formattedDate = new Date(r.created_at).toLocaleString();
+    const itemId = r.id || `'${r.created_at}'`;
     return `
       <div class="archive-item">
         <p class="archive-date">${formattedDate}</p>
         <p class="archive-text">${r.text}</p>
-        <button class="cute-btn delete-btn" onclick="deleteReading(${r.id || `'${r.created_at}'`})">Delete ✕</button>
+        <button class="cute-btn delete-btn" onclick="deleteReading(${itemId})">Delete ✕</button>
       </div>
     `;
   }).join('');
 }
 
-// 3. Save Data
 const sendPetitionBtn = document.getElementById('send-petition-btn');
 const petitionText = document.getElementById('petition-text');
 
 if (sendPetitionBtn) {
   sendPetitionBtn.addEventListener('click', async () => {
-    const val = petitionText.value.trim();
+    const val = petitionText ? petitionText.value.trim() : '';
     if (!val) return;
     
     sendPetitionBtn.disabled = true;
@@ -351,14 +348,13 @@ if (sendPetitionBtn) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: val })
       });
-      petitionText.value = '';
+      if (petitionText) petitionText.value = '';
       playSound();
       await fetchPetitions();
     } catch (e) {
-      console.log("Saving locally as fallback");
       allPetitions.unshift({ text: val, created_at: new Date().toISOString() });
       applyPetitionsFilter();
-      petitionText.value = '';
+      if (petitionText) petitionText.value = '';
       playSound();
     } finally {
       sendPetitionBtn.disabled = false;
@@ -372,7 +368,7 @@ const journalEntry = document.getElementById('journal-entry');
 
 if (saveJournalBtn) {
   saveJournalBtn.addEventListener('click', async () => {
-    const val = journalEntry.value.trim();
+    const val = journalEntry ? journalEntry.value.trim() : '';
     if (!val) return;
 
     saveJournalBtn.disabled = true;
@@ -384,14 +380,13 @@ if (saveJournalBtn) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: val })
       });
-      journalEntry.value = '';
+      if (journalEntry) journalEntry.value = '';
       playSound();
       await fetchReadings();
     } catch (e) {
-      console.log("Saving locally as fallback");
       allReadings.unshift({ text: val, created_at: new Date().toISOString() });
       applyReadingsFilter();
-      journalEntry.value = '';
+      if (journalEntry) journalEntry.value = '';
       playSound();
     } finally {
       saveJournalBtn.disabled = false;
@@ -400,7 +395,6 @@ if (saveJournalBtn) {
   });
 }
 
-// 4. Delete Data Functions 
 window.deletePetition = async function(id) {
   if (!confirm("Delete this petition?")) return;
   try {
@@ -423,26 +417,19 @@ window.deleteReading = async function(id) {
   }
 };
 
-// 5. Date & Keyword Filtering Logic
-const filterPetitionsInput = document.getElementById('filter-petitions-input');
 const filterPetitionsDate = document.getElementById('filter-petitions-date');
 const clearPetitionsDateBtn = document.getElementById('clear-petitions-date-btn');
 
 function applyPetitionsFilter() {
-  const query = filterPetitionsInput ? filterPetitionsInput.value.toLowerCase() : '';
   const selectedDate = filterPetitionsDate ? filterPetitionsDate.value : ''; 
-
   const filtered = allPetitions.filter(p => {
+    if (!selectedDate) return true;
     const itemDate = new Date(p.created_at);
-    const formattedItemDate = itemDate.toISOString().split('T')[0];
-    const matchesText = p.text.toLowerCase().includes(query) || itemDate.toLocaleString().toLowerCase().includes(query);
-    const matchesDate = !selectedDate || formattedItemDate === selectedDate;
-    return matchesText && matchesDate;
+    return itemDate.toISOString().split('T')[0] === selectedDate;
   });
   renderPetitions(filtered);
 }
 
-if (filterPetitionsInput) filterPetitionsInput.addEventListener('input', applyPetitionsFilter);
 if (filterPetitionsDate) filterPetitionsDate.addEventListener('change', applyPetitionsFilter);
 if (clearPetitionsDateBtn) {
   clearPetitionsDateBtn.addEventListener('click', () => {
@@ -451,25 +438,19 @@ if (clearPetitionsDateBtn) {
   });
 }
 
-const filterReadingsInput = document.getElementById('filter-readings-input');
 const filterReadingsDate = document.getElementById('filter-readings-date');
 const clearReadingsDateBtn = document.getElementById('clear-readings-date-btn');
 
 function applyReadingsFilter() {
-  const query = filterReadingsInput ? filterReadingsInput.value.toLowerCase() : '';
   const selectedDate = filterReadingsDate ? filterReadingsDate.value : '';
-
   const filtered = allReadings.filter(r => {
+    if (!selectedDate) return true;
     const itemDate = new Date(r.created_at);
-    const formattedItemDate = itemDate.toISOString().split('T')[0];
-    const matchesText = r.text.toLowerCase().includes(query) || itemDate.toLocaleString().toLowerCase().includes(query);
-    const matchesDate = !selectedDate || formattedItemDate === selectedDate;
-    return matchesText && matchesDate;
+    return itemDate.toISOString().split('T')[0] === selectedDate;
   });
   renderReadings(filtered);
 }
 
-if (filterReadingsInput) filterReadingsInput.addEventListener('input', applyReadingsFilter);
 if (filterReadingsDate) filterReadingsDate.addEventListener('change', applyReadingsFilter);
 if (clearReadingsDateBtn) {
   clearReadingsDateBtn.addEventListener('click', () => {
@@ -478,14 +459,10 @@ if (clearReadingsDateBtn) {
   });
 }
 
-// --- INITIAL FETCH ON STARTUP ---
 window.addEventListener('DOMContentLoaded', () => {
-  // Fire data fetching for moon math and layout
   updateAstronomyData();
   fetchSundown();
   loadDailyHymn();
-
-  // Fire cloud archive fetches
   fetchPetitions();
   fetchReadings();
 });
