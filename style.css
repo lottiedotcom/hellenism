@@ -106,6 +106,88 @@ body.theme-pastel {
   font-size: 0.9rem;
 }
 
+/* STAT PILLS & ALIGNMENT */
+.alignment-box {
+  background: #fdfcff;
+  border: 1px solid var(--border-blue);
+  border-radius: 8px;
+  padding: 10px;
+}
+.alignment-box p {
+  margin: 5px 0;
+  font-size: 0.9rem;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.stat-pill {
+  background: var(--accent-blue);
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+.stat-label {
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.stat-value {
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: var(--text-main);
+}
+
+/* DEIPNON & CYCLE STYLES */
+.progress-bar-container {
+  width: 100%;
+  height: 12px;
+  background-color: var(--accent-blue);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--theme-main);
+  width: 0%;
+  transition: width 0.5s ease;
+}
+.cute-summary {
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--theme-main);
+  list-style: none;
+  text-align: center;
+  padding: 5px;
+  background: var(--accent-blue);
+  border-radius: 8px;
+}
+.cute-summary::-webkit-details-marker {
+  display: none;
+}
+.deipnon-details {
+  background: #fdfcff;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-blue);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-top: 8px;
+}
+.cycle-list p {
+  margin: 8px 0;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--border-blue);
+  padding-bottom: 4px;
+}
+
 /* ARCHIVE ITEM LISTS & FILTERS */
 .filter-box {
   background: #f8f6fc;
@@ -185,4 +267,3 @@ body.theme-pastel {
   max-height: 80vh;
   overflow-y: auto;
 }
-
