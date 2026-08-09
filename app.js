@@ -155,6 +155,110 @@ if (drawHomerBtn) {
   });
 }
 
+// --- DYNAMIC DATA: MOON PHASE & ASTROLOGY ---
+function updateAstronomyData() {
+  const now = new Date();
+  
+  // 1. Calculate Moon Phase mathematically
+  const synodicMonth = 29.53058867;
+  const knownNewMoon = new Date('2024-01-11T11:57:00Z'); 
+  const diff = now - knownNewMoon;
+  const days = diff / (1000 * 60 * 60 * 24);
+  const cycle = days / synodicMonth;
+  let age = (cycle - Math.floor(cycle)) * synodicMonth;
+
+  let phaseName = "";
+  if (age < 1.84) phaseName = "New Moon";
+  else if (age < 5.53) phaseName = "Waxing Crescent";
+  else if (age < 9.22) phaseName = "First Quarter";
+  else if (age < 12.91) phaseName = "Waxing Gibbous";
+  else if (age < 16.61) phaseName = "Full Moon";
+  else if (age < 20.30) phaseName = "Waning Gibbous";
+  else if (age < 23.99) phaseName = "Last Quarter";
+  else if (age < 27.68) phaseName = "Waning Crescent";
+  else phaseName = "New Moon";
+
+  const illumination = Math.round((1 - Math.cos((age / synodicMonth) * 2 * Math.PI)) / 2 * 100);
+
+  // Update Moon HTML
+  if (document.getElementById('moon-phase-name')) document.getElementById('moon-phase-name').innerText = phaseName;
+  if (document.getElementById('moon-percentage')) document.getElementById('moon-percentage').innerText = illumination + "%";
+  if (document.getElementById('moon-age')) document.getElementById('moon-age').innerText = Math.round(age) + " days";
+
+  // 2. Cycle Progress & Countdowns
+  const progress = (age / synodicMonth) * 100;
+  if (document.getElementById('deipnon-percent')) document.getElementById('deipnon-percent').innerText = Math.round(progress) + "%";
+  if (document.getElementById('deipnon-progress')) document.getElementById('deipnon-progress').style.width = progress + "%";
+
+  let daysToDeipnon = Math.round(synodicMonth - age);
+  if (daysToDeipnon === Math.round(synodicMonth)) daysToDeipnon = 0;
+  
+  if (document.getElementById('countdown-deipnon')) document.getElementById('countdown-deipnon').innerText = daysToDeipnon + " Days";
+  if (document.getElementById('countdown-noumenia')) document.getElementById('countdown-noumenia').innerText = (daysToDeipnon + 1) + " Days";
+  if (document.getElementById('countdown-agathos')) document.getElementById('countdown-agathos').innerText = (daysToDeipnon + 2) + " Days";
+
+  // 3. Simple Zodiac Math (Sun Sign Based on Date)
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  let sign = "";
+  
+  if ((month == 1 && day <= 20) || (month == 12 && day >=22)) sign = "Capricorn";
+  else if ((month == 1 && day >= 21) || (month == 2 && day <= 18)) sign = "Aquarius";
+  else if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) sign = "Pisces";
+  else if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) sign = "Aries";
+  else if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) sign = "Taurus";
+  else if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) sign = "Gemini";
+  else if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) sign = "Cancer";
+  else if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) sign = "Leo";
+  else if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) sign = "Virgo";
+  else if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) sign = "Libra";
+  else if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) sign = "Scorpio";
+  else if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) sign = "Sagittarius";
+
+  if (document.getElementById('moon-zodiac')) document.getElementById('moon-zodiac').innerText = sign;
+  if (document.getElementById('moon-keywords')) document.getElementById('moon-keywords').innerText = "Reflection, Cleansing, Preparation";
+}
+
+// --- DYNAMIC DATA: SUNDOWN API ---
+async function fetchSundown() {
+  const sundownText = document.getElementById('sundown-time');
+  if (!sundownText) return;
+
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      try {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const res = await fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0`);
+        const data = await res.json();
+        const sunset = new Date(data.results.sunset);
+        sundownText.innerText = sunset.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      } catch(e) {
+        sundownText.innerText = "~ 6:00 PM";
+      }
+    }, () => {
+      sundownText.innerText = "Location Off";
+    });
+  } else {
+    sundownText.innerText = "~ 6:00 PM";
+  }
+}
+
+// --- DYNAMIC DATA: DAILY HYMN ---
+function loadDailyHymn() {
+  const hymns = [
+    "Hear me, O blessed one, whose light shines upon the earth...",
+    "I call upon you, eternal and pure, to bless this hearth...",
+    "Goddess of the crossroads, guide my steps in the dark...",
+    "Radiant Apollo, bringer of light, heal our spirits today."
+  ];
+  const today = new Date().getDay(); // Gets a number 0-6
+  const selectedHymn = hymns[today % hymns.length];
+  if (document.getElementById('daily-hymn')) {
+    document.getElementById('daily-hymn').innerText = selectedHymn;
+  }
+}
+
 // --- CLOUD DATABASE ARCHIVE SYSTEM (WITH FILTERS) ---
 let allPetitions = [];
 let allReadings = [];
@@ -296,7 +400,7 @@ if (saveJournalBtn) {
   });
 }
 
-// 4. Delete Data Functions (Added fallbacks so local dummy data deletes visually)
+// 4. Delete Data Functions 
 window.deletePetition = async function(id) {
   if (!confirm("Delete this petition?")) return;
   try {
@@ -374,8 +478,15 @@ if (clearReadingsDateBtn) {
   });
 }
 
-// Initial Fetch on Startup
+// --- INITIAL FETCH ON STARTUP ---
 window.addEventListener('DOMContentLoaded', () => {
+  // Fire data fetching for moon math and layout
+  updateAstronomyData();
+  fetchSundown();
+  loadDailyHymn();
+
+  // Fire cloud archive fetches
   fetchPetitions();
   fetchReadings();
 });
+
