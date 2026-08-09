@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Hellenic Practice (✧ω✧)</title>
 
+<!-- PWA Manifest & Mobile Meta Tags -->
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -27,6 +28,7 @@
       <h3 style="margin:0;">Prep & Settings (u_u)</h3>
       <button id="close-settings-btn" class="cute-btn" style="padding: 4px 10px;">✕</button>
     </div>
+    
     <div class="card" style="margin-bottom: 10px;">
       <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Deipnon Prep Checklist</h4>
       <div class="checkbox-group">
@@ -36,10 +38,28 @@
         <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Leave crossroad offering</label>
       </div>
     </div>
+
+    <div class="card" style="margin-bottom: 10px;">
+      <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Schedule Settings</h4>
+      <p style="margin:4px 0;">Wake Up Time:</p>
+      <input type="time" id="wake-time" class="cute-input" value="18:00">
+      <p style="margin:6px 0 4px 0;">Sleep Time:</p>
+      <input type="time" id="sleep-time" class="cute-input" value="06:00">
+      <button id="save-schedule-btn" class="cute-btn full-width margin-top">Save Schedule</button>
+    </div>
+
+    <div class="card" style="margin-bottom: 0;">
+      <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Audio Settings</h4>
+      <label class="custom-checkbox">
+        <input type="checkbox" id="sound-toggle">
+        <span class="checkmark"></span>
+        Enable Sound Effects
+      </label>
+    </div>
   </div>
 </div>
 
-<!-- 1. MOON TAB -->
+<!-- 1. MOON TAB (HOMEPAGE) -->
 <section id="moon-view" class="view active">
 <header class="hero" style="position: relative;">
 <button class="settings-gear-btn" title="Settings">( ≡ )</button>
@@ -53,6 +73,67 @@
 <div class="card">
 <h3>( ♨ ) Hearth of Hestia</h3>
 <button id="hestia-ritual-btn" class="cute-btn full-width">Light the Hearth of Hestia ( ♨ )</button>
+<div id="hestia-ritual-display" class="quote-box hidden margin-top full-width center-text"></div>
+</div>
+
+<div class="card">
+<h3>Energy & Alignment</h3>
+<div class="alignment-box">
+<p><strong>Zodiac Sign:</strong> <span id="moon-zodiac">Loading...</span></p>
+<p><strong>Energy Focus:</strong> <span id="moon-keywords">Loading...</span></p>
+</div>
+</div>
+
+<div class="card">
+<h3>Moon Phase & Sundown</h3>
+<div class="stats-grid">
+<div class="stat-pill">
+<span class="stat-label">Phase</span>
+<span id="moon-phase-name" class="stat-value">Loading...</span>
+</div>
+<div class="stat-pill">
+<span class="stat-label">Illumination</span>
+<span id="moon-percentage" class="stat-value">Loading...</span>
+</div>
+<div class="stat-pill">
+<span class="stat-label">Moon Age</span>
+<span id="moon-age" class="stat-value">Loading...</span>
+</div>
+<div class="stat-pill">
+<span class="stat-label">Sundown</span>
+<span id="sundown-time" class="stat-value">Loading...</span>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3 id="toggle-lunar-events" class="cute-summary">( ✧ ) Upcoming Lunar Events ( ✧ )</h3>
+<div id="lunar-events-list" class="hidden margin-top"></div>
+</div>
+
+<div class="card">
+<h3>Hekate's Deipnon Tracker</h3>
+<div class="progress-bar-container">
+<div id="deipnon-progress" class="progress-bar-fill"></div>
+</div>
+<p class="center-text margin-top">Cycle Progress to Dark Moon: <span id="deipnon-percent">0%</span></p>
+
+<details class="deipnon-info margin-top">
+<summary class="cute-summary">What is Deipnon & How to Celebrate (★ω★)</summary>
+<div class="deipnon-details">
+<p><strong>What it is:</strong> The dark moon night marking the end of the lunar month to honor Hekate, appease restless spirits, and purify the home.</p>
+<p><strong>How to celebrate:</strong> Sweep thresholds, physically clean your space, clear out old offerings, and leave a final offering (garlic, eggs, or leeks) at a crossroads.</p>
+</div>
+</details>
+</div>
+
+<div class="card">
+<h3>Household Cycle Countdowns</h3>
+<div class="cycle-list">
+<p><strong>Hekate's Deipnon:</strong> <span id="countdown-deipnon">Calculating...</span></p>
+<p><strong>Noumenia:</strong> <span id="countdown-noumenia">Calculating...</span></p>
+<p><strong>Agathos Daimon:</strong> <span id="countdown-agathos">Calculating...</span></p>
+</div>
 </div>
 </section>
 
@@ -64,8 +145,59 @@
 </header>
 
 <div class="card">
+<h3>Deity Shrine Switcher</h3>
+<select id="deity-focus-input" class="cute-input"></select>
+<div class="input-group margin-top">
+  <input type="text" id="new-deity-input" placeholder="New deity name..." class="cute-input">
+  <button id="add-custom-deity-btn" class="cute-btn">+ Add Shrine</button>
+</div>
+
+<div id="custom-deity-form" class="hidden margin-top card" style="background: var(--accent-blue);">
+  <h4 style="margin-top:0; text-align:center;">Configure Deity Associations ( ✧ )</h4>
+  <p style="font-size:0.8rem; text-align:center; color:var(--text-muted);">Separate items with commas</p>
+  
+  <label style="font-size:0.8rem; font-weight:700;">( ⚲ ) Sacred Colors:</label>
+  <input type="text" id="new-deity-colors" class="cute-input margin-top" placeholder="e.g., Gold, White, Saffron">
+
+  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">( ϟ ) Sacred Symbols:</label>
+  <input type="text" id="new-deity-symbols" class="cute-input margin-top" placeholder="e.g., Torch, Lyre, Caduceus">
+
+  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">( ⚚ ) Sacred Plants:</label>
+  <input type="text" id="new-deity-plants" class="cute-input margin-top" placeholder="e.g., Laurel, Bay, Olive">
+  
+  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">( ⑀ ) Sacred Animals:</label>
+  <input type="text" id="new-deity-animals" class="cute-input margin-top" placeholder="e.g., Owl, Wolf, Dove">
+  
+  <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">( ☖ ) Standard Offerings:</label>
+  <input type="text" id="new-deity-offerings" class="cute-input margin-top" placeholder="e.g., Honey, Wine, Frankincense">
+
+  <button id="save-new-deity-btn" class="cute-btn full-width margin-top">Save Sanctuary & Associations</button>
+</div>
+</div>
+
+<div class="card">
+<h3>Daily Hymn</h3>
+<p id="daily-hymn" class="hymn-text">Loading daily hymn...</p>
+</div>
+
+<div class="card">
 <h3>Khernips Cleansing</h3>
 <button id="khernips-btn" class="cute-btn full-width">Wash Hands (0)</button>
+</div>
+
+<div class="card">
+<h3>Interactive Canvas</h3>
+<div id="altar-canvas" class="altar-tabletop">
+  <div id="sketch-frame" class="sketch-frame-ui" onclick="document.getElementById('upload-sketch').click()">
+    <span id="sketch-placeholder">Frame<br>(Tap to set)</span>
+  </div>
+</div>
+<div class="input-group margin-top">
+  <input type="file" id="upload-offering" accept="image/png, image/jpeg" style="display:none;">
+  <button id="add-offering-btn" class="cute-btn full-width" onclick="document.getElementById('upload-offering').click()">+ Upload Offering</button>
+  <input type="file" id="upload-sketch" accept="image/png, image/jpeg" style="display:none;">
+</div>
+<button id="sweep-altar-btn" class="cute-btn full-width margin-top">Sweep the Altar ( ˘▽˘)っ彡</button>
 </div>
 
 <div class="card">
@@ -74,8 +206,18 @@
 <p id="prompt-display" class="quote-box hidden margin-top"></p>
 <div style="position: relative;" class="margin-top">
   <textarea id="petition-text" class="cute-input" rows="3" placeholder="Write your petition here..."></textarea>
+  <div id="sparkle-container"></div>
 </div>
 <button id="send-petition-btn" class="cute-btn full-width margin-top">Send to Cloud Archive ( ✧ )</button>
+</div>
+
+<div class="card">
+<h3>Libations & Offerings</h3>
+<div id="libation-list"></div>
+<div class="input-group margin-top">
+<input type="text" id="new-libation" placeholder="New offering..." class="cute-input">
+<button id="add-libation-btn" class="cute-btn">Add</button>
+</div>
 </div>
 
 <div class="card">
@@ -101,6 +243,24 @@
 </div>
 </div>
 
+<div class="card center-text">
+<h3>[ ⌂ ] Delphic Oracle Maxim</h3>
+<button id="draw-delphic-btn" class="cute-btn">Consult the Oracle</button>
+<div id="delphic-display" class="hidden card-result margin-top">
+<h4 id="delphic-maxim" style="margin: 0 0 5px 0;"></h4>
+<p id="delphic-advice" style="font-size: 0.9rem; margin: 0;"></p>
+</div>
+</div>
+
+<div class="card center-text">
+<h3>[ ≡ ] Homeromancy Epic Omen</h3>
+<button id="draw-homer-btn" class="cute-btn">Draw Homeric Verse</button>
+<div id="homer-display" class="hidden card-result margin-top">
+<h4 id="homer-verse" style="margin: 0 0 5px 0;"></h4>
+<p id="homer-omen" style="font-size: 0.9rem; margin: 0;"></p>
+</div>
+</div>
+
 <div class="card">
 <h3>Reading Journal</h3>
 <textarea id="journal-entry" class="cute-input" rows="4" placeholder="Type your reading reflections here..."></textarea>
@@ -114,6 +274,12 @@
 <button class="settings-gear-btn" title="Settings">( ≡ )</button>
 <h2>Grimoire & Archive [ ≡ ]</h2>
 </header>
+
+<div class="card" style="background: #fbf9ff; border: 2px solid var(--border-blue);">
+<h3 style="margin-bottom: 4px;">[ ≡ ] Illuminated Grimoire Archive</h3>
+<p class="center-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Your quick-reference sacred associations synced with your shrines.</p>
+<div id="archive-grid" class="card-grid"></div>
+</div>
 
 <!-- EXPANDABLE PETITION ARCHIVE -->
 <div class="card accordion-card">
@@ -180,3 +346,4 @@
 </script>
 </body>
 </html>
+
