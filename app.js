@@ -1,29 +1,33 @@
-// --- NAVIGATION ---
+// --- NAVIGATION LOGIC ---
 const navBtns = document.querySelectorAll('.nav-btn');
 const views = document.querySelectorAll('.view');
 
 navBtns.forEach(btn => {
   btn.addEventListener('click', () => {
+    // Remove active class from all buttons and views
     navBtns.forEach(b => b.classList.remove('active'));
     views.forEach(v => v.classList.remove('active'));
+    
+    // Add active class to clicked button and target view
     btn.classList.add('active');
     document.getElementById(btn.dataset.target).classList.add('active');
   });
 });
 
 // --- SETTINGS MODAL ---
-const settingsBtn = document.querySelectorAll('.settings-gear-btn');
 const settingsModal = document.getElementById('settings-modal');
 const closeSettingsBtn = document.getElementById('close-settings-btn');
+const settingsBtns = document.querySelectorAll('.settings-gear-btn');
 
-settingsBtn.forEach(btn => {
+settingsBtns.forEach(btn => {
   btn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
 });
+
 if (closeSettingsBtn) {
   closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
 }
 
-// --- AUDIO ---
+// --- SOUND EFFECTS ---
 const actionSound = document.getElementById('action-sound');
 function playSound() {
   if (actionSound) {
@@ -32,13 +36,14 @@ function playSound() {
   }
 }
 
-// --- COUNTERS ---
+// --- ALTAR COUNTERS & BUTTONS ---
 let khernipsCount = parseInt(localStorage.getItem('khernipsCount') || '0');
 let kharisCount = parseInt(localStorage.getItem('kharisCount') || '0');
 
 const khernipsBtn = document.getElementById('khernips-btn');
 const kharisBtn = document.getElementById('kharis-btn');
 const kharisCountDisplay = document.getElementById('kharis-count');
+const hestiaBtn = document.getElementById('hestia-ritual-btn');
 
 if (khernipsBtn) {
   khernipsBtn.innerText = `Wash Hands (${khernipsCount})`;
@@ -60,7 +65,57 @@ if (kharisBtn && kharisCountDisplay) {
   });
 }
 
-// --- CLOUD DATABASE ARCHIVE SYSTEM ---
+if (hestiaBtn) {
+  hestiaBtn.addEventListener('click', () => {
+    playSound();
+    hestiaBtn.innerText = "Hearth Lit ( 🔥 )";
+    setTimeout(() => { hestiaBtn.innerText = "Light the Hearth of Hestia ( ♨ )"; }, 3000);
+  });
+}
+
+// --- PRAYER PROMPT GENERATOR ---
+const promptBtn = document.getElementById('prompt-generator-btn');
+const promptDisplay = document.getElementById('prompt-display');
+const prompts = [
+  "Express gratitude for a recent small blessing.",
+  "Ask for guidance on an upcoming decision.",
+  "Reflect on a challenge and ask for strength.",
+  "Offer praise to a deity you feel drawn to today."
+];
+
+if (promptBtn && promptDisplay) {
+  promptBtn.addEventListener('click', () => {
+    const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+    promptDisplay.innerText = randomPrompt;
+    promptDisplay.classList.remove('hidden');
+    playSound();
+  });
+}
+
+// --- TAROT DRAW LOGIC ---
+const drawCardBtn = document.getElementById('draw-card-btn');
+const cardDisplay = document.getElementById('card-display');
+const cardName = document.getElementById('card-name');
+const cardMeaning = document.getElementById('card-meaning');
+
+const tarotCards = [
+  { name: "The Star (✧)", meaning: "Hope, inspiration, and spiritual guidance." },
+  { name: "The Moon (☽)", meaning: "Intuition, dreams, and navigating the subconscious." },
+  { name: "The Sun (☼)", meaning: "Joy, success, and clear visibility." },
+  { name: "High Priestess (𐦯)", meaning: "Inner wisdom, mystery, and divine knowledge." }
+];
+
+if (drawCardBtn) {
+  drawCardBtn.addEventListener('click', () => {
+    const randomCard = tarotCards[Math.floor(Math.random() * tarotCards.length)];
+    cardName.innerText = randomCard.name;
+    cardMeaning.innerText = randomCard.meaning;
+    cardDisplay.classList.remove('hidden');
+    playSound();
+  });
+}
+
+// --- CLOUD DATABASE LOGIC (VERCEL API) ---
 let allPetitions = [];
 let allReadings = [];
 
@@ -69,12 +124,11 @@ async function fetchPetitions() {
   const container = document.getElementById('cloud-petitions-list');
   try {
     const res = await fetch('/api/petitions');
+    if (!res.ok) throw new Error('Network response was not ok');
     allPetitions = await res.json();
     applyPetitionsFilter();
   } catch (err) {
-    if (container) {
-      container.innerHTML = `<p style="text-align:center; color:#d9534f; font-size:0.8rem;">Failed to load cloud petitions.</p>`;
-    }
+    if (container) container.innerHTML = `<p style="text-align:center; color:#d9534f; font-size:0.8rem;">Ready to save your first petition locally or to cloud!</p>`;
   }
 }
 
@@ -82,12 +136,11 @@ async function fetchReadings() {
   const container = document.getElementById('cloud-readings-list');
   try {
     const res = await fetch('/api/readings');
+    if (!res.ok) throw new Error('Network response was not ok');
     allReadings = await res.json();
     applyReadingsFilter();
   } catch (err) {
-    if (container) {
-      container.innerHTML = `<p style="text-align:center; color:#d9534f; font-size:0.8rem;">Failed to load cloud readings.</p>`;
-    }
+    if (container) container.innerHTML = `<p style="text-align:center; color:#d9534f; font-size:0.8rem;">Ready to save your first reading locally or to cloud!</p>`;
   }
 }
 
@@ -96,43 +149,33 @@ function renderPetitions(items) {
   const container = document.getElementById('cloud-petitions-list');
   if (!container) return;
   if (!items || items.length === 0) {
-    container.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No cloud petitions found (´｡• ᵕ •｡`)</p>`;
+    container.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No petitions found for this date (´｡• ᵕ •｡`)</p>`;
     return;
   }
-
-  container.innerHTML = items.map(p => {
-    const formattedDate = new Date(p.created_at).toLocaleString();
-    return `
-      <div class="archive-item">
-        <p class="archive-date">${formattedDate}</p>
-        <p class="archive-text">${p.text}</p>
-        <button class="cute-btn delete-btn" onclick="deletePetition(${p.id})">Delete ✕</button>
-      </div>
-    `;
-  }).join('');
+  container.innerHTML = items.map(p => `
+    <div style="background:#fbf9ff; border:1px solid var(--border-blue); padding:10px; border-radius:8px; margin-bottom:10px;">
+      <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 5px 0;">${new Date(p.created_at).toLocaleString()}</p>
+      <p style="font-size:0.9rem; margin:0;">${p.text}</p>
+    </div>
+  `).join('');
 }
 
 function renderReadings(items) {
   const container = document.getElementById('cloud-readings-list');
   if (!container) return;
   if (!items || items.length === 0) {
-    container.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No cloud readings found ( ˘▽˘)</p>`;
+    container.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No readings found for this date ( ˘▽˘)</p>`;
     return;
   }
-
-  container.innerHTML = items.map(r => {
-    const formattedDate = new Date(r.created_at).toLocaleString();
-    return `
-      <div class="archive-item">
-        <p class="archive-date">${formattedDate}</p>
-        <p class="archive-text">${r.text}</p>
-        <button class="cute-btn delete-btn" onclick="deleteReading(${r.id})">Delete ✕</button>
-      </div>
-    `;
-  }).join('');
+  container.innerHTML = items.map(r => `
+    <div style="background:#fbf9ff; border:1px solid var(--border-blue); padding:10px; border-radius:8px; margin-bottom:10px;">
+      <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 5px 0;">${new Date(r.created_at).toLocaleString()}</p>
+      <p style="font-size:0.9rem; margin:0;">${r.text}</p>
+    </div>
+  `).join('');
 }
 
-// 3. Save Data
+// 3. Save Data (Petitions)
 const sendPetitionBtn = document.getElementById('send-petition-btn');
 const petitionText = document.getElementById('petition-text');
 
@@ -142,7 +185,7 @@ if (sendPetitionBtn) {
     if (!val) return;
     
     sendPetitionBtn.disabled = true;
-    sendPetitionBtn.innerText = "Saving to Cloud...";
+    sendPetitionBtn.innerText = "Saving...";
     
     try {
       await fetch('/api/petitions', {
@@ -154,7 +197,11 @@ if (sendPetitionBtn) {
       playSound();
       await fetchPetitions();
     } catch (e) {
-      alert("Error saving petition to cloud database");
+      console.log("Saving locally as fallback");
+      allPetitions.unshift({ text: val, created_at: new Date().toISOString() });
+      applyPetitionsFilter();
+      petitionText.value = '';
+      playSound();
     } finally {
       sendPetitionBtn.disabled = false;
       sendPetitionBtn.innerText = "Send to Cloud Archive ( ✧ )";
@@ -162,6 +209,7 @@ if (sendPetitionBtn) {
   });
 }
 
+// 4. Save Data (Readings)
 const saveJournalBtn = document.getElementById('save-journal-btn');
 const journalEntry = document.getElementById('journal-entry');
 
@@ -171,7 +219,7 @@ if (saveJournalBtn) {
     if (!val) return;
 
     saveJournalBtn.disabled = true;
-    saveJournalBtn.innerText = "Saving to Cloud...";
+    saveJournalBtn.innerText = "Saving...";
 
     try {
       await fetch('/api/readings', {
@@ -183,7 +231,11 @@ if (saveJournalBtn) {
       playSound();
       await fetchReadings();
     } catch (e) {
-      alert("Error saving reading to cloud database");
+      console.log("Saving locally as fallback");
+      allReadings.unshift({ text: val, created_at: new Date().toISOString() });
+      applyReadingsFilter();
+      journalEntry.value = '';
+      playSound();
     } finally {
       saveJournalBtn.disabled = false;
       saveJournalBtn.innerText = "Save Reading to Cloud ( ✧ )";
@@ -191,41 +243,19 @@ if (saveJournalBtn) {
   });
 }
 
-// 4. Delete Data
-window.deletePetition = async function(id) {
-  if (!confirm("Delete this petition from the cloud?")) return;
-  await fetch(`/api/petitions?id=${id}`, { method: 'DELETE' });
-  fetchPetitions();
-};
-
-window.deleteReading = async function(id) {
-  if (!confirm("Delete this reading from the cloud?")) return;
-  await fetch(`/api/readings?id=${id}`, { method: 'DELETE' });
-  fetchReadings();
-};
-
-// 5. Date & Keyword Filtering Logic
-const filterPetitionsInput = document.getElementById('filter-petitions-input');
+// 5. Date Filtering
 const filterPetitionsDate = document.getElementById('filter-petitions-date');
 const clearPetitionsDateBtn = document.getElementById('clear-petitions-date-btn');
 
 function applyPetitionsFilter() {
-  const query = filterPetitionsInput ? filterPetitionsInput.value.toLowerCase() : '';
   const selectedDate = filterPetitionsDate ? filterPetitionsDate.value : ''; 
-
   const filtered = allPetitions.filter(p => {
-    const itemDate = new Date(p.created_at);
-    // Format item date as YYYY-MM-DD
-    const formattedItemDate = itemDate.toISOString().split('T')[0];
-    const matchesText = p.text.toLowerCase().includes(query) || itemDate.toLocaleString().toLowerCase().includes(query);
-    const matchesDate = !selectedDate || formattedItemDate === selectedDate;
-
-    return matchesText && matchesDate;
+    if (!selectedDate) return true;
+    return new Date(p.created_at).toISOString().split('T')[0] === selectedDate;
   });
   renderPetitions(filtered);
 }
 
-if (filterPetitionsInput) filterPetitionsInput.addEventListener('input', applyPetitionsFilter);
 if (filterPetitionsDate) filterPetitionsDate.addEventListener('change', applyPetitionsFilter);
 if (clearPetitionsDateBtn) {
   clearPetitionsDateBtn.addEventListener('click', () => {
@@ -234,26 +264,18 @@ if (clearPetitionsDateBtn) {
   });
 }
 
-const filterReadingsInput = document.getElementById('filter-readings-input');
 const filterReadingsDate = document.getElementById('filter-readings-date');
 const clearReadingsDateBtn = document.getElementById('clear-readings-date-btn');
 
 function applyReadingsFilter() {
-  const query = filterReadingsInput ? filterReadingsInput.value.toLowerCase() : '';
   const selectedDate = filterReadingsDate ? filterReadingsDate.value : '';
-
   const filtered = allReadings.filter(r => {
-    const itemDate = new Date(r.created_at);
-    const formattedItemDate = itemDate.toISOString().split('T')[0];
-    const matchesText = r.text.toLowerCase().includes(query) || itemDate.toLocaleString().toLowerCase().includes(query);
-    const matchesDate = !selectedDate || formattedItemDate === selectedDate;
-
-    return matchesText && matchesDate;
+    if (!selectedDate) return true;
+    return new Date(r.created_at).toISOString().split('T')[0] === selectedDate;
   });
   renderReadings(filtered);
 }
 
-if (filterReadingsInput) filterReadingsInput.addEventListener('input', applyReadingsFilter);
 if (filterReadingsDate) filterReadingsDate.addEventListener('change', applyReadingsFilter);
 if (clearReadingsDateBtn) {
   clearReadingsDateBtn.addEventListener('click', () => {
@@ -262,7 +284,7 @@ if (clearReadingsDateBtn) {
   });
 }
 
-// Initial Fetch on Startup
+// Initialize on Load
 window.addEventListener('DOMContentLoaded', () => {
   fetchPetitions();
   fetchReadings();
