@@ -1,7 +1,8 @@
 {
-  "name": "hellenic-app",
+  "name": "sanctuary-pwa",
   "version": "1.0.0",
+  "private": true,
   "dependencies": {
-    "@vercel/postgres": "^0.7.2"
+    "@vercel/postgres": "^0.8.0"
   }
 }
