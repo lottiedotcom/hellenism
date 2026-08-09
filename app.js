@@ -4,11 +4,8 @@ const views = document.querySelectorAll('.view');
 
 navBtns.forEach(btn => {
   btn.addEventListener('click', () => {
-    // Remove active class from all buttons and views
     navBtns.forEach(b => b.classList.remove('active'));
     views.forEach(v => v.classList.remove('active'));
-    
-    // Add active class to clicked button and target view
     btn.classList.add('active');
     document.getElementById(btn.dataset.target).classList.add('active');
   });
@@ -36,7 +33,7 @@ function playSound() {
   }
 }
 
-// --- ALTAR COUNTERS & BUTTONS ---
+// --- UI BUTTONS & COUNTERS ---
 let khernipsCount = parseInt(localStorage.getItem('khernipsCount') || '0');
 let kharisCount = parseInt(localStorage.getItem('kharisCount') || '0');
 
@@ -92,7 +89,7 @@ if (promptBtn && promptDisplay) {
   });
 }
 
-// --- TAROT DRAW LOGIC ---
+// --- DIVINATION: TAROT ---
 const drawCardBtn = document.getElementById('draw-card-btn');
 const cardDisplay = document.getElementById('card-display');
 const cardName = document.getElementById('card-name');
@@ -115,7 +112,50 @@ if (drawCardBtn) {
   });
 }
 
-// --- CLOUD DATABASE LOGIC (VERCEL API) ---
+// --- DIVINATION: DELPHIC MAXIMS ---
+const drawDelphicBtn = document.getElementById('draw-delphic-btn');
+const delphicDisplay = document.getElementById('delphic-display');
+const delphicMaxim = document.getElementById('delphic-maxim');
+const delphicAdvice = document.getElementById('delphic-advice');
+
+const delphicMaxims = [
+  { maxim: "Know Thyself", advice: "Look inward before looking outward." },
+  { maxim: "Nothing in Excess", advice: "Seek balance and moderation in all things." },
+  { maxim: "Surety Brings Ruin", advice: "Avoid overconfidence and absolute guarantees." }
+];
+
+if (drawDelphicBtn) {
+  drawDelphicBtn.addEventListener('click', () => {
+    const randomMaxim = delphicMaxims[Math.floor(Math.random() * delphicMaxims.length)];
+    delphicMaxim.innerText = randomMaxim.maxim;
+    delphicAdvice.innerText = randomMaxim.advice;
+    delphicDisplay.classList.remove('hidden');
+    playSound();
+  });
+}
+
+// --- DIVINATION: HOMEROMANCY ---
+const drawHomerBtn = document.getElementById('draw-homer-btn');
+const homerDisplay = document.getElementById('homer-display');
+const homerVerse = document.getElementById('homer-verse');
+const homerOmen = document.getElementById('homer-omen');
+
+const homerVerses = [
+  { verse: "Endure, my heart...", omen: "Patience and resilience will see you through." },
+  { verse: "Sing to me, O Muse...", omen: "Seek inspiration and allow creativity to flow." }
+];
+
+if (drawHomerBtn) {
+  drawHomerBtn.addEventListener('click', () => {
+    const randomVerse = homerVerses[Math.floor(Math.random() * homerVerses.length)];
+    homerVerse.innerText = randomVerse.verse;
+    homerOmen.innerText = randomVerse.omen;
+    homerDisplay.classList.remove('hidden');
+    playSound();
+  });
+}
+
+// --- CLOUD DATABASE ARCHIVE SYSTEM (WITH FILTERS) ---
 let allPetitions = [];
 let allReadings = [];
 
@@ -124,11 +164,13 @@ async function fetchPetitions() {
   const container = document.getElementById('cloud-petitions-list');
   try {
     const res = await fetch('/api/petitions');
-    if (!res.ok) throw new Error('Network response was not ok');
+    if (!res.ok) throw new Error('API Error');
     allPetitions = await res.json();
     applyPetitionsFilter();
   } catch (err) {
-    if (container) container.innerHTML = `<p style="text-align:center; color:#d9534f; font-size:0.8rem;">Ready to save your first petition locally or to cloud!</p>`;
+    if (container) {
+      container.innerHTML = `<p style="text-align:center; color:#d9534f; font-size:0.8rem;">Ready to save your first petition locally or to cloud!</p>`;
+    }
   }
 }
 
@@ -136,11 +178,13 @@ async function fetchReadings() {
   const container = document.getElementById('cloud-readings-list');
   try {
     const res = await fetch('/api/readings');
-    if (!res.ok) throw new Error('Network response was not ok');
+    if (!res.ok) throw new Error('API Error');
     allReadings = await res.json();
     applyReadingsFilter();
   } catch (err) {
-    if (container) container.innerHTML = `<p style="text-align:center; color:#d9534f; font-size:0.8rem;">Ready to save your first reading locally or to cloud!</p>`;
+    if (container) {
+      container.innerHTML = `<p style="text-align:center; color:#d9534f; font-size:0.8rem;">Ready to save your first reading locally or to cloud!</p>`;
+    }
   }
 }
 
@@ -149,33 +193,43 @@ function renderPetitions(items) {
   const container = document.getElementById('cloud-petitions-list');
   if (!container) return;
   if (!items || items.length === 0) {
-    container.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No petitions found for this date (´｡• ᵕ •｡`)</p>`;
+    container.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No cloud petitions found (´｡• ᵕ •｡`)</p>`;
     return;
   }
-  container.innerHTML = items.map(p => `
-    <div style="background:#fbf9ff; border:1px solid var(--border-blue); padding:10px; border-radius:8px; margin-bottom:10px;">
-      <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 5px 0;">${new Date(p.created_at).toLocaleString()}</p>
-      <p style="font-size:0.9rem; margin:0;">${p.text}</p>
-    </div>
-  `).join('');
+
+  container.innerHTML = items.map(p => {
+    const formattedDate = new Date(p.created_at).toLocaleString();
+    return `
+      <div class="archive-item">
+        <p class="archive-date">${formattedDate}</p>
+        <p class="archive-text">${p.text}</p>
+        <button class="cute-btn delete-btn" onclick="deletePetition(${p.id || `'${p.created_at}'`})">Delete ✕</button>
+      </div>
+    `;
+  }).join('');
 }
 
 function renderReadings(items) {
   const container = document.getElementById('cloud-readings-list');
   if (!container) return;
   if (!items || items.length === 0) {
-    container.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No readings found for this date ( ˘▽˘)</p>`;
+    container.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No cloud readings found ( ˘▽˘)</p>`;
     return;
   }
-  container.innerHTML = items.map(r => `
-    <div style="background:#fbf9ff; border:1px solid var(--border-blue); padding:10px; border-radius:8px; margin-bottom:10px;">
-      <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 5px 0;">${new Date(r.created_at).toLocaleString()}</p>
-      <p style="font-size:0.9rem; margin:0;">${r.text}</p>
-    </div>
-  `).join('');
+
+  container.innerHTML = items.map(r => {
+    const formattedDate = new Date(r.created_at).toLocaleString();
+    return `
+      <div class="archive-item">
+        <p class="archive-date">${formattedDate}</p>
+        <p class="archive-text">${r.text}</p>
+        <button class="cute-btn delete-btn" onclick="deleteReading(${r.id || `'${r.created_at}'`})">Delete ✕</button>
+      </div>
+    `;
+  }).join('');
 }
 
-// 3. Save Data (Petitions)
+// 3. Save Data
 const sendPetitionBtn = document.getElementById('send-petition-btn');
 const petitionText = document.getElementById('petition-text');
 
@@ -185,7 +239,7 @@ if (sendPetitionBtn) {
     if (!val) return;
     
     sendPetitionBtn.disabled = true;
-    sendPetitionBtn.innerText = "Saving...";
+    sendPetitionBtn.innerText = "Saving to Cloud...";
     
     try {
       await fetch('/api/petitions', {
@@ -209,7 +263,6 @@ if (sendPetitionBtn) {
   });
 }
 
-// 4. Save Data (Readings)
 const saveJournalBtn = document.getElementById('save-journal-btn');
 const journalEntry = document.getElementById('journal-entry');
 
@@ -219,7 +272,7 @@ if (saveJournalBtn) {
     if (!val) return;
 
     saveJournalBtn.disabled = true;
-    saveJournalBtn.innerText = "Saving...";
+    saveJournalBtn.innerText = "Saving to Cloud...";
 
     try {
       await fetch('/api/readings', {
@@ -243,19 +296,49 @@ if (saveJournalBtn) {
   });
 }
 
-// 5. Date Filtering
+// 4. Delete Data Functions (Added fallbacks so local dummy data deletes visually)
+window.deletePetition = async function(id) {
+  if (!confirm("Delete this petition?")) return;
+  try {
+    await fetch(`/api/petitions?id=${id}`, { method: 'DELETE' });
+    fetchPetitions();
+  } catch (err) {
+    allPetitions = allPetitions.filter(p => p.id !== id && p.created_at !== id);
+    applyPetitionsFilter();
+  }
+};
+
+window.deleteReading = async function(id) {
+  if (!confirm("Delete this reading?")) return;
+  try {
+    await fetch(`/api/readings?id=${id}`, { method: 'DELETE' });
+    fetchReadings();
+  } catch (err) {
+    allReadings = allReadings.filter(r => r.id !== id && r.created_at !== id);
+    applyReadingsFilter();
+  }
+};
+
+// 5. Date & Keyword Filtering Logic
+const filterPetitionsInput = document.getElementById('filter-petitions-input');
 const filterPetitionsDate = document.getElementById('filter-petitions-date');
 const clearPetitionsDateBtn = document.getElementById('clear-petitions-date-btn');
 
 function applyPetitionsFilter() {
+  const query = filterPetitionsInput ? filterPetitionsInput.value.toLowerCase() : '';
   const selectedDate = filterPetitionsDate ? filterPetitionsDate.value : ''; 
+
   const filtered = allPetitions.filter(p => {
-    if (!selectedDate) return true;
-    return new Date(p.created_at).toISOString().split('T')[0] === selectedDate;
+    const itemDate = new Date(p.created_at);
+    const formattedItemDate = itemDate.toISOString().split('T')[0];
+    const matchesText = p.text.toLowerCase().includes(query) || itemDate.toLocaleString().toLowerCase().includes(query);
+    const matchesDate = !selectedDate || formattedItemDate === selectedDate;
+    return matchesText && matchesDate;
   });
   renderPetitions(filtered);
 }
 
+if (filterPetitionsInput) filterPetitionsInput.addEventListener('input', applyPetitionsFilter);
 if (filterPetitionsDate) filterPetitionsDate.addEventListener('change', applyPetitionsFilter);
 if (clearPetitionsDateBtn) {
   clearPetitionsDateBtn.addEventListener('click', () => {
@@ -264,18 +347,25 @@ if (clearPetitionsDateBtn) {
   });
 }
 
+const filterReadingsInput = document.getElementById('filter-readings-input');
 const filterReadingsDate = document.getElementById('filter-readings-date');
 const clearReadingsDateBtn = document.getElementById('clear-readings-date-btn');
 
 function applyReadingsFilter() {
+  const query = filterReadingsInput ? filterReadingsInput.value.toLowerCase() : '';
   const selectedDate = filterReadingsDate ? filterReadingsDate.value : '';
+
   const filtered = allReadings.filter(r => {
-    if (!selectedDate) return true;
-    return new Date(r.created_at).toISOString().split('T')[0] === selectedDate;
+    const itemDate = new Date(r.created_at);
+    const formattedItemDate = itemDate.toISOString().split('T')[0];
+    const matchesText = r.text.toLowerCase().includes(query) || itemDate.toLocaleString().toLowerCase().includes(query);
+    const matchesDate = !selectedDate || formattedItemDate === selectedDate;
+    return matchesText && matchesDate;
   });
   renderReadings(filtered);
 }
 
+if (filterReadingsInput) filterReadingsInput.addEventListener('input', applyReadingsFilter);
 if (filterReadingsDate) filterReadingsDate.addEventListener('change', applyReadingsFilter);
 if (clearReadingsDateBtn) {
   clearReadingsDateBtn.addEventListener('click', () => {
@@ -284,9 +374,8 @@ if (clearReadingsDateBtn) {
   });
 }
 
-// Initialize on Load
+// Initial Fetch on Startup
 window.addEventListener('DOMContentLoaded', () => {
   fetchPetitions();
   fetchReadings();
 });
-
