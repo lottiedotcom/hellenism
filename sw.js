@@ -1,15 +1,14 @@
-const CACHE_NAME = 'hellenism-cache-v2';
+const CACHE_NAME = 'hellenic-app-v5';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/style.css',
   '/app.js',
   '/manifest.json',
-  '/tarot.json',
-  '/delphic.json',
-  '/homeromancy.json'
+  '/tarot.json'
 ];
 
+// Install Event
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -19,6 +18,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
+// Activate Event
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -34,11 +34,9 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Fetch Event
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-  
-  // Bypass cache completely for API routes so database requests always hit Vercel
-  if (url.pathname.startsWith('/api/')) {
+  if (!event.request.url.startsWith(self.location.origin)) {
     return;
   }
 
@@ -52,11 +50,11 @@ self.addEventListener('fetch', (event) => {
           cache.put(event.request, response.clone());
           return response;
         });
+      }).catch(() => {
+        if (event.request.headers.get('accept').includes('text/html')) {
+          return caches.match('/index.html');
+        }
       });
-    }).catch(() => {
-      if (event.request.headers.get('accept').includes('text/html')) {
-        return caches.match('/index.html');
-      }
     })
   );
 });
