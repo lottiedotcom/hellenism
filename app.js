@@ -57,6 +57,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Modal logic for Deity Archive
+    const archiveModal = document.getElementById('archive-modal');
+    const closeArchiveBtn = document.getElementById('close-archive-btn');
+    if(closeArchiveBtn && archiveModal) {
+        closeArchiveBtn.addEventListener('click', () => {
+            archiveModal.classList.add('hidden');
+        });
+    }
+
     // ==========================================
     // 3. EXPANDED DIVINATION
     // ==========================================
@@ -219,7 +228,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LIBATIONS LOGIC (NEW IN-DEPTH SYSTEM) ---
+    // --- API HELPER FOR DEITY ARCHIVE ---
+    async function addRecordToDeityArchive(deity, record) {
+        try {
+            let records = [];
+            const res = await fetch(`/api/archive?deity=${encodeURIComponent(deity)}`);
+            if(res.ok) {
+                const data = await res.json();
+                if(data.success && data.records) records = data.records;
+            }
+            records.unshift(record); // newest first
+            await fetch('/api/archive', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ deity, records })
+            });
+        } catch (err) {
+            console.error("Failed to sync record to deity archive.", err);
+        }
+    }
+
+    // --- LIBATIONS LOGIC ---
     const addLibationBtn = document.getElementById('add-libation-btn');
     const newLibationName = document.getElementById('new-libation-name');
     const newLibationType = document.getElementById('new-libation-type');
@@ -232,7 +261,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const note = newLibationNote ? newLibationNote.value.trim() : "";
             
             if (name) {
-                // Handle legacy strings vs new objects gracefully just in case
                 libationsList.push({ 
                     id: Date.now(), 
                     name: name,
@@ -246,6 +274,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(newLibationNote) newLibationNote.value = '';
                 await saveToCloud('libationsList', libationsList);
                 renderLibations();
+
+                // 1. Auto Tick Kharis
+                kharisCount++;
+                if (kharisCountSpan) kharisCountSpan.innerText = kharisCount;
+                saveToCloud('kharisCount', kharisCount);
+
+                // 2. Save directly to the deity's database ledger
+                const newRecord = {
+                    id: Date.now(),
+                    name: name,
+                    type: type,
+                    note: note,
+                    date: new Date().toLocaleString()
+                };
+                addRecordToDeityArchive(currentShrine, newRecord);
             }
         });
     }
@@ -256,7 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
         listEl.innerHTML = '';
         
         libationsList.forEach(item => {
-            // Backwards compatibility for old flat-string entries
             if (typeof item === 'string') {
                 item = { id: Date.now() + Math.random(), name: item, type: 'Legacy Offering', note: '', deity: 'General', status: 'active' };
             }
@@ -281,7 +323,6 @@ document.addEventListener('DOMContentLoaded', () => {
             listEl.appendChild(div);
         });
         
-        // Setup Delete Listeners
         document.querySelectorAll('#libation-list .delete-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const id = parseFloat(e.target.getAttribute('data-id'));
@@ -291,7 +332,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        // Setup Active/Cleared Toggle Listeners
         document.querySelectorAll('#libation-list .toggle-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const id = parseFloat(e.target.getAttribute('data-id'));
@@ -369,6 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span>Petitions: ${shrine.petitions.length}</span>
                 </div>
                 <button class="cute-btn full-width margin-top edit-grimoire-btn" data-deity="${d}">Edit Grimoire Associations ✨</button>
+                <button class="cute-btn full-width margin-top open-archive-btn" data-deity="${d}" style="background: #fbf9ff;">♡ Open Offering Archive</button>
             `;
             grid.appendChild(card);
         });
@@ -379,6 +420,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 openGrimoireEditor(deity);
             });
         });
+
+        // Trigger for the new overlay modal
+        document.querySelectorAll('.open-archive-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const deity = e.target.getAttribute('data-deity');
+                openDeityArchiveModal(deity);
+            });
+        });
+    }
+
+    // --- MODAL: Fetch and display the specific deity archive ---
+    async function openDeityArchiveModal(deity) {
+        const modal = document.getElementById('archive-modal');
+        const title = document.getElementById('archive-modal-title');
+        const content = document.getElementById('archive-modal-content');
+        
+        if(modal && title && content) {
+            title.innerText = `${deity}'s Devotional Archive`;
+            content.innerHTML = '<p class="center-text">Loading archives... ( ✧ω✧)</p>';
+            modal.classList.remove('hidden');
+
+            try {
+                const res = await fetch(`/api/archive?deity=${encodeURIComponent(deity)}`);
+                let records = [];
+                if(res.ok) {
+                    const data = await res.json();
+                    if(data.success && data.records) records = data.records;
+                }
+                
+                if(records.length === 0) {
+                    content.innerHTML = '<p class="center-text" style="font-size:0.85rem; color:var(--text-muted);">No records found for this deity yet. Log an offering to start building your ledger!</p>';
+                } else {
+                    content.innerHTML = '';
+                    records.forEach(rec => {
+                        const div = document.createElement('div');
+                        div.className = 'libation-item';
+                        div.style.flexDirection = 'column';
+                        div.style.alignItems = 'flex-start';
+                        div.innerHTML = `
+                            <div style="display:flex; justify-content:space-between; width:100%; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">
+                                <span><strong>${rec.type}</strong></span>
+                                <span>${rec.date}</span>
+                            </div>
+                            <div style="font-size:0.85rem; font-weight:700;">${rec.name}</div>
+                            ${rec.note ? `<div style="font-size:0.8rem; font-style:italic; margin-top:4px; color:var(--text-dark);">"${rec.note}"</div>` : ''}
+                        `;
+                        content.appendChild(div);
+                    });
+                }
+            } catch (err) {
+                content.innerHTML = '<p class="center-text">Error loading archives (x_x)</p>';
+            }
+        }
     }
 
     function renderJournalArchive() {
@@ -835,6 +929,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const sweepBtn = document.getElementById('sweep-altar-btn');
+    const kharisCountSpan = document.getElementById('kharis-count');
     if(sweepBtn) {
         sweepBtn.addEventListener('click', () => {
             if(shrineData[currentShrine]) {
