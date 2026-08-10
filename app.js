@@ -78,6 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const archiveKey = 'archive_' + deity;
                 backupData[archiveKey] = await loadFromCloud(archiveKey, []);
             }
+            
+            backupData['libationsList'] = await loadFromCloud('libationsList', []);
 
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
             const downloadAnchorNode = document.createElement('a');
@@ -91,33 +93,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Fixed Import Logic: Loops over all selected files and parses each!
     if (importBtn && importFileInput) {
         importBtn.addEventListener('click', () => importFileInput.click());
 
-        importFileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
+        importFileInput.addEventListener('change', async (e) => {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
             
-            reader.onload = async (event) => {
-                try {
-                    importBtn.innerText = "Importing... Please wait.";
-                    const importedData = JSON.parse(event.target.result);
-                    
-                    for (const [key, value] of Object.entries(importedData)) {
-                        if (value !== null && value !== undefined) {
-                            await saveToCloud(key, value);
+            importBtn.innerText = "Importing... Please wait.";
+            let successCount = 0;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = async (event) => {
+                        try {
+                            const importedData = JSON.parse(event.target.result);
+                            for (const [key, value] of Object.entries(importedData)) {
+                                if (value !== null && value !== undefined) {
+                                    await saveToCloud(key, value);
+                                }
+                            }
+                            successCount++;
+                            resolve();
+                        } catch (err) {
+                            resolve(); // Skips invalid non-JSON files silently
                         }
-                    }
-                    
-                    alert("Backup imported securely to the cloud! Reloading app... ( ˘▽˘)");
-                    location.reload();
-                } catch (err) {
-                    alert("Failed to parse backup file. Make sure it's a valid JSON. (x_x)");
-                    importBtn.innerText = "(^o^) Import Backup";
-                }
-            };
-            reader.readAsText(file);
+                    };
+                    reader.readAsText(file);
+                });
+            }
+            
+            alert(`Backup imported securely! Loaded ${successCount} file(s) to the cloud. Reloading app... ( ˘▽˘)`);
+            location.reload();
         });
     }
 
@@ -263,6 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let khernipsCount = 0;
     let kharisCount = 0;
+    let libationsList = [];
 
     async function initApp() {
         deities = await loadFromCloud('customDeitiesList', ["Hestia", "Hekate", "Apollo", "Hermes"]);
@@ -273,6 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         khernipsCount = await loadFromCloud('khernipsCount', 0);
         kharisCount = await loadFromCloud('kharisCount', 0);
+        libationsList = await loadFromCloud('libationsList', []);
 
         deities.forEach(d => {
             if(!shrineData[d]) shrineData[d] = { offerings: [], sketch: null, petitions: [] };
@@ -289,6 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const kSpan = document.getElementById('kharis-count');
         if(kSpan) kSpan.innerText = kharisCount;
+        
+        renderLibations();
         
         const deityInput = document.getElementById('deity-focus-input');
         if(deityInput) {
@@ -368,6 +382,59 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function renderLibations() {
+        // Keeps the layout stable on load if there are legacy libations
+        const listEl = document.getElementById('libation-list');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+        
+        libationsList.forEach(item => {
+            if (typeof item === 'string') {
+                item = { id: Date.now() + Math.random(), name: item, type: 'Legacy Offering', note: '', deity: 'General', status: 'active' };
+            }
+            
+            const div = document.createElement('div');
+            div.className = `libation-card ${item.status === 'cleared' ? 'libation-cleared' : ''}`;
+            
+            div.innerHTML = `
+                <div class="libation-header">
+                    <span>${item.name}</span>
+                    <div class="libation-actions">
+                        <button class="action-icon-btn toggle-btn" data-id="${item.id}" title="Toggle Active/Cleared">${item.status === 'active' ? '(b ᵔ▽ᵔ)b' : '( ˘ ³˘)ノ'}</button>
+                        <button class="action-icon-btn delete-btn" data-id="${item.id}" title="Delete">(x_x)</button>
+                    </div>
+                </div>
+                <div class="libation-tags">
+                    <span class="libation-tag">To: ${item.deity}</span>
+                    <span class="libation-tag">${item.type}</span>
+                </div>
+                ${item.note ? `<div class="libation-note">"${item.note}"</div>` : ''}
+            `;
+            listEl.appendChild(div);
+        });
+        
+        document.querySelectorAll('#libation-list .delete-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = parseFloat(e.target.getAttribute('data-id'));
+                libationsList = libationsList.filter(l => l.id !== id && l !== e.target.getAttribute('data-id')); 
+                await saveToCloud('libationsList', libationsList);
+                renderLibations();
+            });
+        });
+        
+        document.querySelectorAll('#libation-list .toggle-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = parseFloat(e.target.getAttribute('data-id'));
+                const item = libationsList.find(l => l.id === id);
+                if (item) {
+                    item.status = item.status === 'active' ? 'cleared' : 'active';
+                    await saveToCloud('libationsList', libationsList);
+                    renderLibations();
+                }
+            });
+        });
+    }
+
     function populateDeityDropdown() {
         const select = document.getElementById('deity-focus-input');
         if(!select) return;
@@ -381,7 +448,6 @@ document.addEventListener('DOMContentLoaded', () => {
         select.value = currentShrine;
     }
 
-    // --- GRIMOIRE ARCHIVE: Collapsible Logic ---
     function renderGrimoireArchive() {
         const grid = document.getElementById('archive-grid');
         if(!grid) return;
@@ -394,7 +460,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = 'grimoire-manuscript-card';
             
-            // Build the card with a clickable header and a hidden content wrapper
             card.innerHTML = `
                 <div class="manuscript-header toggle-collapse" style="cursor: pointer;">
                     <h4>Sanctuary of ${d}</h4>
@@ -442,7 +507,6 @@ document.addEventListener('DOMContentLoaded', () => {
             grid.appendChild(card);
         });
 
-        // Add event listeners to toggle the collapsible section
         document.querySelectorAll('.toggle-collapse').forEach(header => {
             header.addEventListener('click', (e) => {
                 const contentWrapper = header.nextElementSibling;
