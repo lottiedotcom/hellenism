@@ -57,6 +57,73 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- NEW: EXPORT & IMPORT BACKUP LOGIC ---
+    const exportBtn = document.getElementById('export-backup-btn');
+    const importBtn = document.getElementById('import-backup-btn');
+    const importFileInput = document.getElementById('import-file-input');
+
+    if (exportBtn) {
+        exportBtn.addEventListener('click', async () => {
+            // Keys to safely extract
+            const keysToBackup = ['customDeitiesList', 'shrineData', 'deityGrimoire', 'journalArchive', 'khernipsCount', 'kharisCount'];
+            let backupData = {};
+            
+            exportBtn.innerText = "Gathering data...";
+            
+            for (const key of keysToBackup) {
+                backupData[key] = await loadFromCloud(key, null);
+            }
+            
+            // Also grab all dynamic deity archives
+            const deitiesToBackup = backupData['customDeitiesList'] || [];
+            for (const deity of deitiesToBackup) {
+                const archiveKey = 'archive_' + deity;
+                backupData[archiveKey] = await loadFromCloud(archiveKey, []);
+            }
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "hellenic_backup_" + Date.now() + ".json");
+            document.body.appendChild(downloadAnchorNode); 
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            
+            exportBtn.innerText = "📥 Export Backup";
+        });
+    }
+
+    if (importBtn && importFileInput) {
+        importBtn.addEventListener('click', () => importFileInput.click());
+
+        importFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            
+            reader.onload = async (event) => {
+                try {
+                    importBtn.innerText = "Importing... Please wait.";
+                    const importedData = JSON.parse(event.target.result);
+                    
+                    // Iterate and save every valid key sequentially
+                    for (const [key, value] of Object.entries(importedData)) {
+                        if (value !== null && value !== undefined) {
+                            await saveToCloud(key, value);
+                        }
+                    }
+                    
+                    alert("Backup imported securely to the cloud! Reloading app... ( ˘▽˘)");
+                    location.reload();
+                } catch (err) {
+                    alert("Failed to parse backup file. Make sure it's a valid JSON. (x_x)");
+                    importBtn.innerText = "📤 Import Backup";
+                }
+            };
+            reader.readAsText(file);
+        });
+    }
+
     // Modal logic for Deity Archive
     const archiveModal = document.getElementById('archive-modal');
     const closeArchiveBtn = document.getElementById('close-archive-btn');
@@ -237,11 +304,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const note = newLibationNote ? newLibationNote.value.trim() : "";
             
             if (name) {
-                // 1. Fetch existing archive for this specific deity via safe /api/storage route
                 const archiveKey = 'archive_' + currentShrine;
                 let records = await loadFromCloud(archiveKey, []);
                 
-                // 2. Add the new record to the top of the ledger
                 records.unshift({
                     id: Date.now(),
                     name: name,
@@ -251,19 +316,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     date: new Date().toLocaleString()
                 });
                 
-                // 3. Save it back to the cloud
                 await saveToCloud(archiveKey, records);
 
-                // 4. Tick Kharis tracker automatically
                 kharisCount++;
                 if (kharisCountSpan) kharisCountSpan.innerText = kharisCount;
                 await saveToCloud('kharisCount', kharisCount);
 
-                // 5. Clear Inputs from screen immediately
                 newLibationName.value = '';
                 if(newLibationNote) newLibationNote.value = '';
                 
-                // 6. Give visual feedback
                 const container = document.getElementById('libation-sparkle-container');
                 if(container) {
                     const sparkle = document.createElement('div');
@@ -371,7 +432,6 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.classList.remove('hidden');
 
             try {
-                // Fetch the archives using our perfectly working /api/storage method
                 let records = await loadFromCloud('archive_' + deity, []);
                 
                 if(records.length === 0) {
@@ -398,7 +458,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         content.appendChild(div);
                     });
 
-                    // Add Event Listeners for the Toggles inside the Modal
                     content.querySelectorAll('.delete-btn').forEach(btn => {
                         btn.addEventListener('click', async (e) => {
                             if(confirm("Delete this record permanently?")) {
@@ -407,7 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 let recs = await loadFromCloud('archive_' + d, []);
                                 recs = recs.filter(r => r.id !== id);
                                 await saveToCloud('archive_' + d, recs);
-                                openDeityArchiveModal(d); // Re-render instantly
+                                openDeityArchiveModal(d); 
                             }
                         });
                     });
@@ -421,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             if(item) {
                                 item.status = item.status === 'active' ? 'cleared' : 'active';
                                 await saveToCloud('archive_' + d, recs);
-                                openDeityArchiveModal(d); // Re-render instantly
+                                openDeityArchiveModal(d); 
                             }
                         });
                     });
@@ -1071,4 +1130,3 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDailyHymn();
 
 });
-
