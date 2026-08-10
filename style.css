@@ -37,7 +37,6 @@ body.theme-pastel {
   display: none !important;
 }
 
-/* CARDS */
 .card {
   background: var(--card-bg);
   border-radius: 12px;
@@ -56,7 +55,6 @@ body.theme-pastel {
   margin-top: 15px;
 }
 
-/* BUTTONS & INPUTS */
 .cute-btn {
   background-color: var(--theme-main);
   color: white;
@@ -65,7 +63,6 @@ body.theme-pastel {
   padding: 10px 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.2s;
 }
 .cute-btn:active {
   opacity: 0.8;
@@ -84,7 +81,6 @@ body.theme-pastel {
   resize: vertical;
 }
 
-/* HEADER & HERO */
 .hero {
   text-align: center;
   padding: 20px 0;
@@ -106,7 +102,6 @@ body.theme-pastel {
   font-size: 0.9rem;
 }
 
-/* STAT PILLS & ALIGNMENT */
 .alignment-box {
   background: #fdfcff;
   border: 1px solid var(--border-blue);
@@ -142,7 +137,6 @@ body.theme-pastel {
   color: var(--text-main);
 }
 
-/* DEIPNON & CYCLE STYLES */
 .progress-bar-container {
   width: 100%;
   height: 12px;
@@ -157,28 +151,7 @@ body.theme-pastel {
   width: 0%;
   transition: width 0.5s ease;
 }
-.cute-summary {
-  cursor: pointer;
-  font-weight: bold;
-  color: var(--theme-main);
-  list-style: none;
-  text-align: center;
-  padding: 5px;
-  background: var(--accent-blue);
-  border-radius: 8px;
-}
-.cute-summary::-webkit-details-marker {
-  display: none;
-}
-.deipnon-details {
-  background: #fdfcff;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border-blue);
-  font-size: 0.9rem;
-  line-height: 1.4;
-  margin-top: 8px;
-}
+
 .cycle-list p {
   margin: 8px 0;
   font-size: 0.9rem;
@@ -188,39 +161,6 @@ body.theme-pastel {
   padding-bottom: 4px;
 }
 
-/* ARCHIVE ITEM LISTS & FILTERS */
-.filter-box {
-  background: #f8f6fc;
-  border: 1px solid var(--border-blue);
-  border-radius: 8px;
-  padding: 10px;
-}
-
-.archive-item {
-  background: #fbf9ff;
-  border: 1px solid var(--border-blue);
-  border-radius: 8px;
-  padding: 10px;
-  margin-top: 10px;
-}
-.archive-date {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin: 0 0 6px 0;
-}
-.archive-text {
-  font-size: 0.9rem;
-  line-height: 1.4;
-  white-space: pre-wrap;
-  margin: 0 0 8px 0;
-}
-.delete-btn {
-  padding: 4px 10px;
-  font-size: 0.75rem;
-  background: #e6a3a3;
-}
-
-/* BOTTOM NAVIGATION */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -251,7 +191,6 @@ body.theme-pastel {
   margin-bottom: 2px;
 }
 
-/* SETTINGS MODAL */
 .settings-modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -267,3 +206,4 @@ body.theme-pastel {
   max-height: 80vh;
   overflow-y: auto;
 }
+
