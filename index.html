@@ -42,8 +42,9 @@
       <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Data Management</h4>
       <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0;">Backup your archives, shrines, and settings to a file.</p>
       <button id="export-backup-btn" class="cute-btn full-width">(v_v) Export Backup</button>
-      <button id="import-backup-btn" class="cute-btn full-width margin-top">(^o^) Import Backup</button>
-      <input type="file" id="import-file-input" accept=".json" style="display:none;">
+      <button id="import-backup-btn" class="cute-btn full-width margin-top">(^o^) Import Files/Backups</button>
+      <!-- Added 'multiple' to allow selecting multiple files/folders -->
+      <input type="file" id="import-file-input" accept=".json" multiple style="display:none;">
      </div>
 
      <div class="card" style="margin-bottom: 0;">
