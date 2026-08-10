@@ -167,14 +167,24 @@
      </div>
      <button id="send-petition-btn" class="cute-btn full-width margin-top">Send to the Gods</button>
     </div>
+    
+    <!-- NEW IN-DEPTH OFFERINGS SECTION -->
     <div class="card">
      <h3>Libations &amp; Offerings</h3>
      <div id="libation-list"></div>
-     <div class="input-group">
-      <input type="text" id="new-libation" placeholder="New offering..." class="cute-input">
-      <button id="add-libation-btn" class="cute-btn">Add</button>
+     <div class="input-group" style="flex-direction: column; gap: 8px; margin-top: 14px;">
+      <input type="text" id="new-libation-name" placeholder="Offering (e.g., Honey, Bath)..." class="cute-input">
+      <select id="new-libation-type" class="cute-input">
+        <option value="Liquid Libation">💧 Liquid Libation</option>
+        <option value="Consumable">🍞 Consumable / Food</option>
+        <option value="Material Offering">🕯️ Material Offering</option>
+        <option value="Devotional Act">✨ Devotional Act</option>
+      </select>
+      <input type="text" id="new-libation-note" placeholder="Intention / Note (Optional)..." class="cute-input">
+      <button id="add-libation-btn" class="cute-btn full-width">Log Offering</button>
      </div>
     </div>
+    
     <div class="card">
      <h3>Kharis Tracker</h3>
      <button id="kharis-btn" class="cute-btn full-width">Log Devotion (≧◡≦)</button>
@@ -229,7 +239,6 @@
      <div id="archive-grid" class="card-grid"></div>
     </div>
     
-    <!-- READINGS & PRAYERS ARCHIVE SECTION -->
     <div class="card margin-top">
      <h3>📜 Readings &amp; Prayers Archive</h3>
      <div id="journal-archive-list" class="card-grid"></div>
@@ -254,4 +263,3 @@
 </script>
  </body>
 </html>
-
