@@ -69,7 +69,7 @@ transition: transform 0.2s;
 transform: scale(0.92);
 }
 
-/* Modal System (Used for Settings and Archives) */
+/* Modal System */
 .settings-modal {
 position: fixed;
 top: 0;
@@ -254,7 +254,7 @@ gap: 8px;
 margin-top: 10px;
 }
 
-/* Offering Cards (Now inside the Archive Modal!) */
+/* Offering Cards */
 .libation-card {
     background: var(--accent-blue);
     border: 1px solid var(--border-blue);
@@ -588,16 +588,7 @@ position: relative;
   transition: opacity 1s ease-out;
 }
 
-#sparkle-container {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none;
-  z-index: 20;
-}
-/* New container for the Libations button feedback */
-#libation-sparkle-container {
+#sparkle-container, #libation-sparkle-container {
   position: absolute;
   bottom: 40px;
   left: 50%;
