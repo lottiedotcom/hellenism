@@ -36,7 +36,7 @@ function playSound() {
   }
 }
 
-// --- ALTAR COUNTERS & BUTTONS ---
+// --- COUNTERS & BUTTONS ---
 let khernipsCount = parseInt(localStorage.getItem('khernipsCount') || '0');
 let kharisCount = parseInt(localStorage.getItem('kharisCount') || '0');
 
@@ -73,26 +73,7 @@ if (hestiaBtn) {
   });
 }
 
-// --- PRAYER PROMPT GENERATOR ---
-const promptBtn = document.getElementById('prompt-generator-btn');
-const promptDisplay = document.getElementById('prompt-display');
-const prompts = [
-  "Express gratitude for a recent small blessing.",
-  "Ask for guidance on an upcoming decision.",
-  "Reflect on a challenge and ask for strength.",
-  "Offer praise to a deity you feel drawn to today."
-];
-
-if (promptBtn && promptDisplay) {
-  promptBtn.addEventListener('click', () => {
-    const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
-    promptDisplay.innerText = randomPrompt;
-    promptDisplay.classList.remove('hidden');
-    playSound();
-  });
-}
-
-// --- DIVINATION: TAROT ---
+// --- TAROT DRAW LOGIC ---
 const drawCardBtn = document.getElementById('draw-card-btn');
 const cardDisplay = document.getElementById('card-display');
 const cardName = document.getElementById('card-name');
@@ -115,50 +96,7 @@ if (drawCardBtn) {
   });
 }
 
-// --- DIVINATION: DELPHIC MAXIMS ---
-const drawDelphicBtn = document.getElementById('draw-delphic-btn');
-const delphicDisplay = document.getElementById('delphic-display');
-const delphicMaxim = document.getElementById('delphic-maxim');
-const delphicAdvice = document.getElementById('delphic-advice');
-
-const delphicMaxims = [
-  { maxim: "Know Thyself", advice: "Look inward before looking outward." },
-  { maxim: "Nothing in Excess", advice: "Seek balance and moderation in all things." },
-  { maxim: "Surety Brings Ruin", advice: "Avoid overconfidence and absolute guarantees." }
-];
-
-if (drawDelphicBtn) {
-  drawDelphicBtn.addEventListener('click', () => {
-    const randomMaxim = delphicMaxims[Math.floor(Math.random() * delphicMaxims.length)];
-    if (delphicMaxim) delphicMaxim.innerText = randomMaxim.maxim;
-    if (delphicAdvice) delphicAdvice.innerText = randomMaxim.advice;
-    if (delphicDisplay) delphicDisplay.classList.remove('hidden');
-    playSound();
-  });
-}
-
-// --- DIVINATION: HOMEROMANCY ---
-const drawHomerBtn = document.getElementById('draw-homer-btn');
-const homerDisplay = document.getElementById('homer-display');
-const homerVerse = document.getElementById('homer-verse');
-const homerOmen = document.getElementById('homer-omen');
-
-const homerVerses = [
-  { verse: "Endure, my heart...", omen: "Patience and resilience will see you through." },
-  { verse: "Sing to me, O Muse...", omen: "Seek inspiration and allow creativity to flow." }
-];
-
-if (drawHomerBtn) {
-  drawHomerBtn.addEventListener('click', () => {
-    const randomVerse = homerVerses[Math.floor(Math.random() * homerVerses.length)];
-    if (homerVerse) homerVerse.innerText = randomVerse.verse;
-    if (homerOmen) homerOmen.innerText = randomVerse.omen;
-    if (homerDisplay) homerDisplay.classList.remove('hidden');
-    playSound();
-  });
-}
-
-// --- DYNAMIC DATA: MOON PHASE & ASTROLOGY ---
+// --- MOON & ASTRONOMY CALCULATIONS ---
 function updateAstronomyData() {
   const now = new Date();
   const synodicMonth = 29.53058867;
@@ -217,32 +155,13 @@ function updateAstronomyData() {
   if (document.getElementById('moon-keywords')) document.getElementById('moon-keywords').innerText = "Reflection, Cleansing, Preparation";
 }
 
-// --- DYNAMIC DATA: SUNDOWN API ---
+// --- SUNDOWN & HYMN ---
 async function fetchSundown() {
   const sundownText = document.getElementById('sundown-time');
   if (!sundownText) return;
-
-  if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition(async (position) => {
-      try {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        const res = await fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0`);
-        const data = await res.json();
-        const sunset = new Date(data.results.sunset);
-        sundownText.innerText = sunset.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      } catch(e) {
-        sundownText.innerText = "~ 6:00 PM";
-      }
-    }, () => {
-      sundownText.innerText = "~ 6:00 PM";
-    });
-  } else {
-    sundownText.innerText = "~ 6:00 PM";
-  }
+  sundownText.innerText = "~ 6:00 PM";
 }
 
-// --- DYNAMIC DATA: DAILY HYMN ---
 function loadDailyHymn() {
   const hymns = [
     "Hear me, O blessed one, whose light shines upon the earth...",
@@ -251,219 +170,97 @@ function loadDailyHymn() {
     "Radiant Apollo, bringer of light, heal our spirits today."
   ];
   const today = new Date().getDay();
-  const selectedHymn = hymns[today % hymns.length];
   if (document.getElementById('daily-hymn')) {
-    document.getElementById('daily-hymn').innerText = selectedHymn;
+    document.getElementById('daily-hymn').innerText = hymns[today % hymns.length];
   }
 }
 
-// --- CLOUD DATABASE ARCHIVE SYSTEM (WITH FILTERS) ---
-let allPetitions = [];
-let allReadings = [];
+// --- LOCAL STORAGE ARCHIVES (INSTANT & CRASH-PROOF) ---
+function loadLocalArchives() {
+  const petitionsContainer = document.getElementById('local-petitions-list');
+  const readingsContainer = document.getElementById('local-readings-list');
 
-async function fetchPetitions() {
-  const container = document.getElementById('cloud-petitions-list');
-  try {
-    const res = await fetch('/api/petitions');
-    if (!res.ok) throw new Error('API Error');
-    allPetitions = await res.json();
-    applyPetitionsFilter();
-  } catch (err) {
-    if (container) {
-      container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:0.8rem;">Ready to save your first petition to the cloud!</p>`;
+  let petitions = JSON.parse(localStorage.getItem('localPetitions') || '[]');
+  let readings = JSON.parse(localStorage.getItem('localReadings') || '[]');
+
+  if (petitionsContainer) {
+    if (petitions.length === 0) {
+      petitionsContainer.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No saved petitions yet.</p>`;
+    } else {
+      petitionsContainer.innerHTML = petitions.map((p, idx) => `
+        <div style="background:#fbf9ff; border:1px solid var(--border-blue); padding:10px; border-radius:8px; margin-bottom:10px;">
+          <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 4px 0;">${p.date}</p>
+          <p style="font-size:0.9rem; margin:0 0 8px 0;">${p.text}</p>
+          <button class="cute-btn" style="padding:2px 8px; font-size:0.7rem; background:#e6a3a3;" onclick="deleteLocalPetition(${idx})">Delete ✕</button>
+        </div>
+      `).join('');
+    }
+  }
+
+  if (readingsContainer) {
+    if (readings.length === 0) {
+      readingsContainer.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No saved readings yet.</p>`;
+    } else {
+      readingsContainer.innerHTML = readings.map((r, idx) => `
+        <div style="background:#fbf9ff; border:1px solid var(--border-blue); padding:10px; border-radius:8px; margin-bottom:10px;">
+          <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 4px 0;">${r.date}</p>
+          <p style="font-size:0.9rem; margin:0 0 8px 0;">${r.text}</p>
+          <button class="cute-btn" style="padding:2px 8px; font-size:0.7rem; background:#e6a3a3;" onclick="deleteLocalReading(${idx})">Delete ✕</button>
+        </div>
+      `).join('');
     }
   }
 }
 
-async function fetchReadings() {
-  const container = document.getElementById('cloud-readings-list');
-  try {
-    const res = await fetch('/api/readings');
-    if (!res.ok) throw new Error('API Error');
-    allReadings = await res.json();
-    applyReadingsFilter();
-  } catch (err) {
-    if (container) {
-      container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:0.8rem;">Ready to save your first reading to the cloud!</p>`;
-    }
-  }
-}
+window.deleteLocalPetition = function(idx) {
+  let petitions = JSON.parse(localStorage.getItem('localPetitions') || '[]');
+  petitions.splice(idx, 1);
+  localStorage.setItem('localPetitions', JSON.stringify(petitions));
+  loadLocalArchives();
+};
 
-function renderPetitions(items) {
-  const container = document.getElementById('cloud-petitions-list');
-  if (!container) return;
-  if (!items || items.length === 0) {
-    container.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No cloud petitions found (´｡• ᵕ •｡`)</p>`;
-    return;
-  }
-
-  container.innerHTML = items.map(p => {
-    const formattedDate = new Date(p.created_at).toLocaleString();
-    const itemId = p.id || `'${p.created_at}'`;
-    return `
-      <div class="archive-item">
-        <p class="archive-date">${formattedDate}</p>
-        <p class="archive-text">${p.text}</p>
-        <button class="cute-btn delete-btn" onclick="deletePetition(${itemId})">Delete ✕</button>
-      </div>
-    `;
-  }).join('');
-}
-
-function renderReadings(items) {
-  const container = document.getElementById('cloud-readings-list');
-  if (!container) return;
-  if (!items || items.length === 0) {
-    container.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No cloud readings found ( ˘▽˘)</p>`;
-    return;
-  }
-
-  container.innerHTML = items.map(r => {
-    const formattedDate = new Date(r.created_at).toLocaleString();
-    const itemId = r.id || `'${r.created_at}'`;
-    return `
-      <div class="archive-item">
-        <p class="archive-date">${formattedDate}</p>
-        <p class="archive-text">${r.text}</p>
-        <button class="cute-btn delete-btn" onclick="deleteReading(${itemId})">Delete ✕</button>
-      </div>
-    `;
-  }).join('');
-}
+window.deleteLocalReading = function(idx) {
+  let readings = JSON.parse(localStorage.getItem('localReadings') || '[]');
+  readings.splice(idx, 1);
+  localStorage.setItem('localReadings', JSON.stringify(readings));
+  loadLocalArchives();
+};
 
 const sendPetitionBtn = document.getElementById('send-petition-btn');
 const petitionText = document.getElementById('petition-text');
-
-if (sendPetitionBtn) {
-  sendPetitionBtn.addEventListener('click', async () => {
-    const val = petitionText ? petitionText.value.trim() : '';
+if (sendPetitionBtn && petitionText) {
+  sendPetitionBtn.addEventListener('click', () => {
+    const val = petitionText.value.trim();
     if (!val) return;
-    
-    sendPetitionBtn.disabled = true;
-    sendPetitionBtn.innerText = "Saving to Cloud...";
-    
-    try {
-      await fetch('/api/petitions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: val })
-      });
-      if (petitionText) petitionText.value = '';
-      playSound();
-      await fetchPetitions();
-    } catch (e) {
-      allPetitions.unshift({ text: val, created_at: new Date().toISOString() });
-      applyPetitionsFilter();
-      if (petitionText) petitionText.value = '';
-      playSound();
-    } finally {
-      sendPetitionBtn.disabled = false;
-      sendPetitionBtn.innerText = "Send to Cloud Archive ( ✧ )";
-    }
+    let petitions = JSON.parse(localStorage.getItem('localPetitions') || '[]');
+    petitions.unshift({ text: val, date: new Date().toLocaleString() });
+    localStorage.setItem('localPetitions', JSON.stringify(petitions));
+    petitionText.value = '';
+    playSound();
+    loadLocalArchives();
   });
 }
 
 const saveJournalBtn = document.getElementById('save-journal-btn');
 const journalEntry = document.getElementById('journal-entry');
-
-if (saveJournalBtn) {
-  saveJournalBtn.addEventListener('click', async () => {
-    const val = journalEntry ? journalEntry.value.trim() : '';
+if (saveJournalBtn && journalEntry) {
+  saveJournalBtn.addEventListener('click', () => {
+    const val = journalEntry.value.trim();
     if (!val) return;
-
-    saveJournalBtn.disabled = true;
-    saveJournalBtn.innerText = "Saving to Cloud...";
-
-    try {
-      await fetch('/api/readings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: val })
-      });
-      if (journalEntry) journalEntry.value = '';
-      playSound();
-      await fetchReadings();
-    } catch (e) {
-      allReadings.unshift({ text: val, created_at: new Date().toISOString() });
-      applyReadingsFilter();
-      if (journalEntry) journalEntry.value = '';
-      playSound();
-    } finally {
-      saveJournalBtn.disabled = false;
-      saveJournalBtn.innerText = "Save Reading to Cloud ( ✧ )";
-    }
+    let readings = JSON.parse(localStorage.getItem('localReadings') || '[]');
+    readings.unshift({ text: val, date: new Date().toLocaleString() });
+    localStorage.setItem('localReadings', JSON.stringify(readings));
+    journalEntry.value = '';
+    playSound();
+    loadLocalArchives();
   });
 }
 
-window.deletePetition = async function(id) {
-  if (!confirm("Delete this petition?")) return;
-  try {
-    await fetch(`/api/petitions?id=${id}`, { method: 'DELETE' });
-    fetchPetitions();
-  } catch (err) {
-    allPetitions = allPetitions.filter(p => p.id !== id && p.created_at !== id);
-    applyPetitionsFilter();
-  }
-};
-
-window.deleteReading = async function(id) {
-  if (!confirm("Delete this reading?")) return;
-  try {
-    await fetch(`/api/readings?id=${id}`, { method: 'DELETE' });
-    fetchReadings();
-  } catch (err) {
-    allReadings = allReadings.filter(r => r.id !== id && r.created_at !== id);
-    applyReadingsFilter();
-  }
-};
-
-const filterPetitionsDate = document.getElementById('filter-petitions-date');
-const clearPetitionsDateBtn = document.getElementById('clear-petitions-date-btn');
-
-function applyPetitionsFilter() {
-  const selectedDate = filterPetitionsDate ? filterPetitionsDate.value : ''; 
-  const filtered = allPetitions.filter(p => {
-    if (!selectedDate) return true;
-    const itemDate = new Date(p.created_at);
-    return itemDate.toISOString().split('T')[0] === selectedDate;
-  });
-  renderPetitions(filtered);
-}
-
-if (filterPetitionsDate) filterPetitionsDate.addEventListener('change', applyPetitionsFilter);
-if (clearPetitionsDateBtn) {
-  clearPetitionsDateBtn.addEventListener('click', () => {
-    if (filterPetitionsDate) filterPetitionsDate.value = '';
-    applyPetitionsFilter();
-  });
-}
-
-const filterReadingsDate = document.getElementById('filter-readings-date');
-const clearReadingsDateBtn = document.getElementById('clear-readings-date-btn');
-
-function applyReadingsFilter() {
-  const selectedDate = filterReadingsDate ? filterReadingsDate.value : '';
-  const filtered = allReadings.filter(r => {
-    if (!selectedDate) return true;
-    const itemDate = new Date(r.created_at);
-    return itemDate.toISOString().split('T')[0] === selectedDate;
-  });
-  renderReadings(filtered);
-}
-
-if (filterReadingsDate) filterReadingsDate.addEventListener('change', applyReadingsFilter);
-if (clearReadingsDateBtn) {
-  clearReadingsDateBtn.addEventListener('click', () => {
-    if (filterReadingsDate) filterReadingsDate.value = '';
-    applyReadingsFilter();
-  });
-}
-
+// --- INITIALIZATION ---
 window.addEventListener('DOMContentLoaded', () => {
   updateAstronomyData();
   fetchSundown();
   loadDailyHymn();
-  fetchPetitions();
-  fetchReadings();
+  loadLocalArchives();
 });
 
