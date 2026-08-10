@@ -57,24 +57,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- NEW: EXPORT & IMPORT BACKUP LOGIC ---
+    // --- EXPORT & IMPORT BACKUP LOGIC ---
     const exportBtn = document.getElementById('export-backup-btn');
     const importBtn = document.getElementById('import-backup-btn');
     const importFileInput = document.getElementById('import-file-input');
 
     if (exportBtn) {
         exportBtn.addEventListener('click', async () => {
-            // Keys to safely extract
-            const keysToBackup = ['customDeitiesList', 'shrineData', 'deityGrimoire', 'journalArchive', 'khernipsCount', 'kharisCount'];
+            const keysToBackup = ['customDeitiesList', 'shrineData', 'deityGrimoire', 'journalArchive', 'oneiroiArchive', 'khernipsCount', 'kharisCount'];
             let backupData = {};
             
-            exportBtn.innerText = "Gathering data...";
+            exportBtn.innerText = "Gathering data... ( ˘▽˘)";
             
             for (const key of keysToBackup) {
                 backupData[key] = await loadFromCloud(key, null);
             }
             
-            // Also grab all dynamic deity archives
             const deitiesToBackup = backupData['customDeitiesList'] || [];
             for (const deity of deitiesToBackup) {
                 const archiveKey = 'archive_' + deity;
@@ -89,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
             
-            exportBtn.innerText = "📥 Export Backup";
+            exportBtn.innerText = "(v_v) Export Backup";
         });
     }
 
@@ -106,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     importBtn.innerText = "Importing... Please wait.";
                     const importedData = JSON.parse(event.target.result);
                     
-                    // Iterate and save every valid key sequentially
                     for (const [key, value] of Object.entries(importedData)) {
                         if (value !== null && value !== undefined) {
                             await saveToCloud(key, value);
@@ -117,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     location.reload();
                 } catch (err) {
                     alert("Failed to parse backup file. Make sure it's a valid JSON. (x_x)");
-                    importBtn.innerText = "📤 Import Backup";
+                    importBtn.innerText = "(^o^) Import Backup";
                 }
             };
             reader.readAsText(file);
@@ -130,6 +127,39 @@ document.addEventListener('DOMContentLoaded', () => {
     if(closeArchiveBtn && archiveModal) {
         closeArchiveBtn.addEventListener('click', () => {
             archiveModal.classList.add('hidden');
+        });
+    }
+
+    // Modal logic for Oneiroi Analysis
+    const oneiroiModal = document.getElementById('oneiroi-modal');
+    const closeOneiroiBtn = document.getElementById('close-oneiroi-btn');
+    if (closeOneiroiBtn && oneiroiModal) {
+        closeOneiroiBtn.addEventListener('click', () => {
+            oneiroiModal.classList.add('hidden');
+        });
+    }
+
+    const saveOneiroiBtn = document.getElementById('save-oneiroi-deepdive-btn');
+    if (saveOneiroiBtn) {
+        saveOneiroiBtn.addEventListener('click', async () => {
+            const id = parseInt(document.getElementById('edit-dream-id').value);
+            const index = oneiroiArchive.findIndex(d => d.id === id);
+            if (index !== -1) {
+                oneiroiArchive[index].title = document.getElementById('edit-dream-title').value || "Untitled Fragment";
+                oneiroiArchive[index].raw_notes = document.getElementById('edit-dream-notes').value;
+                oneiroiArchive[index].source = document.getElementById('edit-dream-source').value;
+                oneiroiArchive[index].deity = document.getElementById('edit-dream-deity').value;
+                oneiroiArchive[index].context = document.getElementById('edit-dream-context').value;
+                
+                const tagsStr = document.getElementById('edit-dream-tags').value;
+                oneiroiArchive[index].tags = tagsStr.split(',').map(s => s.trim()).filter(Boolean);
+                
+                oneiroiArchive[index].aftermath = document.getElementById('edit-dream-aftermath').value;
+
+                await saveToCloud('oneiroiArchive', oneiroiArchive);
+                renderOneiroiArchive();
+                oneiroiModal.classList.add('hidden');
+            }
         });
     }
 
@@ -201,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const omenEl = document.getElementById("homer-omen");
 
             if(display) display.classList.remove("hidden");
-            if(verseEl) verseEl.innerText = "Opening the Epics... ( 🏛️ )";
+            if(verseEl) verseEl.innerText = "Opening the Epics... (￣▽￣)ノ";
             if(omenEl) omenEl.innerText = "";
 
             try {
@@ -231,6 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let deityGrimoire = {}; 
     let currentShrine = "Hestia";
     let journalArchive = [];
+    let oneiroiArchive = [];
     
     let khernipsCount = 0;
     let kharisCount = 0;
@@ -240,6 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         shrineData = await loadFromCloud('shrineData', {});
         deityGrimoire = await loadFromCloud('deityGrimoire', {});
         journalArchive = await loadFromCloud('journalArchive', []);
+        oneiroiArchive = await loadFromCloud('oneiroiArchive', []);
         
         khernipsCount = await loadFromCloud('khernipsCount', 0);
         kharisCount = await loadFromCloud('kharisCount', 0);
@@ -252,6 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
         populateDeityDropdown();
         renderGrimoireArchive();
         renderJournalArchive(); 
+        renderOneiroiArchive();
         
         const kBtn = document.getElementById('khernips-btn');
         if(kBtn) kBtn.innerText = `Wash Hands (${khernipsCount})`;
@@ -363,35 +396,35 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'grimoire-manuscript-card';
             card.innerHTML = `
                 <div class="manuscript-header">
-                    <h4>📖 Sanctuary of ${d}</h4>
+                    <h4>( ￣▽￣)[] Sanctuary of ${d}</h4>
                     <span class="manuscript-badge">Active Shrine</span>
                 </div>
                 <div class="manuscript-section">
-                    <p class="manuscript-label">🎨 Sacred Colors</p>
+                    <p class="manuscript-label">( ´ ▽ \` )ﾉ Sacred Colors</p>
                     <div class="tag-container">
                         ${data.colors.length ? data.colors.map(c => `<span class="cute-tag">${c}</span>`).join('') : '<span class="empty-tag">No colors added</span>'}
                     </div>
                 </div>
                 <div class="manuscript-section">
-                    <p class="manuscript-label">⚡ Sacred Symbols</p>
+                    <p class="manuscript-label">(✧ω✧) Sacred Symbols</p>
                     <div class="tag-container">
                         ${data.symbols.length ? data.symbols.map(s => `<span class="cute-tag">${s}</span>`).join('') : '<span class="empty-tag">No symbols added</span>'}
                     </div>
                 </div>
                 <div class="manuscript-section">
-                    <p class="manuscript-label">🌿 Sacred Plants</p>
+                    <p class="manuscript-label">( ˘▽˘)っ♨ Sacred Plants</p>
                     <div class="tag-container">
                         ${data.plants.length ? data.plants.map(p => `<span class="cute-tag">${p}</span>`).join('') : '<span class="empty-tag">No plants added</span>'}
                     </div>
                 </div>
                 <div class="manuscript-section">
-                    <p class="manuscript-label">🐾 Sacred Animals</p>
+                    <p class="manuscript-label">(=^･ω･^=) Sacred Animals</p>
                     <div class="tag-container">
                         ${data.animals.length ? data.animals.map(a => `<span class="cute-tag">${a}</span>`).join('') : '<span class="empty-tag">No animals added</span>'}
                     </div>
                 </div>
                 <div class="manuscript-section">
-                    <p class="manuscript-label">🍯 Standard Offerings</p>
+                    <p class="manuscript-label">( ˘▽˘)っU Standard Offerings</p>
                     <div class="tag-container">
                         ${data.offerings.length ? data.offerings.map(o => `<span class="cute-tag">${o}</span>`).join('') : '<span class="empty-tag">No offerings added</span>'}
                     </div>
@@ -400,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span>Canvas Items: ${shrine.offerings.length}</span>
                     <span>Petitions: ${shrine.petitions.length}</span>
                 </div>
-                <button class="cute-btn full-width margin-top edit-grimoire-btn" data-deity="${d}">Edit Grimoire Associations ✨</button>
+                <button class="cute-btn full-width margin-top edit-grimoire-btn" data-deity="${d}">Edit Grimoire Associations *:･ﾟ✧</button>
                 <button class="cute-btn full-width margin-top open-archive-btn" data-deity="${d}" style="background: #fbf9ff;">♡ Open Offering Archive</button>
             `;
             grid.appendChild(card);
@@ -445,8 +478,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="libation-header">
                                 <span>${item.name}</span>
                                 <div class="libation-actions">
-                                    <button class="action-icon-btn toggle-btn" data-id="${item.id}" data-deity="${deity}" title="Toggle Active/Cleared">${item.status === 'active' ? '✅' : '🔄'}</button>
-                                    <button class="action-icon-btn delete-btn" data-id="${item.id}" data-deity="${deity}" title="Delete">❌</button>
+                                    <button class="action-icon-btn toggle-btn" data-id="${item.id}" data-deity="${deity}" title="Toggle Active/Cleared">${item.status === 'active' ? '(b ᵔ▽ᵔ)b' : '( ˘ ³˘)ノ'}</button>
+                                    <button class="action-icon-btn delete-btn" data-id="${item.id}" data-deity="${deity}" title="Delete">(x_x)</button>
                                 </div>
                             </div>
                             <div class="libation-tags">
@@ -460,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     content.querySelectorAll('.delete-btn').forEach(btn => {
                         btn.addEventListener('click', async (e) => {
-                            if(confirm("Delete this record permanently?")) {
+                            if(confirm("Delete this record permanently? (x_x)")) {
                                 const id = parseFloat(e.currentTarget.getAttribute('data-id'));
                                 const d = e.currentTarget.getAttribute('data-deity');
                                 let recs = await loadFromCloud('archive_' + d, []);
@@ -491,6 +524,106 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- ONEIROI ARCHIVE LOGIC ---
+    const saveQuickDreamBtn = document.getElementById('save-quick-dream-btn');
+    if(saveQuickDreamBtn) {
+        saveQuickDreamBtn.addEventListener('click', async () => {
+            const text = document.getElementById('quick-dream-text').value.trim();
+            if(!text) return;
+            oneiroiArchive.unshift({
+                id: Date.now(),
+                title: "Untitled Fragment",
+                raw_notes: text,
+                source: "Uncategorized",
+                deity: "",
+                context: "",
+                tags: [],
+                aftermath: "",
+                date: new Date().toLocaleString()
+            });
+            document.getElementById('quick-dream-text').value = '';
+            await saveToCloud('oneiroiArchive', oneiroiArchive);
+            renderOneiroiArchive();
+            
+            const container = document.getElementById('quick-log-container');
+            if(container) {
+                const sparkle = document.createElement('div');
+                sparkle.innerText = 'Dream Logged! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧';
+                sparkle.className = 'sparkle-anim';
+                container.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 2500);
+            }
+        });
+    }
+
+    function renderOneiroiArchive() {
+        const list = document.getElementById('oneiroi-list');
+        if(!list) return;
+        list.innerHTML = '';
+        
+        if (oneiroiArchive.length === 0) {
+            list.innerHTML = '<p class="center-text" style="font-size:0.8rem; color:var(--text-muted);">No dreams logged yet. (－.－)...zzz</p>';
+            return;
+        }
+
+        oneiroiArchive.forEach(entry => {
+            const card = document.createElement('div');
+            card.className = 'libation-card';
+            
+            let tagsHtml = (entry.tags || []).map(t => `<span class="libation-tag">#${t}</span>`).join('');
+            
+            card.innerHTML = `
+                <div class="libation-header">
+                    <span>${entry.title}</span>
+                    <div class="libation-actions">
+                        <button class="action-icon-btn edit-dream-btn" data-id="${entry.id}" title="Deep-Dive Analysis">(✎)</button>
+                        <button class="action-icon-btn delete-dream-btn" data-id="${entry.id}" title="Delete">(x_x)</button>
+                    </div>
+                </div>
+                <div style="font-size:0.85rem; font-style:italic; margin-bottom: 6px;">"${entry.raw_notes}"</div>
+                <div class="libation-tags">
+                    <span class="libation-tag">Source: ${entry.source}</span>
+                    ${entry.deity ? `<span class="libation-tag">Deity: ${entry.deity}</span>` : ''}
+                    ${tagsHtml}
+                </div>
+                ${entry.context ? `<div class="libation-note">Context: ${entry.context}</div>` : ''}
+                ${entry.aftermath ? `<div class="libation-note">Aftermath: ${entry.aftermath}</div>` : ''}
+                <div style="font-size:0.65rem; color:var(--text-muted); margin-top:4px; text-align:right;">${entry.date}</div>
+            `;
+            list.appendChild(card);
+        });
+
+        document.querySelectorAll('.delete-dream-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                if(confirm("Delete this dream log? (x_x)")) {
+                    const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                    oneiroiArchive = oneiroiArchive.filter(d => d.id !== id);
+                    await saveToCloud('oneiroiArchive', oneiroiArchive);
+                    renderOneiroiArchive();
+                }
+            });
+        });
+
+        document.querySelectorAll('.edit-dream-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                const dream = oneiroiArchive.find(d => d.id === id);
+                if(dream) {
+                    document.getElementById('edit-dream-id').value = dream.id;
+                    document.getElementById('edit-dream-title').value = dream.title === "Untitled Fragment" ? "" : dream.title;
+                    document.getElementById('edit-dream-notes').value = dream.raw_notes;
+                    document.getElementById('edit-dream-source').value = dream.source || "Theoi / Daimonic";
+                    document.getElementById('edit-dream-deity').value = dream.deity || "";
+                    document.getElementById('edit-dream-context').value = dream.context || "";
+                    document.getElementById('edit-dream-tags').value = (dream.tags || []).join(', ');
+                    document.getElementById('edit-dream-aftermath').value = dream.aftermath || "";
+                    
+                    document.getElementById('oneiroi-modal').classList.remove('hidden');
+                }
+            });
+        });
+    }
+
     function renderJournalArchive() {
         const list = document.getElementById('journal-archive-list');
         if(!list) return;
@@ -515,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="font-size:0.85rem; font-weight:normal; line-height:1.4;">
                     ${entry.text}
                 </div>
-                <button class="edit-archive-btn" data-id="${entry.id}">⚙️</button>
+                <button class="edit-archive-btn" data-id="${entry.id}">(≡)</button>
             `;
             list.appendChild(card);
         });
@@ -817,20 +950,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if(hestiaActive) {
                 hestiaDisplay.classList.remove('hidden');
                 hestiaDisplay.innerHTML = `
-                    <strong>🔥 Hearth of Hestia Lit</strong><br>
+                    <strong>(*炎*) Hearth of Hestia Lit</strong><br>
                     <em>"First and last to Hestia we pour the sacred honey-sweet libation."</em><br>
                     Your sacred space is now opened and protected by the First Goddess.
                 `;
-                hestiaToggleBtn.textContent = "Extinguish / Close Hearth (🔥)";
+                hestiaToggleBtn.textContent = "Extinguish / Close Hearth (x_x)";
             } else {
                 hestiaDisplay.innerHTML = `
-                    <strong>🔥 Hearth Closed</strong><br>
+                    <strong>(x_x) Hearth Closed</strong><br>
                     <em>"Farewell gentle Hestia, guardian of our home."</em>
                 `;
                 setTimeout(() => {
                     hestiaDisplay.classList.add('hidden');
                 }, 2000);
-                hestiaToggleBtn.textContent = "Light the Hearth of Hestia (🔥)";
+                hestiaToggleBtn.textContent = "Light the Hearth of Hestia (*炎*)";
             }
         });
     }
@@ -986,13 +1119,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // 8. ASTRONOMICAL MOON & LOCATION DATA
     // ==========================================
     const upcomingLunarEvents = [
-        { date: "Aug 12, 2026", event: "Total Solar Eclipse 🌑" },
-        { date: "Aug 28, 2026", event: "Partial Lunar Eclipse 🌕" },
-        { date: "Dec 24, 2026", event: "Super Full Moon ✨" },
-        { date: "Feb 6, 2027", event: "Annular Solar Eclipse 🌒" },
-        { date: "Feb 20, 2027", event: "Penumbral Lunar Eclipse 🌗" },
-        { date: "Jul 18, 2027", event: "Supermoon ✨" },
-        { date: "Aug 2, 2027", event: "Total Solar Eclipse 🌑" }
+        { date: "Aug 12, 2026", event: "Total Solar Eclipse (x_x)" },
+        { date: "Aug 28, 2026", event: "Partial Lunar Eclipse ( ˘▽˘)" },
+        { date: "Dec 24, 2026", event: "Super Full Moon *:･ﾟ✧" },
+        { date: "Feb 6, 2027", event: "Annular Solar Eclipse (✧ω✧)" },
+        { date: "Feb 20, 2027", event: "Penumbral Lunar Eclipse (－.－)" },
+        { date: "Jul 18, 2027", event: "Supermoon *:･ﾟ✧" },
+        { date: "Aug 2, 2027", event: "Total Solar Eclipse (x_x)" }
     ];
 
     const toggleLunar = document.getElementById('toggle-lunar-events');
@@ -1043,14 +1176,14 @@ document.addEventListener('DOMContentLoaded', () => {
         let illumination = (1 - Math.cos(elongation * rad)) / 2 * 100;
         
         let phase = "";
-        if (elongation < 3 || elongation > 357) phase = "New Moon";
-        else if (elongation >= 3 && elongation < 87) phase = "Waxing Crescent";
-        else if (elongation >= 87 && elongation < 93) phase = "First Quarter";
-        else if (elongation >= 93 && elongation < 177) phase = "Waxing Gibbous";
-        else if (elongation >= 177 && elongation < 183) phase = "Full Moon";
-        else if (elongation >= 183 && elongation < 267) phase = "Waning Gibbous";
-        else if (elongation >= 267 && elongation < 273) phase = "Third Quarter";
-        else phase = "Waning Crescent";
+        if (elongation < 3 || elongation > 357) phase = "[New Moon]";
+        else if (elongation >= 3 && elongation < 87) phase = "[Waxing Crescent]";
+        else if (elongation >= 87 && elongation < 93) phase = "[First Quarter]";
+        else if (elongation >= 93 && elongation < 177) phase = "[Waxing Gibbous]";
+        else if (elongation >= 177 && elongation < 183) phase = "[Full Moon]";
+        else if (elongation >= 183 && elongation < 267) phase = "[Waning Gibbous]";
+        else if (elongation >= 267 && elongation < 273) phase = "[Third Quarter]";
+        else phase = "[Waning Crescent]";
 
         let moonAgeDays = (elongation / 360) * 29.530588;
 
@@ -1130,3 +1263,4 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDailyHymn();
 
 });
+
