@@ -1,3 +1,16 @@
+// ==========================================
+// 🚨 GLOBAL ERROR POPUPS 🚨
+// ==========================================
+window.onerror = function(message, source, lineno, colno, error) {
+    alert("🚨 JAVASCRIPT ERROR 🚨\n\nWhat: " + message + "\nWhere: " + source + " (Line " + lineno + ")\n\nTake a screenshot of this.");
+    return true;
+};
+
+window.addEventListener('unhandledrejection', function(event) {
+    let errorMsg = event.reason ? (event.reason.stack || event.reason.message || event.reason) : "Unknown Network/Fetch Error";
+    alert("🚨 API/PROMISE ERROR 🚨\n\nDetails: " + errorMsg + "\n\nTake a screenshot of this. (If it says 'Unexpected token <', your GitHub Pages is failing to read the backend API).");
+});
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // ==========================================
@@ -6,12 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
     async function saveToCloud(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
         try {
-            await fetch('/api/saveJournal', {
+            const res = await fetch('/api/saveJournal', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key, value })
             });
-        } catch (err) {}
+            if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+        } catch (err) {
+            alert("🚨 SAVE TO CLOUD FAILED 🚨\nKey: " + key + "\nError: " + err.message);
+        }
     }
 
     async function loadFromCloud(key, defaultValue) {
@@ -23,8 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.setItem(key, JSON.stringify(data.value));
                     return data.value;
                 }
+            } else if (res.status !== 404) {
+                throw new Error(`HTTP Error: ${res.status}`);
             }
-        } catch (err) {}
+        } catch (err) {
+            alert("🚨 LOAD FROM CLOUD FAILED 🚨\nKey: " + key + "\nError: " + err.message);
+        }
         const local = localStorage.getItem(key);
         return local ? JSON.parse(local) : defaultValue;
     }
@@ -58,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 3. EXPANDED DIVINATION (Tarot, Delphic, Homeromancy, Reading Journal)
+    // 3. EXPANDED DIVINATION
     // ==========================================
     const drawBtn = document.getElementById("draw-card-btn");
     if(drawBtn) {
@@ -73,12 +93,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const response = await fetch("tarot.json");
+                if (!response.ok) throw new Error(`tarot.json not found (${response.status})`);
                 const tarotDeck = await response.json();
                 const randomCard = tarotDeck[Math.floor(Math.random() * tarotDeck.length)];
 
                 if(nameEl) nameEl.innerText = randomCard.name;
                 if(meaningEl) meaningEl.innerHTML = `<strong>Keywords:</strong> ${randomCard.keywords.join(" • ")}<br><br>${randomCard.meaning}`;
             } catch (error) {
+                alert("🚨 TAROT JSON ERROR 🚨\n" + error.message);
                 if(nameEl) nameEl.innerText = "Error (x_x)";
                 if(meaningEl) meaningEl.innerText = "Could not load tarot.json.";
             }
@@ -98,20 +120,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const response = await fetch("delphic.json");
+                if (!response.ok) throw new Error(`delphic.json not found (${response.status})`);
                 const delphicDeck = await response.json();
                 const randomMaxim = delphicDeck[Math.floor(Math.random() * delphicDeck.length)];
 
                 if(maximEl) maximEl.innerText = randomMaxim.maxim;
                 if(adviceEl) adviceEl.innerHTML = `<strong>Guidance:</strong> ${randomMaxim.advice}`;
             } catch (error) {
+                alert("🚨 DELPHIC JSON ERROR 🚨\n" + error.message);
                 const fallbacks = [
-                    { maxim: "Know Thyself", advice: "Look inward before seeking answers from the outside world." },
-                    { maxim: "Nothing in Excess", advice: "Seek balance and moderation in all things today." },
-                    { maxim: "Pledge Surety and Ruin is Near", advice: "Exercise caution in commitments and contracts." }
+                    { maxim: "Know Thyself", advice: "Look inward before seeking answers from the outside world." }
                 ];
-                const fb = fallbacks[Math.floor(Math.random() * fallbacks.length)];
-                if(maximEl) maximEl.innerText = fb.maxim;
-                if(adviceEl) adviceEl.innerHTML = `<strong>Guidance:</strong> ${fb.advice}`;
+                if(maximEl) maximEl.innerText = fallbacks[0].maxim;
+                if(adviceEl) adviceEl.innerHTML = `<strong>Guidance:</strong> ${fallbacks[0].advice}`;
             }
         });
     }
@@ -129,19 +150,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const response = await fetch("homeromancy.json");
+                if (!response.ok) throw new Error(`homeromancy.json not found (${response.status})`);
                 const homerDeck = await response.json();
                 const randomVerse = homerDeck[Math.floor(Math.random() * homerDeck.length)];
 
                 if(verseEl) verseEl.innerText = `"${randomVerse.verse}" — ${randomVerse.source}`;
                 if(omenEl) omenEl.innerHTML = `<strong>Omen:</strong> ${randomVerse.omen}`;
             } catch (error) {
-                const fallbacks = [
-                    { verse: "Even a fool is wise after the event.", source: "Iliad", omen: "Learn from past missteps without carrying regret." },
-                    { verse: "Endure my heart, even worse have you endured.", source: "Odyssey", omen: "Resilience will see you through your present trials." }
-                ];
-                const fb = fallbacks[Math.floor(Math.random() * fallbacks.length)];
-                if(verseEl) verseEl.innerText = `"${fb.verse}" — ${fb.source}`;
-                if(omenEl) omenEl.innerHTML = `<strong>Omen:</strong> ${fb.omen}`;
+                alert("🚨 HOMEROMANCY JSON ERROR 🚨\n" + error.message);
             }
         });
     }
@@ -158,8 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (resP.ok) {
                 const dataP = await resP.json();
                 cloudPetitions = dataP.petitions || [];
+            } else {
+                throw new Error(`Failed to load Petitions API. Status: ${resP.status}`);
             }
         } catch (e) {
+            alert("🚨 API PETITIONS FETCH ERROR 🚨\n" + e.message + "\n\nLoading local fallback.");
             cloudPetitions = JSON.parse(localStorage.getItem('cloudPetitionsList') || '[]');
         }
 
@@ -168,8 +187,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (resR.ok) {
                 const dataR = await resR.json();
                 cloudReadings = dataR.readings || [];
+            } else {
+                throw new Error(`Failed to load Readings API. Status: ${resR.status}`);
             }
         } catch (e) {
+            alert("🚨 API READINGS FETCH ERROR 🚨\n" + e.message + "\n\nLoading local fallback.");
             cloudReadings = JSON.parse(localStorage.getItem('cloudReadingsList') || '[]');
         }
 
@@ -180,23 +202,29 @@ document.addEventListener('DOMContentLoaded', () => {
     async function savePetitionsCloud() {
         localStorage.setItem('cloudPetitionsList', JSON.stringify(cloudPetitions));
         try {
-            await fetch('/api/petitions', {
+            const res = await fetch('/api/petitions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ petitions: cloudPetitions })
             });
-        } catch (err) {}
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        } catch (err) {
+            alert("🚨 SAVE PETITIONS API ERROR 🚨\n" + err.message);
+        }
     }
 
     async function saveReadingsCloud() {
         localStorage.setItem('cloudReadingsList', JSON.stringify(cloudReadings));
         try {
-            await fetch('/api/readings', {
+            const res = await fetch('/api/readings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ readings: cloudReadings })
             });
-        } catch (err) {}
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        } catch (err) {
+            alert("🚨 SAVE READINGS API ERROR 🚨\n" + err.message);
+        }
     }
 
     function renderCloudPetitions(items) {
@@ -944,6 +972,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const { latitude, longitude } = position.coords;
                     const response = await fetch(`https://api.sunrise-sunset.org/json?lat=${latitude}&lng=${longitude}&formatted=0`);
+                    if (!response.ok) throw new Error(`Sunrise API Error: ${response.status}`);
                     const data = await response.json();
                     
                     if (data.results && data.results.sunset && sundownEl) {
@@ -954,12 +983,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch (err) {
                     if(sundownEl) sundownEl.innerText = "Network Error";
+                    alert("🚨 FETCH ERROR IN SUNSET API 🚨\n" + err.message);
                 }
-            }, () => {
+            }, (geoError) => {
                 if(sundownEl) sundownEl.innerText = "Loc Denied";
+                alert("🚨 GEOLOCATION FAILED/DENIED 🚨\nReason: " + geoError.message);
             });
-        } else if(sundownEl) {
-            sundownEl.innerText = "No GPS";
+        } else {
+            if(sundownEl) sundownEl.innerText = "No GPS";
+            alert("🚨 NO GEOLOCATION SUPPORT IN THIS BROWSER 🚨");
         }
     }
 
@@ -970,3 +1002,4 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDailyHymn();
 
 });
+
