@@ -69,6 +69,7 @@ transition: transform 0.2s;
 transform: scale(0.92);
 }
 
+/* Modal System (Used for Settings and Archives) */
 .settings-modal {
 position: fixed;
 top: 0;
@@ -253,7 +254,7 @@ gap: 8px;
 margin-top: 10px;
 }
 
-/* NEW IN-DEPTH OFFERING CARDS */
+/* Offering Cards */
 .libation-card {
     background: var(--accent-blue);
     border: 1px solid var(--border-blue);
@@ -308,7 +309,6 @@ margin-top: 10px;
 .action-icon-btn:active {
     transform: scale(0.85);
 }
-/* Styling for when an offering is cleared */
 .libation-cleared {
     opacity: 0.6;
     background: #f0f0f5;
@@ -318,7 +318,6 @@ margin-top: 10px;
     color: var(--text-muted);
 }
 
-/* Checkboxes */
 .checkbox-group {
 display: flex;
 flex-direction: column;
@@ -354,7 +353,6 @@ background-color: var(--accent-blue);
 background-color: var(--border-blue);
 }
 
-/* Illuminated Grimoire Manuscript Cards */
 .card-grid {
 display: grid;
 grid-template-columns: 1fr;
@@ -431,7 +429,6 @@ margin-top: 10px;
 font-weight: 700;
 }
 
-/* Floating Navigation */
 .bottom-nav {
 position: fixed;
 bottom: 12px;
@@ -475,10 +472,9 @@ font-weight: 700;
 margin-top: 2px;
 }
 
-/* Utility */
 .center-text { text-align: center; }
 .margin-top { margin-top: 10px; }
-.hidden { display: none; }
+.hidden { display: none !important; }
 .card-result { margin-top: 10px; padding: 10px; background: var(--accent-blue); border-radius: 15px; }
 .hymn-text { font-style: italic; text-align: center; font-size: 0.9rem; line-height: 1.5; }
 
@@ -575,7 +571,19 @@ margin-top: 2px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Animations */
+/* Libation General List Styling Used for Modals */
+.libation-item {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 8px 12px;
+background: var(--accent-blue);
+border-radius: 15px;
+margin-bottom: 6px;
+font-weight: 700;
+position: relative;
+}
+
 .fade-out {
   opacity: 0;
   transition: opacity 1s ease-out;
@@ -601,3 +609,4 @@ margin-top: 2px;
   0% { transform: translateY(0) scale(1); opacity: 1; }
   100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
 }
+
