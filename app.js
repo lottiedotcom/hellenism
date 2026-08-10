@@ -121,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Modal logic for Deity Archive
     const archiveModal = document.getElementById('archive-modal');
     const closeArchiveBtn = document.getElementById('close-archive-btn');
     if(closeArchiveBtn && archiveModal) {
@@ -130,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Modal logic for Oneiroi Analysis
     const oneiroiModal = document.getElementById('oneiroi-modal');
     const closeOneiroiBtn = document.getElementById('close-oneiroi-btn');
     if (closeOneiroiBtn && oneiroiModal) {
@@ -324,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LIBATIONS LOGIC (DIRECT TO ARCHIVE) ---
+    // --- LIBATIONS LOGIC ---
     const addLibationBtn = document.getElementById('add-libation-btn');
     const newLibationName = document.getElementById('new-libation-name');
     const newLibationType = document.getElementById('new-libation-type');
@@ -383,6 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
         select.value = currentShrine;
     }
 
+    // --- GRIMOIRE ARCHIVE: Collapsible Logic ---
     function renderGrimoireArchive() {
         const grid = document.getElementById('archive-grid');
         if(!grid) return;
@@ -394,49 +393,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const card = document.createElement('div');
             card.className = 'grimoire-manuscript-card';
+            
+            // Build the card with a clickable header and a hidden content wrapper
             card.innerHTML = `
-                <div class="manuscript-header">
-                    <h4>( ￣▽￣)[] Sanctuary of ${d}</h4>
+                <div class="manuscript-header toggle-collapse" style="cursor: pointer;">
+                    <h4>Sanctuary of ${d}</h4>
                     <span class="manuscript-badge">Active Shrine</span>
                 </div>
-                <div class="manuscript-section">
-                    <p class="manuscript-label">( ´ ▽ \` )ﾉ Sacred Colors</p>
-                    <div class="tag-container">
-                        ${data.colors.length ? data.colors.map(c => `<span class="cute-tag">${c}</span>`).join('') : '<span class="empty-tag">No colors added</span>'}
+                <div class="manuscript-content hidden">
+                    <div class="manuscript-section">
+                        <p class="manuscript-label">( ´ ▽ \` )ﾉ Sacred Colors</p>
+                        <div class="tag-container">
+                            ${data.colors.length ? data.colors.map(c => `<span class="cute-tag">${c}</span>`).join('') : '<span class="empty-tag">No colors added</span>'}
+                        </div>
                     </div>
-                </div>
-                <div class="manuscript-section">
-                    <p class="manuscript-label">(✧ω✧) Sacred Symbols</p>
-                    <div class="tag-container">
-                        ${data.symbols.length ? data.symbols.map(s => `<span class="cute-tag">${s}</span>`).join('') : '<span class="empty-tag">No symbols added</span>'}
+                    <div class="manuscript-section">
+                        <p class="manuscript-label">(✧ω✧) Sacred Symbols</p>
+                        <div class="tag-container">
+                            ${data.symbols.length ? data.symbols.map(s => `<span class="cute-tag">${s}</span>`).join('') : '<span class="empty-tag">No symbols added</span>'}
+                        </div>
                     </div>
-                </div>
-                <div class="manuscript-section">
-                    <p class="manuscript-label">( ˘▽˘)っ♨ Sacred Plants</p>
-                    <div class="tag-container">
-                        ${data.plants.length ? data.plants.map(p => `<span class="cute-tag">${p}</span>`).join('') : '<span class="empty-tag">No plants added</span>'}
+                    <div class="manuscript-section">
+                        <p class="manuscript-label">( ˘▽˘)っ♨ Sacred Plants</p>
+                        <div class="tag-container">
+                            ${data.plants.length ? data.plants.map(p => `<span class="cute-tag">${p}</span>`).join('') : '<span class="empty-tag">No plants added</span>'}
+                        </div>
                     </div>
-                </div>
-                <div class="manuscript-section">
-                    <p class="manuscript-label">(=^･ω･^=) Sacred Animals</p>
-                    <div class="tag-container">
-                        ${data.animals.length ? data.animals.map(a => `<span class="cute-tag">${a}</span>`).join('') : '<span class="empty-tag">No animals added</span>'}
+                    <div class="manuscript-section">
+                        <p class="manuscript-label">(=^･ω･^=) Sacred Animals</p>
+                        <div class="tag-container">
+                            ${data.animals.length ? data.animals.map(a => `<span class="cute-tag">${a}</span>`).join('') : '<span class="empty-tag">No animals added</span>'}
+                        </div>
                     </div>
-                </div>
-                <div class="manuscript-section">
-                    <p class="manuscript-label">( ˘▽˘)っU Standard Offerings</p>
-                    <div class="tag-container">
-                        ${data.offerings.length ? data.offerings.map(o => `<span class="cute-tag">${o}</span>`).join('') : '<span class="empty-tag">No offerings added</span>'}
+                    <div class="manuscript-section">
+                        <p class="manuscript-label">( ˘▽˘)っU Standard Offerings</p>
+                        <div class="tag-container">
+                            ${data.offerings.length ? data.offerings.map(o => `<span class="cute-tag">${o}</span>`).join('') : '<span class="empty-tag">No offerings added</span>'}
+                        </div>
                     </div>
+                    <div class="manuscript-footer">
+                        <span>Canvas Items: ${shrine.offerings.length}</span>
+                        <span>Petitions: ${shrine.petitions.length}</span>
+                    </div>
+                    <button class="cute-btn full-width margin-top edit-grimoire-btn" data-deity="${d}">Edit Grimoire Associations *:･ﾟ✧</button>
+                    <button class="cute-btn full-width margin-top open-archive-btn" data-deity="${d}" style="background: #fbf9ff;">♡ Open Offering Archive</button>
                 </div>
-                <div class="manuscript-footer">
-                    <span>Canvas Items: ${shrine.offerings.length}</span>
-                    <span>Petitions: ${shrine.petitions.length}</span>
-                </div>
-                <button class="cute-btn full-width margin-top edit-grimoire-btn" data-deity="${d}">Edit Grimoire Associations *:･ﾟ✧</button>
-                <button class="cute-btn full-width margin-top open-archive-btn" data-deity="${d}" style="background: #fbf9ff;">♡ Open Offering Archive</button>
             `;
             grid.appendChild(card);
+        });
+
+        // Add event listeners to toggle the collapsible section
+        document.querySelectorAll('.toggle-collapse').forEach(header => {
+            header.addEventListener('click', (e) => {
+                const contentWrapper = header.nextElementSibling;
+                if(contentWrapper && contentWrapper.classList.contains('manuscript-content')) {
+                    contentWrapper.classList.toggle('hidden');
+                }
+            });
         });
 
         document.querySelectorAll('.edit-grimoire-btn').forEach(btn => {
