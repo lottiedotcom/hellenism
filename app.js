@@ -155,16 +155,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let shrineData = {};
     let deityGrimoire = {}; 
     let currentShrine = "Hestia";
-    
-    // NEW: Unified Archive for Readings & Prayers
     let journalArchive = [];
 
     async function initDeitiesAndShrines() {
         deities = await loadFromCloud('customDeitiesList', ["Hestia", "Hekate", "Apollo", "Hermes"]);
         shrineData = await loadFromCloud('shrineData', {});
         deityGrimoire = await loadFromCloud('deityGrimoire', {});
-        
-        // Load the journal archive from the cloud via the REST endpoint mechanism
         journalArchive = await loadFromCloud('journalArchive', []);
 
         deities.forEach(d => {
@@ -174,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         populateDeityDropdown();
         renderGrimoireArchive();
-        renderJournalArchive(); // Render the newly loaded archive
+        renderJournalArchive(); 
         
         const deityInput = document.getElementById('deity-focus-input');
         if(deityInput) {
@@ -200,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         select.value = currentShrine;
     }
 
-    // Render Illuminated Grimoire Manuscript Cards (Tab 4)
+    // Render Illuminated Grimoire Manuscript Cards
     function renderGrimoireArchive() {
         const grid = document.getElementById('archive-grid');
         if(!grid) return;
@@ -264,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // NEW: Render the unified journal and prayer archive to the screen
+    // Render the unified journal and prayer archive to the screen (Now with settings button)
     function renderJournalArchive() {
         const list = document.getElementById('journal-archive-list');
         if(!list) return;
@@ -280,16 +276,45 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'libation-item';
             card.style.flexDirection = 'column';
             card.style.alignItems = 'flex-start';
+            card.style.position = 'relative'; // Allows absolute positioning of the edit button
             card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; width:100%; font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">
+                <div style="display:flex; justify-content:space-between; width:100%; font-size:0.75rem; color:var(--text-muted); margin-bottom:6px; padding-right:30px;">
                     <span><strong>${entry.type}</strong></span>
                     <span>${entry.date}</span>
                 </div>
                 <div style="font-size:0.85rem; font-weight:normal; line-height:1.4;">
                     ${entry.text}
                 </div>
+                <button class="edit-archive-btn" data-id="${entry.id}">⚙️</button>
             `;
             list.appendChild(card);
+        });
+
+        // Add event listeners to the new settings buttons
+        document.querySelectorAll('.edit-archive-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = parseInt(e.target.getAttribute('data-id'));
+                const entryIndex = journalArchive.findIndex(item => item.id === id);
+                if (entryIndex === -1) return;
+
+                const action = prompt("Type 'edit' to change this entry or 'delete' to remove it (u_u):", "edit");
+                if (action === null) return;
+                
+                if (action.toLowerCase() === 'delete') {
+                    if (confirm("Are you sure you want to delete this entry?")) {
+                        journalArchive.splice(entryIndex, 1);
+                        await saveToCloud('journalArchive', journalArchive);
+                        renderJournalArchive();
+                    }
+                } else if (action.toLowerCase() === 'edit') {
+                    const newText = prompt("Update your reading/prayer:", journalArchive[entryIndex].text);
+                    if (newText !== null && newText.trim() !== '') {
+                        journalArchive[entryIndex].text = newText.trim();
+                        await saveToCloud('journalArchive', journalArchive);
+                        renderJournalArchive();
+                    }
+                }
+            });
         });
     }
 
@@ -366,7 +391,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderGrimoireArchive();
                 saveAndRenderShrine();
 
-                // Reset form
                 newDeityInput.value = '';
                 document.getElementById('new-deity-colors').value = '';
                 document.getElementById('new-deity-symbols').value = '';
@@ -404,6 +428,15 @@ document.addEventListener('DOMContentLoaded', () => {
             img.className = 'draggable-offering';
             img.style.left = off.x + 'px';
             img.style.top = off.y + 'px';
+            
+            // Double click / Tap to delete an offering from the grid
+            img.addEventListener('click', () => {
+                if(confirm("Remove this offering from the shrine?")) {
+                    shrineData[currentShrine].offerings = shrineData[currentShrine].offerings.filter(o => o.id !== off.id);
+                    saveAndRenderShrine();
+                }
+            });
+
             canvas.appendChild(img);
             makeDraggable(img, off.id);
         });
@@ -420,8 +453,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 shrineData[currentShrine].offerings.push({
                     id: Date.now(),
                     src: event.target.result,
-                    x: 20, 
-                    y: 20
+                    x: 10, 
+                    y: 10
                 });
                 saveAndRenderShrine();
             };
@@ -446,6 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Grid Snapping Logic
     function makeDraggable(el, offeringId) {
         let offsetX = 0, offsetY = 0;
         let startX, startY, isDragging = false;
@@ -461,6 +495,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const rect = el.getBoundingClientRect();
             offsetX = clientX - rect.left;
             offsetY = clientY - rect.top;
+            
+            // Boost z-index while dragging
+            el.style.zIndex = "100";
 
             document.addEventListener(e.type.includes('touch') ? 'touchmove' : 'mousemove', dragMove, {passive: false});
             document.addEventListener(e.type.includes('touch') ? 'touchend' : 'mouseup', dragEnd);
@@ -493,17 +530,42 @@ document.addEventListener('DOMContentLoaded', () => {
         function dragEnd(e) {
             document.removeEventListener(e.type.includes('touch') ? 'touchmove' : 'mousemove', dragMove);
             document.removeEventListener(e.type.includes('touch') ? 'touchend' : 'mouseup', dragEnd);
+            
+            el.style.zIndex = "10";
 
-            if (!isDragging) {
-                if(confirm("Remove this offering?")) {
-                    shrineData[currentShrine].offerings = shrineData[currentShrine].offerings.filter(o => o.id !== offeringId);
-                    saveAndRenderShrine();
+            if (isDragging) {
+                const canvas = document.getElementById("altar-canvas");
+                
+                // Calculate grid cell dimensions
+                const cellW = canvas.offsetWidth / 3;
+                const cellH = canvas.offsetHeight / 3;
+
+                let finalX = parseInt(el.style.left) || 0;
+                let finalY = parseInt(el.style.top) || 0;
+
+                // Determine nearest column and row (0, 1, or 2)
+                let col = Math.round(finalX / cellW);
+                let row = Math.round(finalY / cellH);
+
+                col = Math.max(0, Math.min(col, 2));
+                row = Math.max(0, Math.min(row, 2));
+
+                // Prevent snapping directly onto the top-center Frame slot
+                if (col === 1 && row === 0) {
+                    row = 1; // Bump it down a slot
                 }
-            } else {
+
+                // Snap coordinates to center of determined slot
+                const snappedX = (col * cellW) + (cellW / 2) - (el.offsetWidth / 2);
+                const snappedY = (row * cellH) + (cellH / 2) - (el.offsetHeight / 2);
+
+                el.style.left = snappedX + "px";
+                el.style.top = snappedY + "px";
+
                 const offering = shrineData[currentShrine].offerings.find(o => o.id === offeringId);
                 if (offering) {
-                    offering.x = parseInt(el.style.left);
-                    offering.y = parseInt(el.style.top);
+                    offering.x = snappedX;
+                    offering.y = snappedY;
                     saveAndRenderShrine();
                 }
             }
@@ -514,7 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 5. HEARTH OF HESTIA RITUAL TOGGLE (Moon View / Homepage)
+    // 5. HEARTH OF HESTIA RITUAL TOGGLE
     // ==========================================
     const hestiaToggleBtn = document.getElementById('hestia-ritual-btn');
     const hestiaDisplay = document.getElementById('hestia-ritual-display');
@@ -602,7 +664,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!shrineData[currentShrine]) shrineData[currentShrine] = { offerings: [], sketch: null, petitions: [] };
             shrineData[currentShrine].petitions.push(textArea.value);
             
-            // NEW: Push to the unified archive
             journalArchive.unshift({
                 id: Date.now(),
                 type: `Petition to ${currentShrine}`,
@@ -614,7 +675,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await saveToCloud('journalArchive', journalArchive);
 
             renderGrimoireArchive();
-            renderJournalArchive(); // Update visual list immediately
+            renderJournalArchive(); 
             textArea.classList.add('fade-out');
             
             const container = document.getElementById('sparkle-container');
@@ -633,14 +694,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // NEW: Wiring up the Divination Journal button
     const saveJournalBtn = document.getElementById('save-journal-btn');
     if (saveJournalBtn) {
         saveJournalBtn.addEventListener('click', async () => {
             const journalEntry = document.getElementById('journal-entry');
             if (!journalEntry || journalEntry.value.trim() === '') return;
 
-            // Push to the unified archive
             journalArchive.unshift({
                 id: Date.now(),
                 type: 'Divination Reading',
@@ -649,7 +708,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             await saveToCloud('journalArchive', journalArchive);
-            renderJournalArchive(); // Update visual list immediately
+            renderJournalArchive(); 
 
             journalEntry.value = '';
             alert("Entry saved to your archive! ( ˘▽˘)");
