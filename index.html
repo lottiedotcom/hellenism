@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Hellenic Practice (✧ω✧)</title>
 
+<!-- PWA Manifest & iOS Support -->
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -37,10 +38,19 @@
         <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Leave crossroad offering</label>
       </div>
     </div>
+
+    <div class="card" style="margin-bottom: 10px;">
+      <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Schedule Settings</h4>
+      <p style="margin:4px 0;">Wake Up Time:</p>
+      <input type="time" id="wake-time" class="cute-input" value="18:00">
+      <p style="margin:6px 0 4px 0;">Sleep Time:</p>
+      <input type="time" id="sleep-time" class="cute-input" value="06:00">
+      <button id="save-schedule-btn" class="cute-btn full-width margin-top">Save Schedule</button>
+    </div>
   </div>
 </div>
 
-<!-- 1. MOON TAB -->
+<!-- 1. MOON TAB (HOMEPAGE) -->
 <section id="moon-view" class="view active">
 <header class="hero" style="position: relative;">
 <button class="settings-gear-btn" title="Settings">( ≡ )</button>
@@ -54,53 +64,23 @@
 <div class="card">
 <h3>( ♨ ) Hearth of Hestia</h3>
 <button id="hestia-ritual-btn" class="cute-btn full-width">Light the Hearth of Hestia ( ♨ )</button>
-</div>
-
-<div class="card">
-<h3>Energy & Alignment</h3>
-<div class="alignment-box">
-<p><strong>Zodiac Sign:</strong> <span id="moon-zodiac">Loading...</span></p>
-<p><strong>Energy Focus:</strong> <span id="moon-keywords">Loading...</span></p>
-</div>
-</div>
-
-<div class="card">
-<h3>Moon Phase & Sundown</h3>
-<div class="stats-grid">
-<div class="stat-pill">
-<span class="stat-label">Phase</span>
-<span id="moon-phase-name" class="stat-value">Loading...</span>
-</div>
-<div class="stat-pill">
-<span class="stat-label">Illumination</span>
-<span id="moon-percentage" class="stat-value">Loading...</span>
-</div>
-<div class="stat-pill">
-<span class="stat-label">Moon Age</span>
-<span id="moon-age" class="stat-value">Loading...</span>
-</div>
-<div class="stat-pill">
-<span class="stat-label">Sundown</span>
-<span id="sundown-time" class="stat-value">Loading...</span>
-</div>
-</div>
+<div id="hestia-ritual-display" class="quote-box hidden margin-top full-width center-text"></div>
 </div>
 
 <div class="card">
 <h3>Hekate's Deipnon Tracker</h3>
 <div class="progress-bar-container">
-<div id="deipnon-progress" class="progress-bar-fill"></div>
+<div id="deipnon-progress" class="progress-bar-fill" style="width: 45%;"></div>
 </div>
-<p class="center-text margin-top">Cycle Progress to Dark Moon: <span id="deipnon-percent">0%</span></p>
-</div>
+<p class="center-text margin-top">Cycle Progress to Dark Moon: <span id="deipnon-percent">45%</span></p>
 
-<div class="card">
-<h3>Household Cycle Countdowns</h3>
-<div class="cycle-list">
-<p><strong>Hekate's Deipnon:</strong> <span id="countdown-deipnon">Calculating...</span></p>
-<p><strong>Noumenia:</strong> <span id="countdown-noumenia">Calculating...</span></p>
-<p><strong>Agathos Daimon:</strong> <span id="countdown-agathos">Calculating...</span></p>
+<details class="deipnon-info margin-top">
+<summary class="cute-summary">What is Deipnon & How to Celebrate (★ω★)</summary>
+<div class="deipnon-details">
+<p><strong>What it is:</strong> The dark moon night marking the end of the lunar month to honor Hekate, appease restless spirits, and purify the home.</p>
+<p><strong>How to celebrate:</strong> Sweep thresholds, physically clean your space, clear out old offerings, and leave a final offering at a crossroads.</p>
 </div>
+</details>
 </div>
 </section>
 
@@ -112,19 +92,25 @@
 </header>
 
 <div class="card">
-<h3>Daily Hymn</h3>
-<p id="daily-hymn" class="hymn-text">Loading daily hymn...</p>
-</div>
-
-<div class="card">
 <h3>Khernips Cleansing</h3>
 <button id="khernips-btn" class="cute-btn full-width">Wash Hands (0)</button>
 </div>
 
 <div class="card">
 <h3>Prayer & Petition</h3>
-<textarea id="petition-text" class="cute-input" rows="3" placeholder="Write your petition here..."></textarea>
-<button id="send-petition-btn" class="cute-btn full-width margin-top">Save Petition Locally ( ✧ )</button>
+<button id="prompt-generator-btn" class="cute-btn full-width">Generate Time-Based Prompt</button>
+<p id="prompt-display" class="quote-box hidden margin-top"></p>
+<div style="position: relative;" class="margin-top">
+  <textarea id="petition-text" class="cute-input" rows="3" placeholder="Write your petition here..."></textarea>
+</div>
+<button id="send-petition-btn" class="cute-btn full-width margin-top">Send & Save to Archive</button>
+</div>
+
+<div class="card">
+<h3>Petition Archive ( ˘▽˘)</h3>
+<div id="petition-archive-list" class="archive-list margin-top">
+  <!-- Saved petitions appear here -->
+</div>
 </div>
 
 <div class="card">
@@ -150,10 +136,25 @@
 </div>
 </div>
 
+<div class="card center-text">
+<h3>[ ⌂ ] Delphic Oracle Maxim</h3>
+<button id="draw-delphic-btn" class="cute-btn">Consult the Oracle</button>
+<div id="delphic-display" class="hidden card-result margin-top">
+<h4 id="delphic-maxim" style="margin: 0 0 5px 0;"></h4>
+</div>
+</div>
+
 <div class="card">
 <h3>Reading Journal</h3>
 <textarea id="journal-entry" class="cute-input" rows="4" placeholder="Type your reading reflections here..."></textarea>
-<button id="save-journal-btn" class="cute-btn full-width margin-top">Save Reading Locally ( ✧ )</button>
+<button id="save-journal-btn" class="cute-btn full-width margin-top">Save Reading</button>
+</div>
+
+<div class="card">
+<h3>Tarot Archive (✯◡✯)</h3>
+<div id="journal-archive-list" class="archive-list margin-top">
+  <!-- Saved journals appear here -->
+</div>
 </div>
 </section>
 
@@ -164,20 +165,13 @@
 <h2>Grimoire & Archive [ ≡ ]</h2>
 </header>
 
-<div class="card">
-  <h3>( ˘▽˘) Saved Petitions</h3>
-  <div id="local-petitions-list" class="archive-list margin-top">
-    <p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No saved petitions yet.</p>
-  </div>
+<div class="card" style="background: #fbf9ff; border: 2px solid var(--border-blue);">
+<h3 style="margin-bottom: 4px;">[ ≡ ] Illuminated Grimoire Archive</h3>
+<p class="center-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Your quick-reference sacred associations.</p>
+<div class="card-grid">
+  <p class="center-text" style="font-size: 0.9rem;">( ⚲ ) Colors: Gold, White<br>( ϟ ) Symbols: Torch, Lyre<br>( ⑀ ) Animals: Owl, Wolf</p>
 </div>
-
-<div class="card">
-  <h3>(✯◡✯) Saved Readings</h3>
-  <div id="local-readings-list" class="archive-list margin-top">
-    <p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No saved readings yet.</p>
-  </div>
 </div>
-
 </section>
 
 </main>
@@ -202,6 +196,15 @@
 </nav>
 
 <script src="app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => console.log('SW registered!', reg.scope))
+        .catch((err) => console.log('SW failed', err));
+    });
+  }
+</script>
 </body>
 </html>
 
