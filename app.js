@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 3. EXPANDED DIVINATION (Tarot, Delphic, Homeromancy)
+    // 3. EXPANDED DIVINATION
     // ==========================================
     const drawBtn = document.getElementById("draw-card-btn");
     if(drawBtn) {
@@ -156,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentShrine = "Hestia";
     let journalArchive = [];
     
-    // Trackers
     let khernipsCount = 0;
     let kharisCount = 0;
     let libationsList = [];
@@ -167,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
         deityGrimoire = await loadFromCloud('deityGrimoire', {});
         journalArchive = await loadFromCloud('journalArchive', []);
         
-        // Load Tracker Data
         khernipsCount = await loadFromCloud('khernipsCount', 0);
         kharisCount = await loadFromCloud('kharisCount', 0);
         libationsList = await loadFromCloud('libationsList', []);
@@ -181,7 +179,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderGrimoireArchive();
         renderJournalArchive(); 
         
-        // Populate Trackers visually on load
         const kBtn = document.getElementById('khernips-btn');
         if(kBtn) kBtn.innerText = `Wash Hands (${khernipsCount})`;
         
@@ -222,16 +219,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LIBATIONS LOGIC ---
+    // --- LIBATIONS LOGIC (NEW IN-DEPTH SYSTEM) ---
     const addLibationBtn = document.getElementById('add-libation-btn');
-    const newLibationInput = document.getElementById('new-libation');
+    const newLibationName = document.getElementById('new-libation-name');
+    const newLibationType = document.getElementById('new-libation-type');
+    const newLibationNote = document.getElementById('new-libation-note');
     
-    if (addLibationBtn && newLibationInput) {
+    if (addLibationBtn && newLibationName) {
         addLibationBtn.addEventListener('click', async () => {
-            const val = newLibationInput.value.trim();
-            if (val) {
-                libationsList.push({ id: Date.now(), text: val });
-                newLibationInput.value = '';
+            const name = newLibationName.value.trim();
+            const type = newLibationType ? newLibationType.options[newLibationType.selectedIndex].text : "Offering";
+            const note = newLibationNote ? newLibationNote.value.trim() : "";
+            
+            if (name) {
+                // Handle legacy strings vs new objects gracefully just in case
+                libationsList.push({ 
+                    id: Date.now(), 
+                    name: name,
+                    type: type,
+                    note: note,
+                    deity: currentShrine,
+                    status: 'active' 
+                });
+                
+                newLibationName.value = '';
+                if(newLibationNote) newLibationNote.value = '';
                 await saveToCloud('libationsList', libationsList);
                 renderLibations();
             }
@@ -242,23 +254,56 @@ document.addEventListener('DOMContentLoaded', () => {
         const listEl = document.getElementById('libation-list');
         if (!listEl) return;
         listEl.innerHTML = '';
+        
         libationsList.forEach(item => {
+            // Backwards compatibility for old flat-string entries
+            if (typeof item === 'string') {
+                item = { id: Date.now() + Math.random(), name: item, type: 'Legacy Offering', note: '', deity: 'General', status: 'active' };
+            }
+            
             const div = document.createElement('div');
-            div.className = 'libation-item';
-            div.innerHTML = `<span>${item.text}</span> <button class="delete-btn" data-id="${item.id}">✕</button>`;
+            div.className = `libation-card ${item.status === 'cleared' ? 'libation-cleared' : ''}`;
+            
+            div.innerHTML = `
+                <div class="libation-header">
+                    <span>${item.name}</span>
+                    <div class="libation-actions">
+                        <button class="action-icon-btn toggle-btn" data-id="${item.id}" title="Toggle Active/Cleared">${item.status === 'active' ? '✅' : '🔄'}</button>
+                        <button class="action-icon-btn delete-btn" data-id="${item.id}" title="Delete">❌</button>
+                    </div>
+                </div>
+                <div class="libation-tags">
+                    <span class="libation-tag">To: ${item.deity}</span>
+                    <span class="libation-tag">${item.type}</span>
+                </div>
+                ${item.note ? `<div class="libation-note">"${item.note}"</div>` : ''}
+            `;
             listEl.appendChild(div);
         });
         
+        // Setup Delete Listeners
         document.querySelectorAll('#libation-list .delete-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
-                const id = parseInt(e.target.getAttribute('data-id'));
-                libationsList = libationsList.filter(l => l.id !== id);
+                const id = parseFloat(e.target.getAttribute('data-id'));
+                libationsList = libationsList.filter(l => l.id !== id && l !== e.target.getAttribute('data-id')); 
                 await saveToCloud('libationsList', libationsList);
                 renderLibations();
             });
         });
+        
+        // Setup Active/Cleared Toggle Listeners
+        document.querySelectorAll('#libation-list .toggle-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = parseFloat(e.target.getAttribute('data-id'));
+                const item = libationsList.find(l => l.id === id);
+                if (item) {
+                    item.status = item.status === 'active' ? 'cleared' : 'active';
+                    await saveToCloud('libationsList', libationsList);
+                    renderLibations();
+                }
+            });
+        });
     }
-
 
     function populateDeityDropdown() {
         const select = document.getElementById('deity-focus-input');
@@ -975,3 +1020,4 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDailyHymn();
 
 });
+
