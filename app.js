@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const keysToBackup = ['customDeitiesList', 'shrineData', 'deityGrimoire', 'journalArchive', 'oneiroiArchive', 'khernipsCount', 'kharisCount'];
             let backupData = {};
             
-            exportBtn.innerText = "Gathering data... ( ˘▽˘)";
+            exportBtn.innerText = "Gathering data... ⋆｡°✩";
             
             for (const key of keysToBackup) {
                 backupData[key] = await loadFromCloud(key, null);
@@ -89,11 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
             
-            exportBtn.innerText = "(v_v) Export Backup";
+            exportBtn.innerText = "⋆｡°✩ Export Backup";
         });
     }
 
-    // Fixed Import Logic: Loops over all selected files and parses each!
     if (importBtn && importFileInput) {
         importBtn.addEventListener('click', () => importFileInput.click());
 
@@ -119,14 +118,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             successCount++;
                             resolve();
                         } catch (err) {
-                            resolve(); // Skips invalid non-JSON files silently
+                            resolve(); 
                         }
                     };
                     reader.readAsText(file);
                 });
             }
             
-            alert(`Backup imported securely! Loaded ${successCount} file(s) to the cloud. Reloading app... ( ˘▽˘)`);
+            alert(`Backup imported securely! Loaded ${successCount} file(s) to the cloud. Reloading app... ˙⋆✮⋆˚࿔`);
             location.reload();
         });
     }
@@ -183,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const meaningEl = document.getElementById("card-meaning");
 
             if(display) display.classList.remove("hidden");
-            if(nameEl) nameEl.innerText = "Shuffling Tarot... ( ˘▽˘)";
+            if(nameEl) nameEl.innerText = "Shuffling Tarot... ⋆˚₊ 𖤓☽˚.⋆";
             if(meaningEl) meaningEl.innerText = "";
 
             try {
@@ -194,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(nameEl) nameEl.innerText = randomCard.name;
                 if(meaningEl) meaningEl.innerHTML = `<strong>Keywords:</strong> ${randomCard.keywords.join(" • ")}<br><br>${randomCard.meaning}`;
             } catch (error) {
-                if(nameEl) nameEl.innerText = "Error (x_x)";
+                if(nameEl) nameEl.innerText = "Error (x.x)";
                 if(meaningEl) meaningEl.innerText = "Could not load tarot.json.";
             }
         });
@@ -208,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const adviceEl = document.getElementById("delphic-advice");
 
             if(display) display.classList.remove("hidden");
-            if(maximEl) maximEl.innerText = "Consulting Apollo... ( ✧ω✧)";
+            if(maximEl) maximEl.innerText = "Consulting Apollo... ⋆˚₊ 𖤓☽˚.⋆";
             if(adviceEl) adviceEl.innerText = "";
 
             try {
@@ -239,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const omenEl = document.getElementById("homer-omen");
 
             if(display) display.classList.remove("hidden");
-            if(verseEl) verseEl.innerText = "Opening the Epics... (￣▽￣)ノ";
+            if(verseEl) verseEl.innerText = "Opening the Epics... ₊˚ ꗃ";
             if(omenEl) omenEl.innerText = "";
 
             try {
@@ -373,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const container = document.getElementById('libation-sparkle-container');
                 if(container) {
                     const sparkle = document.createElement('div');
-                    sparkle.innerText = `Logged to ${currentShrine}'s Archive! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧`;
+                    sparkle.innerText = `Logged to ${currentShrine}'s Archive! (∩^ω^)⊃━☆ﾟ.*`;
                     sparkle.className = 'sparkle-anim';
                     container.appendChild(sparkle);
                     setTimeout(() => sparkle.remove(), 2500);
@@ -383,7 +382,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderLibations() {
-        // Keeps the layout stable on load if there are legacy libations
         const listEl = document.getElementById('libation-list');
         if (!listEl) return;
         listEl.innerHTML = '';
@@ -400,8 +398,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="libation-header">
                     <span>${item.name}</span>
                     <div class="libation-actions">
-                        <button class="action-icon-btn toggle-btn" data-id="${item.id}" title="Toggle Active/Cleared">${item.status === 'active' ? '(b ᵔ▽ᵔ)b' : '( ˘ ³˘)ノ'}</button>
-                        <button class="action-icon-btn delete-btn" data-id="${item.id}" title="Delete">(x_x)</button>
+                        <button class="action-icon-btn toggle-btn" data-id="${item.id}" title="Toggle Active/Cleared">${item.status === 'active' ? '⋆☀︎.' : '( ˘ ³˘)ノ'}</button>
+                        <button class="action-icon-btn delete-btn" data-id="${item.id}" title="Delete">(x.x)</button>
                     </div>
                 </div>
                 <div class="libation-tags">
@@ -467,31 +465,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="manuscript-content hidden">
                     <div class="manuscript-section">
-                        <p class="manuscript-label">( ´ ▽ \` )ﾉ Sacred Colors</p>
+                        <p class="manuscript-label">⊹🩵ྀི Sacred Colors</p>
                         <div class="tag-container">
                             ${data.colors.length ? data.colors.map(c => `<span class="cute-tag">${c}</span>`).join('') : '<span class="empty-tag">No colors added</span>'}
                         </div>
                     </div>
                     <div class="manuscript-section">
-                        <p class="manuscript-label">(✧ω✧) Sacred Symbols</p>
+                        <p class="manuscript-label">𓆣𓏲⋆ Sacred Symbols</p>
                         <div class="tag-container">
                             ${data.symbols.length ? data.symbols.map(s => `<span class="cute-tag">${s}</span>`).join('') : '<span class="empty-tag">No symbols added</span>'}
                         </div>
                     </div>
                     <div class="manuscript-section">
-                        <p class="manuscript-label">( ˘▽˘)っ♨ Sacred Plants</p>
+                        <p class="manuscript-label">˚˖𓍢ִ໋❁˚ Sacred Plants</p>
                         <div class="tag-container">
                             ${data.plants.length ? data.plants.map(p => `<span class="cute-tag">${p}</span>`).join('') : '<span class="empty-tag">No plants added</span>'}
                         </div>
                     </div>
                     <div class="manuscript-section">
-                        <p class="manuscript-label">(=^･ω･^=) Sacred Animals</p>
+                        <p class="manuscript-label">݁ ˖Ი𐑼⋆ Sacred Animals</p>
                         <div class="tag-container">
                             ${data.animals.length ? data.animals.map(a => `<span class="cute-tag">${a}</span>`).join('') : '<span class="empty-tag">No animals added</span>'}
                         </div>
                     </div>
                     <div class="manuscript-section">
-                        <p class="manuscript-label">( ˘▽˘)っU Standard Offerings</p>
+                        <p class="manuscript-label">𓏢 Standard Offerings</p>
                         <div class="tag-container">
                             ${data.offerings.length ? data.offerings.map(o => `<span class="cute-tag">${o}</span>`).join('') : '<span class="empty-tag">No offerings added</span>'}
                         </div>
@@ -538,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if(modal && title && content) {
             title.innerText = `${deity}'s Devotional Archive`;
-            content.innerHTML = '<p class="center-text">Loading archives... ( ✧ω✧)</p>';
+            content.innerHTML = '<p class="center-text">Loading archives... ↺</p>';
             modal.classList.remove('hidden');
 
             try {
@@ -555,8 +553,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="libation-header">
                                 <span>${item.name}</span>
                                 <div class="libation-actions">
-                                    <button class="action-icon-btn toggle-btn" data-id="${item.id}" data-deity="${deity}" title="Toggle Active/Cleared">${item.status === 'active' ? '(b ᵔ▽ᵔ)b' : '( ˘ ³˘)ノ'}</button>
-                                    <button class="action-icon-btn delete-btn" data-id="${item.id}" data-deity="${deity}" title="Delete">(x_x)</button>
+                                    <button class="action-icon-btn toggle-btn" data-id="${item.id}" data-deity="${deity}" title="Toggle Active/Cleared">${item.status === 'active' ? '⋆☀︎.' : '( ˘ ³˘)ノ'}</button>
+                                    <button class="action-icon-btn delete-btn" data-id="${item.id}" data-deity="${deity}" title="Delete">(x.x)</button>
                                 </div>
                             </div>
                             <div class="libation-tags">
@@ -570,7 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     content.querySelectorAll('.delete-btn').forEach(btn => {
                         btn.addEventListener('click', async (e) => {
-                            if(confirm("Delete this record permanently? (x_x)")) {
+                            if(confirm("Delete this record permanently? (x.x)")) {
                                 const id = parseFloat(e.currentTarget.getAttribute('data-id'));
                                 const d = e.currentTarget.getAttribute('data-deity');
                                 let recs = await loadFromCloud('archive_' + d, []);
@@ -596,7 +594,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             } catch (err) {
-                content.innerHTML = '<p class="center-text">Error loading archives (x_x)</p>';
+                content.innerHTML = '<p class="center-text">Error loading archives (x.x)</p>';
             }
         }
     }
@@ -625,7 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const container = document.getElementById('quick-log-container');
             if(container) {
                 const sparkle = document.createElement('div');
-                sparkle.innerText = 'Dream Logged! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧';
+                sparkle.innerText = 'Dream Logged! (∩^ω^)⊃━☆ﾟ.*';
                 sparkle.className = 'sparkle-anim';
                 container.appendChild(sparkle);
                 setTimeout(() => sparkle.remove(), 2500);
@@ -639,7 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
         list.innerHTML = '';
         
         if (oneiroiArchive.length === 0) {
-            list.innerHTML = '<p class="center-text" style="font-size:0.8rem; color:var(--text-muted);">No dreams logged yet. (－.－)...zzz</p>';
+            list.innerHTML = '<p class="center-text" style="font-size:0.8rem; color:var(--text-muted);">No dreams logged yet. ‧₊˚ ☁️⋅𓂃 ࣪</p>';
             return;
         }
 
@@ -653,8 +651,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="libation-header">
                     <span>${entry.title}</span>
                     <div class="libation-actions">
-                        <button class="action-icon-btn edit-dream-btn" data-id="${entry.id}" title="Deep-Dive Analysis">(✎)</button>
-                        <button class="action-icon-btn delete-dream-btn" data-id="${entry.id}" title="Delete">(x_x)</button>
+                        <button class="action-icon-btn edit-dream-btn" data-id="${entry.id}" title="Deep-Dive Analysis">✎</button>
+                        <button class="action-icon-btn delete-dream-btn" data-id="${entry.id}" title="Delete">(x.x)</button>
                     </div>
                 </div>
                 <div style="font-size:0.85rem; font-style:italic; margin-bottom: 6px;">"${entry.raw_notes}"</div>
@@ -672,7 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.delete-dream-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
-                if(confirm("Delete this dream log? (x_x)")) {
+                if(confirm("Delete this dream log? (x.x)")) {
                     const id = parseInt(e.currentTarget.getAttribute('data-id'));
                     oneiroiArchive = oneiroiArchive.filter(d => d.id !== id);
                     await saveToCloud('oneiroiArchive', oneiroiArchive);
@@ -725,7 +723,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="font-size:0.85rem; font-weight:normal; line-height:1.4;">
                     ${entry.text}
                 </div>
-                <button class="edit-archive-btn" data-id="${entry.id}">(≡)</button>
+                <button class="edit-archive-btn" data-id="${entry.id}">≡</button>
             `;
             list.appendChild(card);
         });
@@ -1029,11 +1027,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 hestiaDisplay.innerHTML = `
                     <strong>𓍢ִ໋🀦 Hearth of Hestia Lit</strong><br>
                     <em>"First and last to Hestia we pour the sacred honey-sweet libation."</em><br>
+                    Your sacred space is now opened and protected by the First Goddess.
                 `;
-                hestiaToggleBtn.textContent = "Extinguish / Close Hearth (x.x)";
+                hestiaToggleBtn.textContent = "Extinguish / Close Hearth 🇽";
             } else {
                 hestiaDisplay.innerHTML = `
-                    <strong> (x.x) Hearth Closed</strong><br>
+                    <strong>🇽 Hearth Closed</strong><br>
                     <em>"Farewell gentle Hestia, guardian of our home."</em>
                 `;
                 setTimeout(() => {
@@ -1119,7 +1118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const container = document.getElementById('sparkle-container');
             if(container) {
                 const sparkle = document.createElement('div');
-                sparkle.innerText = '(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧';
+                sparkle.innerText = '(∩^ω^)⊃━☆ﾟ.*';
                 sparkle.className = 'sparkle-anim';
                 container.appendChild(sparkle);
                 
@@ -1149,7 +1148,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderJournalArchive(); 
 
             journalEntry.value = '';
-            alert("Entry saved to your archive! ( ˘▽˘)");
+            alert("Entry saved to your archive! ⋆☀︎.");
         });
     }
 
@@ -1165,7 +1164,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(kharisCountSpan) kharisCountSpan.innerText = kharisCount;
             saveToCloud('kharisCount', kharisCount);
 
-            alert("Make sure to clean your physical space as well! ( ˘▽˘)っ🧹");
+            alert("Make sure to clean your physical space as well! 𓇢𓆸");
         });
     }
 
@@ -1195,13 +1194,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // 8. ASTRONOMICAL MOON & LOCATION DATA
     // ==========================================
     const upcomingLunarEvents = [
-        { date: "Aug 12, 2026", event: "Total Solar Eclipse (x_x)" },
-        { date: "Aug 28, 2026", event: "Partial Lunar Eclipse ( ˘▽˘)" },
-        { date: "Dec 24, 2026", event: "Super Full Moon *:･ﾟ✧" },
-        { date: "Feb 6, 2027", event: "Annular Solar Eclipse (✧ω✧)" },
-        { date: "Feb 20, 2027", event: "Penumbral Lunar Eclipse (－.－)" },
-        { date: "Jul 18, 2027", event: "Supermoon *:･ﾟ✧" },
-        { date: "Aug 2, 2027", event: "Total Solar Eclipse (x_x)" }
+        { date: "Aug 12, 2026", event: "Total Solar Eclipse 𑣲☾" },
+        { date: "Aug 28, 2026", event: "Partial Lunar Eclipse ⋆" },
+        { date: "Dec 24, 2026", event: "Super Full Moon ◯" },
+        { date: "Feb 6, 2027", event: "Annular Solar Eclipse 𑣲☾" },
+        { date: "Feb 20, 2027", event: "Penumbral Lunar Eclipse ⋆" },
+        { date: "Jul 18, 2027", event: "Supermoon ◯" },
+        { date: "Aug 2, 2027", event: "Total Solar Eclipse 𑣲☾" }
     ];
 
     const toggleLunar = document.getElementById('toggle-lunar-events');
