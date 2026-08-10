@@ -1027,20 +1027,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if(hestiaActive) {
                 hestiaDisplay.classList.remove('hidden');
                 hestiaDisplay.innerHTML = `
-                    <strong>(*炎*) Hearth of Hestia Lit</strong><br>
+                    <strong>𓍢ִ໋🀦 Hearth of Hestia Lit</strong><br>
                     <em>"First and last to Hestia we pour the sacred honey-sweet libation."</em><br>
-                    Your sacred space is now opened and protected by the First Goddess.
                 `;
-                hestiaToggleBtn.textContent = "Extinguish / Close Hearth (x_x)";
+                hestiaToggleBtn.textContent = "Extinguish / Close Hearth (x.x)";
             } else {
                 hestiaDisplay.innerHTML = `
-                    <strong>(x_x) Hearth Closed</strong><br>
+                    <strong> (x.x) Hearth Closed</strong><br>
                     <em>"Farewell gentle Hestia, guardian of our home."</em>
                 `;
                 setTimeout(() => {
                     hestiaDisplay.classList.add('hidden');
                 }, 2000);
-                hestiaToggleBtn.textContent = "Light the Hearth of Hestia (*炎*)";
+                hestiaToggleBtn.textContent = "Light the Hearth of Hestia 𓍢ִ໋🀦";
             }
         });
     }
