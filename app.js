@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function saveToCloud(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
         try {
-            await fetch('/api/storage', {
+            await fetch('/api/saveJournal', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key, value })
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadFromCloud(key, defaultValue) {
         try {
-            const res = await fetch(`/api/storage?key=${encodeURIComponent(key)}`);
+            const res = await fetch(`/api/saveJournal?key=${encodeURIComponent(key)}`);
             if (res.ok) {
                 const data = await res.json();
                 if (data && data.value !== undefined) {
@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Settings Gear Modal Logic
     const settingsModal = document.getElementById('settings-modal');
     document.querySelectorAll('.settings-gear-btn').forEach(gear => {
         gear.addEventListener('click', () => {
@@ -64,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const drawBtn = document.getElementById("draw-card-btn");
     if(drawBtn) {
         drawBtn.addEventListener("click", async () => {
-            if(typeof playSound === 'function') playSound();
             const display = document.getElementById("card-display");
             const nameEl = document.getElementById("card-name");
             const meaningEl = document.getElementById("card-meaning");
@@ -155,10 +153,50 @@ document.addEventListener('DOMContentLoaded', () => {
     let cloudReadings = [];
 
     async function initCloudArchives() {
-        cloudPetitions = await loadFromCloud('cloudPetitionsList', []);
-        cloudReadings = await loadFromCloud('cloudReadingsList', []);
+        try {
+            const resP = await fetch('/api/petitions');
+            if (resP.ok) {
+                const dataP = await resP.json();
+                cloudPetitions = dataP.petitions || [];
+            }
+        } catch (e) {
+            cloudPetitions = JSON.parse(localStorage.getItem('cloudPetitionsList') || '[]');
+        }
+
+        try {
+            const resR = await fetch('/api/readings');
+            if (resR.ok) {
+                const dataR = await resR.json();
+                cloudReadings = dataR.readings || [];
+            }
+        } catch (e) {
+            cloudReadings = JSON.parse(localStorage.getItem('cloudReadingsList') || '[]');
+        }
+
         applyPetitionsFilter();
         applyReadingsFilter();
+    }
+
+    async function savePetitionsCloud() {
+        localStorage.setItem('cloudPetitionsList', JSON.stringify(cloudPetitions));
+        try {
+            await fetch('/api/petitions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ petitions: cloudPetitions })
+            });
+        } catch (err) {}
+    }
+
+    async function saveReadingsCloud() {
+        localStorage.setItem('cloudReadingsList', JSON.stringify(cloudReadings));
+        try {
+            await fetch('/api/readings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ readings: cloudReadings })
+            });
+        } catch (err) {}
     }
 
     function renderCloudPetitions(items) {
@@ -204,18 +242,17 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteCloudPetition = async function(idx) {
         if (!confirm("Delete this petition from cloud archive?")) return;
         cloudPetitions.splice(idx, 1);
-        await saveToCloud('cloudPetitionsList', cloudPetitions);
+        await savePetitionsCloud();
         applyPetitionsFilter();
     };
 
     window.deleteCloudReading = async function(idx) {
         if (!confirm("Delete this reading from cloud archive?")) return;
         cloudReadings.splice(idx, 1);
-        await saveToCloud('cloudReadingsList', cloudReadings);
+        await saveReadingsCloud();
         applyReadingsFilter();
     };
 
-    // Petition & Reading Filters
     const filterPetitionsInput = document.getElementById('filter-petitions-input');
     const filterPetitionsDate = document.getElementById('filter-petitions-date');
     const clearPetitionsDateBtn = document.getElementById('clear-petitions-date-btn');
@@ -272,7 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Save Reading Journal to Cloud
     const saveJournalBtn = document.getElementById('save-journal-btn');
     const journalEntry = document.getElementById('journal-entry');
 
@@ -291,12 +327,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 rawDate: now.toISOString()
             });
 
-            await saveToCloud('cloudReadingsList', cloudReadings);
+            await saveReadingsCloud();
             applyReadingsFilter();
             journalEntry.value = '';
             saveJournalBtn.disabled = false;
             saveJournalBtn.innerText = "Save to Cloud Archive ( ✧ )";
-            if(typeof playSound === 'function') playSound();
         });
     }
 
@@ -724,7 +759,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             await saveToCloud('shrineData', shrineData);
-            await saveToCloud('cloudPetitionsList', cloudPetitions);
+            await savePetitionsCloud();
             applyPetitionsFilter();
 
             renderGrimoireArchive();
@@ -928,7 +963,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Initialize modules safely
     initDeitiesAndShrines();
     initCloudArchives();
     renderLunarEvents();
@@ -936,4 +970,3 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDailyHymn();
 
 });
-
