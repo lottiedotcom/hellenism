@@ -136,10 +136,17 @@
     <div class="card">
      <h3>Interactive Canvas</h3>
      <div id="altar-canvas" class="altar-tabletop">
-      <div id="sketch-frame" class="sketch-frame-ui" onclick="document.getElementById('upload-sketch').click()">
-       <span id="sketch-placeholder">Frame
-        <br>(Tap to set)</span>
+      <div class="grid-slot"></div>
+      <div class="grid-slot frame-slot" id="sketch-frame" onclick="document.getElementById('upload-sketch').click()">
+       <span id="sketch-placeholder">Frame<br>(Tap to set)</span>
       </div>
+      <div class="grid-slot"></div>
+      <div class="grid-slot"></div>
+      <div class="grid-slot"></div>
+      <div class="grid-slot"></div>
+      <div class="grid-slot"></div>
+      <div class="grid-slot"></div>
+      <div class="grid-slot"></div>
      </div>
      <div class="input-group margin-top">
       <input type="file" id="upload-offering" accept="image/png, image/jpeg" style="display:none;">
@@ -220,7 +227,7 @@
      <div id="archive-grid" class="card-grid"></div>
     </div>
     
-    <!-- NEW: READINGS & PRAYERS ARCHIVE SECTION -->
+    <!-- READINGS & PRAYERS ARCHIVE SECTION -->
     <div class="card margin-top">
      <h3>📜 Readings &amp; Prayers Archive</h3>
      <div id="journal-archive-list" class="card-grid"></div>
