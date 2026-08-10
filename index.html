@@ -37,6 +37,16 @@
       <input type="time" id="sleep-time" class="cute-input" value="06:00">
       <button id="save-schedule-btn" class="cute-btn full-width margin-top">Save Schedule</button>
      </div>
+     
+     <!-- NEW DATA MANAGEMENT SECTION -->
+     <div class="card" style="margin-bottom: 10px;">
+      <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Data Management</h4>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0;">Backup your archives, shrines, and settings to a file.</p>
+      <button id="export-backup-btn" class="cute-btn full-width">📥 Export Backup</button>
+      <button id="import-backup-btn" class="cute-btn full-width margin-top">📤 Import Backup</button>
+      <input type="file" id="import-file-input" accept=".json" style="display:none;">
+     </div>
+
      <div class="card" style="margin-bottom: 0;">
       <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Audio Settings</h4>
       <label class="custom-checkbox"> <input type="checkbox" id="sound-toggle"> <span class="checkmark"></span> Enable Sound Effects </label>
@@ -280,4 +290,3 @@
 </script>
  </body>
 </html>
-
