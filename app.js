@@ -1,16 +1,3 @@
-// ==========================================
-// 🚨 GLOBAL ERROR POPUPS 🚨
-// ==========================================
-window.onerror = function(message, source, lineno, colno, error) {
-    alert("🚨 JAVASCRIPT ERROR 🚨\n\nWhat: " + message + "\nWhere: " + source + " (Line " + lineno + ")\n\nTake a screenshot of this.");
-    return true;
-};
-
-window.addEventListener('unhandledrejection', function(event) {
-    let errorMsg = event.reason ? (event.reason.stack || event.reason.message || event.reason) : "Unknown Network/Fetch Error";
-    alert("🚨 API/PROMISE ERROR 🚨\n\nDetails: " + errorMsg + "\n\nTake a screenshot of this. (If it says 'Unexpected token <', your GitHub Pages is failing to read the backend API).");
-});
-
 document.addEventListener('DOMContentLoaded', () => {
 
     // ==========================================
@@ -19,32 +6,25 @@ document.addEventListener('DOMContentLoaded', () => {
     async function saveToCloud(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
         try {
-            const res = await fetch('/api/saveJournal', {
+            await fetch('/api/storage', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key, value })
             });
-            if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-        } catch (err) {
-            alert("🚨 SAVE TO CLOUD FAILED 🚨\nKey: " + key + "\nError: " + err.message);
-        }
+        } catch (err) {}
     }
 
     async function loadFromCloud(key, defaultValue) {
         try {
-            const res = await fetch(`/api/saveJournal?key=${encodeURIComponent(key)}`);
+            const res = await fetch(`/api/storage?key=${encodeURIComponent(key)}`);
             if (res.ok) {
                 const data = await res.json();
                 if (data && data.value !== undefined) {
                     localStorage.setItem(key, JSON.stringify(data.value));
                     return data.value;
                 }
-            } else if (res.status !== 404) {
-                throw new Error(`HTTP Error: ${res.status}`);
             }
-        } catch (err) {
-            alert("🚨 LOAD FROM CLOUD FAILED 🚨\nKey: " + key + "\nError: " + err.message);
-        }
+        } catch (err) {}
         const local = localStorage.getItem(key);
         return local ? JSON.parse(local) : defaultValue;
     }
@@ -63,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Settings Gear Modal Logic
     const settingsModal = document.getElementById('settings-modal');
     document.querySelectorAll('.settings-gear-btn').forEach(gear => {
         gear.addEventListener('click', () => {
@@ -78,11 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 3. EXPANDED DIVINATION
+    // 3. EXPANDED DIVINATION (Tarot, Delphic, Homeromancy)
     // ==========================================
     const drawBtn = document.getElementById("draw-card-btn");
     if(drawBtn) {
         drawBtn.addEventListener("click", async () => {
+            if(typeof playSound === 'function') playSound();
             const display = document.getElementById("card-display");
             const nameEl = document.getElementById("card-name");
             const meaningEl = document.getElementById("card-meaning");
@@ -93,14 +75,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const response = await fetch("tarot.json");
-                if (!response.ok) throw new Error(`tarot.json not found (${response.status})`);
                 const tarotDeck = await response.json();
                 const randomCard = tarotDeck[Math.floor(Math.random() * tarotDeck.length)];
 
                 if(nameEl) nameEl.innerText = randomCard.name;
                 if(meaningEl) meaningEl.innerHTML = `<strong>Keywords:</strong> ${randomCard.keywords.join(" • ")}<br><br>${randomCard.meaning}`;
             } catch (error) {
-                alert("🚨 TAROT JSON ERROR 🚨\n" + error.message);
                 if(nameEl) nameEl.innerText = "Error (x_x)";
                 if(meaningEl) meaningEl.innerText = "Could not load tarot.json.";
             }
@@ -120,19 +100,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const response = await fetch("delphic.json");
-                if (!response.ok) throw new Error(`delphic.json not found (${response.status})`);
                 const delphicDeck = await response.json();
                 const randomMaxim = delphicDeck[Math.floor(Math.random() * delphicDeck.length)];
 
                 if(maximEl) maximEl.innerText = randomMaxim.maxim;
                 if(adviceEl) adviceEl.innerHTML = `<strong>Guidance:</strong> ${randomMaxim.advice}`;
             } catch (error) {
-                alert("🚨 DELPHIC JSON ERROR 🚨\n" + error.message);
                 const fallbacks = [
-                    { maxim: "Know Thyself", advice: "Look inward before seeking answers from the outside world." }
+                    { maxim: "Know Thyself", advice: "Look inward before seeking answers from the outside world." },
+                    { maxim: "Nothing in Excess", advice: "Seek balance and moderation in all things today." },
+                    { maxim: "Pledge Surety and Ruin is Near", advice: "Exercise caution in commitments and contracts." }
                 ];
-                if(maximEl) maximEl.innerText = fallbacks[0].maxim;
-                if(adviceEl) adviceEl.innerHTML = `<strong>Guidance:</strong> ${fallbacks[0].advice}`;
+                const fb = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+                if(maximEl) maximEl.innerText = fb.maxim;
+                if(adviceEl) adviceEl.innerHTML = `<strong>Guidance:</strong> ${fb.advice}`;
             }
         });
     }
@@ -150,231 +131,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const response = await fetch("homeromancy.json");
-                if (!response.ok) throw new Error(`homeromancy.json not found (${response.status})`);
                 const homerDeck = await response.json();
                 const randomVerse = homerDeck[Math.floor(Math.random() * homerDeck.length)];
 
                 if(verseEl) verseEl.innerText = `"${randomVerse.verse}" — ${randomVerse.source}`;
                 if(omenEl) omenEl.innerHTML = `<strong>Omen:</strong> ${randomVerse.omen}`;
             } catch (error) {
-                alert("🚨 HOMEROMANCY JSON ERROR 🚨\n" + error.message);
+                const fallbacks = [
+                    { verse: "Even a fool is wise after the event.", source: "Iliad", omen: "Learn from past missteps without carrying regret." },
+                    { verse: "Endure my heart, even worse have you endured.", source: "Odyssey", omen: "Resilience will see you through your present trials." }
+                ];
+                const fb = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+                if(verseEl) verseEl.innerText = `"${fb.verse}" — ${fb.source}`;
+                if(omenEl) omenEl.innerHTML = `<strong>Omen:</strong> ${fb.omen}`;
             }
         });
     }
 
     // ==========================================
-    // 4. CLOUD ARCHIVE SYNC (Petitions & Readings)
-    // ==========================================
-    let cloudPetitions = [];
-    let cloudReadings = [];
-
-    async function initCloudArchives() {
-        try {
-            const resP = await fetch('/api/petitions');
-            if (resP.ok) {
-                const dataP = await resP.json();
-                cloudPetitions = dataP.petitions || [];
-            } else {
-                throw new Error(`Failed to load Petitions API. Status: ${resP.status}`);
-            }
-        } catch (e) {
-            alert("🚨 API PETITIONS FETCH ERROR 🚨\n" + e.message + "\n\nLoading local fallback.");
-            cloudPetitions = JSON.parse(localStorage.getItem('cloudPetitionsList') || '[]');
-        }
-
-        try {
-            const resR = await fetch('/api/readings');
-            if (resR.ok) {
-                const dataR = await resR.json();
-                cloudReadings = dataR.readings || [];
-            } else {
-                throw new Error(`Failed to load Readings API. Status: ${resR.status}`);
-            }
-        } catch (e) {
-            alert("🚨 API READINGS FETCH ERROR 🚨\n" + e.message + "\n\nLoading local fallback.");
-            cloudReadings = JSON.parse(localStorage.getItem('cloudReadingsList') || '[]');
-        }
-
-        applyPetitionsFilter();
-        applyReadingsFilter();
-    }
-
-    async function savePetitionsCloud() {
-        localStorage.setItem('cloudPetitionsList', JSON.stringify(cloudPetitions));
-        try {
-            const res = await fetch('/api/petitions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ petitions: cloudPetitions })
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        } catch (err) {
-            alert("🚨 SAVE PETITIONS API ERROR 🚨\n" + err.message);
-        }
-    }
-
-    async function saveReadingsCloud() {
-        localStorage.setItem('cloudReadingsList', JSON.stringify(cloudReadings));
-        try {
-            const res = await fetch('/api/readings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ readings: cloudReadings })
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        } catch (err) {
-            alert("🚨 SAVE READINGS API ERROR 🚨\n" + err.message);
-        }
-    }
-
-    function renderCloudPetitions(items) {
-        const container = document.getElementById('cloud-petitions-list');
-        if (!container) return;
-        if (!items || items.length === 0) {
-            container.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No petitions found (´｡• ᵕ •｡`)</p>`;
-            return;
-        }
-
-        container.innerHTML = items.map((p, idx) => {
-            const formattedDate = p.date || new Date().toLocaleString();
-            return `
-              <div style="background:#fbf9ff; border:1px solid var(--border-blue); padding:10px; border-radius:8px; margin-bottom:10px;">
-                <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 4px 0;">${formattedDate}</p>
-                <p style="font-size:0.9rem; margin:0 0 8px 0; white-space: pre-wrap;">${p.text}</p>
-                <button class="cute-btn" style="padding:2px 8px; font-size:0.7rem; background:#e6a3a3;" onclick="deleteCloudPetition(${idx})">Delete ✕</button>
-              </div>
-            `;
-        }).join('');
-    }
-
-    function renderCloudReadings(items) {
-        const container = document.getElementById('cloud-readings-list');
-        if (!container) return;
-        if (!items || items.length === 0) {
-            container.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">No readings found ( ˘▽˘)</p>`;
-            return;
-        }
-
-        container.innerHTML = items.map((r, idx) => {
-            const formattedDate = r.date || new Date().toLocaleString();
-            return `
-              <div style="background:#fbf9ff; border:1px solid var(--border-blue); padding:10px; border-radius:8px; margin-bottom:10px;">
-                <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 4px 0;">${formattedDate}</p>
-                <p style="font-size:0.9rem; margin:0 0 8px 0; white-space: pre-wrap;">${r.text}</p>
-                <button class="cute-btn" style="padding:2px 8px; font-size:0.7rem; background:#e6a3a3;" onclick="deleteCloudReading(${idx})">Delete ✕</button>
-              </div>
-            `;
-        }).join('');
-    }
-
-    window.deleteCloudPetition = async function(idx) {
-        if (!confirm("Delete this petition from cloud archive?")) return;
-        cloudPetitions.splice(idx, 1);
-        await savePetitionsCloud();
-        applyPetitionsFilter();
-    };
-
-    window.deleteCloudReading = async function(idx) {
-        if (!confirm("Delete this reading from cloud archive?")) return;
-        cloudReadings.splice(idx, 1);
-        await saveReadingsCloud();
-        applyReadingsFilter();
-    };
-
-    const filterPetitionsInput = document.getElementById('filter-petitions-input');
-    const filterPetitionsDate = document.getElementById('filter-petitions-date');
-    const clearPetitionsDateBtn = document.getElementById('clear-petitions-date-btn');
-
-    function applyPetitionsFilter() {
-        const query = filterPetitionsInput ? filterPetitionsInput.value.toLowerCase() : '';
-        const selectedDate = filterPetitionsDate ? filterPetitionsDate.value : ''; 
-
-        const filtered = cloudPetitions.filter(p => {
-            const itemDateStr = p.rawDate || p.date || '';
-            const itemDate = itemDateStr ? new Date(itemDateStr) : new Date();
-            const formattedItemDate = !isNaN(itemDate) ? itemDate.toISOString().split('T')[0] : '';
-            const matchesText = p.text.toLowerCase().includes(query) || (p.date && p.date.toLowerCase().includes(query));
-            const matchesDate = !selectedDate || formattedItemDate === selectedDate;
-            return matchesText && matchesDate;
-        });
-        renderCloudPetitions(filtered);
-    }
-
-    if (filterPetitionsInput) filterPetitionsInput.addEventListener('input', applyPetitionsFilter);
-    if (filterPetitionsDate) filterPetitionsDate.addEventListener('change', applyPetitionsFilter);
-    if (clearPetitionsDateBtn) {
-        clearPetitionsDateBtn.addEventListener('click', () => {
-            if (filterPetitionsDate) filterPetitionsDate.value = '';
-            applyPetitionsFilter();
-        });
-    }
-
-    const filterReadingsInput = document.getElementById('filter-readings-input');
-    const filterReadingsDate = document.getElementById('filter-readings-date');
-    const clearReadingsDateBtn = document.getElementById('clear-readings-date-btn');
-
-    function applyReadingsFilter() {
-        const query = filterReadingsInput ? filterReadingsInput.value.toLowerCase() : '';
-        const selectedDate = filterReadingsDate ? filterReadingsDate.value : '';
-
-        const filtered = cloudReadings.filter(r => {
-            const itemDateStr = r.rawDate || r.date || '';
-            const itemDate = itemDateStr ? new Date(itemDateStr) : new Date();
-            const formattedItemDate = !isNaN(itemDate) ? itemDate.toISOString().split('T')[0] : '';
-            const matchesText = r.text.toLowerCase().includes(query) || (r.date && r.date.toLowerCase().includes(query));
-            const matchesDate = !selectedDate || formattedItemDate === selectedDate;
-            return matchesText && matchesDate;
-        });
-        renderCloudReadings(filtered);
-    }
-
-    if (filterReadingsInput) filterReadingsInput.addEventListener('input', applyReadingsFilter);
-    if (filterReadingsDate) filterReadingsDate.addEventListener('change', applyReadingsFilter);
-    if (clearReadingsDateBtn) {
-        clearReadingsDateBtn.addEventListener('click', () => {
-            if (filterReadingsDate) filterReadingsDate.value = '';
-            applyReadingsFilter();
-        });
-    }
-
-    const saveJournalBtn = document.getElementById('save-journal-btn');
-    const journalEntry = document.getElementById('journal-entry');
-
-    if (saveJournalBtn && journalEntry) {
-        saveJournalBtn.addEventListener('click', async () => {
-            const val = journalEntry.value.trim();
-            if (!val) return;
-
-            saveJournalBtn.disabled = true;
-            saveJournalBtn.innerText = "Saving to Cloud...";
-
-            const now = new Date();
-            cloudReadings.unshift({
-                text: val,
-                date: now.toLocaleString(),
-                rawDate: now.toISOString()
-            });
-
-            await saveReadingsCloud();
-            applyReadingsFilter();
-            journalEntry.value = '';
-            saveJournalBtn.disabled = false;
-            saveJournalBtn.innerText = "Save to Cloud Archive ( ✧ )";
-        });
-    }
-
-    // ==========================================
-    // 5. MULTI-DEITY SHRINE & GRIMOIRE ARCHIVE
+    // 4. MULTI-DEITY SHRINE & GRIMOIRE ARCHIVE
     // ==========================================
     let deities = ["Hestia", "Hekate", "Apollo", "Hermes"];
     let shrineData = {};
     let deityGrimoire = {}; 
     let currentShrine = "Hestia";
+    
+    // NEW: Unified Archive for Readings & Prayers
+    let journalArchive = [];
 
     async function initDeitiesAndShrines() {
         deities = await loadFromCloud('customDeitiesList', ["Hestia", "Hekate", "Apollo", "Hermes"]);
         shrineData = await loadFromCloud('shrineData', {});
         deityGrimoire = await loadFromCloud('deityGrimoire', {});
+        
+        // Load the journal archive from the cloud via the REST endpoint mechanism
+        journalArchive = await loadFromCloud('journalArchive', []);
 
         deities.forEach(d => {
             if(!shrineData[d]) shrineData[d] = { offerings: [], sketch: null, petitions: [] };
@@ -383,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         populateDeityDropdown();
         renderGrimoireArchive();
+        renderJournalArchive(); // Render the newly loaded archive
         
         const deityInput = document.getElementById('deity-focus-input');
         if(deityInput) {
@@ -408,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         select.value = currentShrine;
     }
 
+    // Render Illuminated Grimoire Manuscript Cards (Tab 4)
     function renderGrimoireArchive() {
         const grid = document.getElementById('archive-grid');
         if(!grid) return;
@@ -471,6 +264,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // NEW: Render the unified journal and prayer archive to the screen
+    function renderJournalArchive() {
+        const list = document.getElementById('journal-archive-list');
+        if(!list) return;
+        list.innerHTML = '';
+        
+        if (journalArchive.length === 0) {
+            list.innerHTML = '<p class="center-text" style="font-size:0.8rem; color:var(--text-muted);">No entries yet. Cast a reading or send a petition to see it here!</p>';
+            return;
+        }
+
+        journalArchive.forEach(entry => {
+            const card = document.createElement('div');
+            card.className = 'libation-item';
+            card.style.flexDirection = 'column';
+            card.style.alignItems = 'flex-start';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; width:100%; font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">
+                    <span><strong>${entry.type}</strong></span>
+                    <span>${entry.date}</span>
+                </div>
+                <div style="font-size:0.85rem; font-weight:normal; line-height:1.4;">
+                    ${entry.text}
+                </div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
     function openGrimoireEditor(deity) {
         const currentData = deityGrimoire[deity] || { plants: [], animals: [], offerings: [], colors: [], symbols: [] };
         
@@ -494,6 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderGrimoireArchive();
     }
 
+    // Custom Deity Addition with Inline Form
     const addDeityBtn = document.getElementById('add-custom-deity-btn');
     const newDeityInput = document.getElementById('new-deity-input');
     const customDeityForm = document.getElementById('custom-deity-form');
@@ -543,6 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderGrimoireArchive();
                 saveAndRenderShrine();
 
+                // Reset form
                 newDeityInput.value = '';
                 document.getElementById('new-deity-colors').value = '';
                 document.getElementById('new-deity-symbols').value = '';
@@ -690,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 6. HEARTH OF HESTIA RITUAL TOGGLE
+    // 5. HEARTH OF HESTIA RITUAL TOGGLE (Moon View / Homepage)
     // ==========================================
     const hestiaToggleBtn = document.getElementById('hestia-ritual-btn');
     const hestiaDisplay = document.getElementById('hestia-ritual-display');
@@ -721,7 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 7. MULTI-PROMPT GENERATOR & PETITIONS
+    // 6. MULTI-PROMPT GENERATOR & PETITIONS
     // ==========================================
     const promptLibrary = {
         morning: [
@@ -776,21 +600,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!textArea || textArea.value.trim() === '') return;
             
             if(!shrineData[currentShrine]) shrineData[currentShrine] = { offerings: [], sketch: null, petitions: [] };
-            const petitionContent = `[${currentShrine}]: ${textArea.value.trim()}`;
-            shrineData[currentShrine].petitions.push(textArea.value.trim());
+            shrineData[currentShrine].petitions.push(textArea.value);
             
-            const now = new Date();
-            cloudPetitions.unshift({
-                text: petitionContent,
-                date: now.toLocaleString(),
-                rawDate: now.toISOString()
+            // NEW: Push to the unified archive
+            journalArchive.unshift({
+                id: Date.now(),
+                type: `Petition to ${currentShrine}`,
+                text: textArea.value.trim(),
+                date: new Date().toLocaleString()
             });
-
+            
             await saveToCloud('shrineData', shrineData);
-            await savePetitionsCloud();
-            applyPetitionsFilter();
+            await saveToCloud('journalArchive', journalArchive);
 
             renderGrimoireArchive();
+            renderJournalArchive(); // Update visual list immediately
             textArea.classList.add('fade-out');
             
             const container = document.getElementById('sparkle-container');
@@ -806,6 +630,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     textArea.classList.remove('fade-out');
                 }, 2000);
             }
+        });
+    }
+
+    // NEW: Wiring up the Divination Journal button
+    const saveJournalBtn = document.getElementById('save-journal-btn');
+    if (saveJournalBtn) {
+        saveJournalBtn.addEventListener('click', async () => {
+            const journalEntry = document.getElementById('journal-entry');
+            if (!journalEntry || journalEntry.value.trim() === '') return;
+
+            // Push to the unified archive
+            journalArchive.unshift({
+                id: Date.now(),
+                type: 'Divination Reading',
+                text: journalEntry.value.trim(),
+                date: new Date().toLocaleString()
+            });
+
+            await saveToCloud('journalArchive', journalArchive);
+            renderJournalArchive(); // Update visual list immediately
+
+            journalEntry.value = '';
+            alert("Entry saved to your archive! ( ˘▽˘)");
         });
     }
 
@@ -829,7 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 8. DAILY HYMNS LOADER
+    // 7. DAILY HYMNS LOADER
     // ==========================================
     const dailyHymns = {
         0: { title: "Orphic Hymn to Helios (Sunday)", text: "Hear, golden Helios, whose blessed light shines across the boundless earth... Bringer of daylight, eternal sun, guide our steps with radiant grace." },
@@ -851,7 +698,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 9. ASTRONOMICAL MOON & LOCATION DATA
+    // 8. ASTRONOMICAL MOON & LOCATION DATA
     // ==========================================
     const upcomingLunarEvents = [
         { date: "Aug 12, 2026", event: "Total Solar Eclipse 🌑" },
@@ -972,7 +819,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const { latitude, longitude } = position.coords;
                     const response = await fetch(`https://api.sunrise-sunset.org/json?lat=${latitude}&lng=${longitude}&formatted=0`);
-                    if (!response.ok) throw new Error(`Sunrise API Error: ${response.status}`);
                     const data = await response.json();
                     
                     if (data.results && data.results.sunset && sundownEl) {
@@ -983,20 +829,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch (err) {
                     if(sundownEl) sundownEl.innerText = "Network Error";
-                    alert("🚨 FETCH ERROR IN SUNSET API 🚨\n" + err.message);
                 }
-            }, (geoError) => {
+            }, () => {
                 if(sundownEl) sundownEl.innerText = "Loc Denied";
-                alert("🚨 GEOLOCATION FAILED/DENIED 🚨\nReason: " + geoError.message);
             });
-        } else {
-            if(sundownEl) sundownEl.innerText = "No GPS";
-            alert("🚨 NO GEOLOCATION SUPPORT IN THIS BROWSER 🚨");
+        } else if(sundownEl) {
+            sundownEl.innerText = "No GPS";
         }
     }
 
+    // Initialize modules safely
     initDeitiesAndShrines();
-    initCloudArchives();
     renderLunarEvents();
     loadMoonAndLocationData();
     loadDailyHymn();
