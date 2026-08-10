@@ -275,12 +275,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 await saveToCloud('libationsList', libationsList);
                 renderLibations();
 
-                // 1. Auto Tick Kharis
                 kharisCount++;
                 if (kharisCountSpan) kharisCountSpan.innerText = kharisCount;
                 saveToCloud('kharisCount', kharisCount);
 
-                // 2. Save directly to the deity's database ledger
                 const newRecord = {
                     id: Date.now(),
                     name: name,
@@ -421,7 +419,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Trigger for the new overlay modal
         document.querySelectorAll('.open-archive-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const deity = e.target.getAttribute('data-deity');
@@ -430,7 +427,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- MODAL: Fetch and display the specific deity archive ---
     async function openDeityArchiveModal(deity) {
         const modal = document.getElementById('archive-modal');
         const title = document.getElementById('archive-modal-title');
@@ -929,7 +925,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const sweepBtn = document.getElementById('sweep-altar-btn');
-    const kharisCountSpan = document.getElementById('kharis-count');
     if(sweepBtn) {
         sweepBtn.addEventListener('click', () => {
             if(shrineData[currentShrine]) {
