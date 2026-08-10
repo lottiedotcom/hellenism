@@ -22,10 +22,7 @@
      <div class="card" style="margin-bottom: 10px;">
       <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Deipnon Prep Checklist</h4>
       <div class="checkbox-group">
-       <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Clear the shrine</label> 
-       <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Sweep thresholds</label> 
-       <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Dispose of old offerings</label> 
-       <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Leave crossroad offering</label>
+       <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Clear the shrine</label> <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Sweep thresholds</label> <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Dispose of old offerings</label> <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Leave crossroad offering</label>
       </div>
      </div>
      <div class="card" style="margin-bottom: 10px;">
@@ -42,7 +39,6 @@
      </div>
     </div>
    </div>
-
    <!-- 1. MOON TAB (HOMEPAGE) -->
    <section id="moon-view" class="view active">
     <header class="hero" style="position: relative;">
@@ -109,7 +105,6 @@
      </div>
     </div>
    </section>
-
    <!-- 2. ALTAR TAB -->
    <section id="altar-view" class="view">
     <header class="hero" style="position: relative;">
@@ -126,11 +121,7 @@
      <div id="custom-deity-form" class="hidden margin-top card" style="background: var(--accent-blue);">
       <h4 style="margin-top:0; text-align:center;">Configure Deity Associations ✨</h4>
       <p style="font-size:0.8rem; text-align:center; color:var(--text-muted);">Separate items with commas</p>
-      <label style="font-size:0.8rem; font-weight:700;">🎨 Sacred Colors:</label> <input type="text" id="new-deity-colors" class="cute-input margin-top" placeholder="e.g., Gold, White, Saffron"> 
-      <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">⚡ Sacred Symbols:</label> <input type="text" id="new-deity-symbols" class="cute-input margin-top" placeholder="e.g., Torch, Lyre, Caduceus"> 
-      <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">🌿 Sacred Plants:</label> <input type="text" id="new-deity-plants" class="cute-input margin-top" placeholder="e.g., Laurel, Bay, Olive"> 
-      <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">🐾 Sacred Animals:</label> <input type="text" id="new-deity-animals" class="cute-input margin-top" placeholder="e.g., Owl, Wolf, Dove"> 
-      <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">🍯 Standard Offerings:</label> <input type="text" id="new-deity-offerings" class="cute-input margin-top" placeholder="e.g., Honey, Wine, Frankincense">
+      <label style="font-size:0.8rem; font-weight:700;">🎨 Sacred Colors:</label> <input type="text" id="new-deity-colors" class="cute-input margin-top" placeholder="e.g., Gold, White, Saffron"> <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">⚡ Sacred Symbols:</label> <input type="text" id="new-deity-symbols" class="cute-input margin-top" placeholder="e.g., Torch, Lyre, Caduceus"> <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">🌿 Sacred Plants:</label> <input type="text" id="new-deity-plants" class="cute-input margin-top" placeholder="e.g., Laurel, Bay, Olive"> <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">🐾 Sacred Animals:</label> <input type="text" id="new-deity-animals" class="cute-input margin-top" placeholder="e.g., Owl, Wolf, Dove"> <label style="font-size:0.8rem; font-weight:700; display:block; margin-top:8px;">🍯 Standard Offerings:</label> <input type="text" id="new-deity-offerings" class="cute-input margin-top" placeholder="e.g., Honey, Wine, Frankincense">
       <button id="save-new-deity-btn" class="cute-btn full-width margin-top">Save Sanctuary &amp; Associations</button>
      </div>
     </div>
@@ -146,7 +137,8 @@
      <h3>Interactive Canvas</h3>
      <div id="altar-canvas" class="altar-tabletop">
       <div id="sketch-frame" class="sketch-frame-ui" onclick="document.getElementById('upload-sketch').click()">
-       <span id="sketch-placeholder">Frame<br>(Tap to set)</span>
+       <span id="sketch-placeholder">Frame
+        <br>(Tap to set)</span>
       </div>
      </div>
      <div class="input-group margin-top">
@@ -180,7 +172,6 @@
      <p class="center-text margin-top">Total logs: <span id="kharis-count">0</span></p>
     </div>
    </section>
-
    <!-- 3. DIVINATION TAB -->
    <section id="divination-view" class="view">
     <header class="hero" style="position: relative;">
@@ -214,63 +205,34 @@
     <div class="card">
      <h3>Reading Journal</h3>
      <textarea id="journal-entry" class="cute-input" rows="4" placeholder="Type reflections here..."></textarea>
-     <button id="save-journal-btn" class="cute-btn full-width margin-top">Save to Cloud Archive ( ✧ )</button>
+     <button id="save-journal-btn" class="cute-btn full-width margin-top">Save to Cloud</button>
     </div>
    </section>
-
    <!-- 4. GRIMOIRE & ARCHIVE TAB -->
    <section id="archive-view" class="view">
     <header class="hero" style="position: relative;">
      <button class="settings-gear-btn" title="Settings">⚙️</button>
      <h2>Grimoire &amp; Archive (📖)</h2>
     </header>
-    
-    <!-- Illuminated Grimoire Manuscript Cards -->
-    <div class="card" style="background: #fbf9ff; border: 2px solid var(--border-blue); margin-bottom: 14px;">
+    <div class="card" style="background: #fbf9ff; border: 2px solid var(--border-blue);">
      <h3 style="margin-bottom: 4px;">📖 Illuminated Grimoire Archive</h3>
      <p class="center-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Your quick-reference sacred associations synced with your shrines.</p>
      <div id="archive-grid" class="card-grid"></div>
     </div>
-
-    <!-- Cloud Petitions Archive -->
-    <div class="card" style="margin-bottom: 14px;">
-      <h3>( ˘▽˘) Cloud Prayers & Petitions</h3>
-      <div class="filter-box margin-top" style="margin-bottom:10px;">
-        <div style="display: flex; gap: 8px; align-items: center;">
-          <input type="date" id="filter-petitions-date" class="cute-input" style="flex: 1;">
-          <button id="clear-petitions-date-btn" class="cute-btn" style="padding: 8px 12px; font-size: 0.8rem;">Clear</button>
-        </div>
-        <input type="text" id="filter-petitions-input" class="cute-input margin-top" placeholder="Search petition keywords...">
-      </div>
-      <div id="cloud-petitions-list" class="archive-list">
-        <p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">Loading cloud petitions...</p>
-      </div>
-    </div>
-
-    <!-- Cloud Readings Archive -->
-    <div class="card">
-      <h3>(✯◡✯) Cloud Tarot & Reading Journals</h3>
-      <div class="filter-box margin-top" style="margin-bottom:10px;">
-        <div style="display: flex; gap: 8px; align-items: center;">
-          <input type="date" id="filter-readings-date" class="cute-input" style="flex: 1;">
-          <button id="clear-readings-date-btn" class="cute-btn" style="padding: 8px 12px; font-size: 0.8rem;">Clear</button>
-        </div>
-        <input type="text" id="filter-readings-input" class="cute-input margin-top" placeholder="Search reading keywords...">
-      </div>
-      <div id="cloud-readings-list" class="archive-list">
-        <p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">Loading cloud readings...</p>
-      </div>
+    
+    <!-- NEW: READINGS & PRAYERS ARCHIVE SECTION -->
+    <div class="card margin-top">
+     <h3>📜 Readings &amp; Prayers Archive</h3>
+     <div id="journal-archive-list" class="card-grid"></div>
     </div>
    </section>
   </main>
-
   <nav class="bottom-nav">
    <button class="nav-btn active" data-target="moon-view"><span class="nav-icon">(☽°ˊ3ˋ°)</span> <span class="nav-label">Moon</span></button>
    <button class="nav-btn" data-target="altar-view"><span class="nav-icon">( ˘▽˘)</span> <span class="nav-label">Altar</span></button>
    <button class="nav-btn" data-target="divination-view"><span class="nav-icon">(✯◡✯)</span> <span class="nav-label">Divination</span></button>
    <button class="nav-btn" data-target="archive-view"><span class="nav-icon">(📖)</span> <span class="nav-label">Grimoire</span></button>
   </nav>
-
   <script src="app.js"></script>
   <script>
   if ('serviceWorker' in navigator) {
@@ -280,7 +242,7 @@
         .catch((err) => console.log('Service Worker registration failed:', err));
     });
   }
-  </script>
+</script>
  </body>
 </html>
 
