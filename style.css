@@ -37,6 +37,7 @@ body.theme-pastel {
   display: none !important;
 }
 
+/* CARDS */
 .card {
   background: var(--card-bg);
   border-radius: 12px;
@@ -55,6 +56,7 @@ body.theme-pastel {
   margin-top: 15px;
 }
 
+/* BUTTONS & INPUTS */
 .cute-btn {
   background-color: var(--theme-main);
   color: white;
@@ -63,6 +65,7 @@ body.theme-pastel {
   padding: 10px 15px;
   font-weight: 700;
   cursor: pointer;
+  transition: opacity 0.2s;
 }
 .cute-btn:active {
   opacity: 0.8;
@@ -81,6 +84,7 @@ body.theme-pastel {
   resize: vertical;
 }
 
+/* HEADER & HERO */
 .hero {
   text-align: center;
   padding: 20px 0;
@@ -102,65 +106,7 @@ body.theme-pastel {
   font-size: 0.9rem;
 }
 
-.alignment-box {
-  background: #fdfcff;
-  border: 1px solid var(--border-blue);
-  border-radius: 8px;
-  padding: 10px;
-}
-.alignment-box p {
-  margin: 5px 0;
-  font-size: 0.9rem;
-}
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.stat-pill {
-  background: var(--accent-blue);
-  padding: 8px;
-  border-radius: 8px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-}
-.stat-label {
-  font-size: 0.7rem;
-  font-weight: bold;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-.stat-value {
-  font-size: 0.95rem;
-  font-weight: bold;
-  color: var(--text-main);
-}
-
-.progress-bar-container {
-  width: 100%;
-  height: 12px;
-  background-color: var(--accent-blue);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 10px;
-}
-.progress-bar-fill {
-  height: 100%;
-  background-color: var(--theme-main);
-  width: 0%;
-  transition: width 0.5s ease;
-}
-
-.cycle-list p {
-  margin: 8px 0;
-  font-size: 0.9rem;
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px dashed var(--border-blue);
-  padding-bottom: 4px;
-}
-
+/* BOTTOM NAVIGATION */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -191,6 +137,7 @@ body.theme-pastel {
   margin-bottom: 2px;
 }
 
+/* SETTINGS MODAL */
 .settings-modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -205,5 +152,35 @@ body.theme-pastel {
   max-width: 400px;
   max-height: 80vh;
   overflow-y: auto;
+}
+.checkbox-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+/* PROGRESS BAR */
+.progress-bar-container {
+  width: 100%;
+  background: var(--accent-blue);
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--theme-main);
+  transition: width 0.3s ease;
+}
+
+/* MISC */
+.moon-kaomoji {
+  font-size: 2rem;
+  margin: 10px 0;
+}
+.card-result {
+  background: var(--accent-blue);
+  padding: 12px;
+  border-radius: 8px;
 }
 
