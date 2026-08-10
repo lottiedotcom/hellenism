@@ -167,7 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let khernipsCount = 0;
     let kharisCount = 0;
-    let libationsList = [];
 
     async function initApp() {
         deities = await loadFromCloud('customDeitiesList', ["Hestia", "Hekate", "Apollo", "Hermes"]);
@@ -177,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         khernipsCount = await loadFromCloud('khernipsCount', 0);
         kharisCount = await loadFromCloud('kharisCount', 0);
-        libationsList = await loadFromCloud('libationsList', []);
 
         deities.forEach(d => {
             if(!shrineData[d]) shrineData[d] = { offerings: [], sketch: null, petitions: [] };
@@ -193,8 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const kSpan = document.getElementById('kharis-count');
         if(kSpan) kSpan.innerText = kharisCount;
-        
-        renderLibations();
         
         const deityInput = document.getElementById('deity-focus-input');
         if(deityInput) {
@@ -228,27 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- API HELPER FOR DEITY ARCHIVE ---
-    async function addRecordToDeityArchive(deity, record) {
-        try {
-            let records = [];
-            const res = await fetch(`/api/archive?deity=${encodeURIComponent(deity)}`);
-            if(res.ok) {
-                const data = await res.json();
-                if(data.success && data.records) records = data.records;
-            }
-            records.unshift(record); // newest first
-            await fetch('/api/archive', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ deity, records })
-            });
-        } catch (err) {
-            console.error("Failed to sync record to deity archive.", err);
-        }
-    }
-
-    // --- LIBATIONS LOGIC ---
+    // --- LIBATIONS LOGIC (DIRECT TO ARCHIVE) ---
     const addLibationBtn = document.getElementById('add-libation-btn');
     const newLibationName = document.getElementById('new-libation-name');
     const newLibationType = document.getElementById('new-libation-type');
@@ -261,85 +237,42 @@ document.addEventListener('DOMContentLoaded', () => {
             const note = newLibationNote ? newLibationNote.value.trim() : "";
             
             if (name) {
-                libationsList.push({ 
-                    id: Date.now(), 
-                    name: name,
-                    type: type,
-                    note: note,
-                    deity: currentShrine,
-                    status: 'active' 
-                });
+                // 1. Fetch existing archive for this specific deity via safe /api/storage route
+                const archiveKey = 'archive_' + currentShrine;
+                let records = await loadFromCloud(archiveKey, []);
                 
-                newLibationName.value = '';
-                if(newLibationNote) newLibationNote.value = '';
-                await saveToCloud('libationsList', libationsList);
-                renderLibations();
-
-                kharisCount++;
-                if (kharisCountSpan) kharisCountSpan.innerText = kharisCount;
-                saveToCloud('kharisCount', kharisCount);
-
-                const newRecord = {
+                // 2. Add the new record to the top of the ledger
+                records.unshift({
                     id: Date.now(),
                     name: name,
                     type: type,
                     note: note,
+                    status: 'active',
                     date: new Date().toLocaleString()
-                };
-                addRecordToDeityArchive(currentShrine, newRecord);
-            }
-        });
-    }
+                });
+                
+                // 3. Save it back to the cloud
+                await saveToCloud(archiveKey, records);
 
-    function renderLibations() {
-        const listEl = document.getElementById('libation-list');
-        if (!listEl) return;
-        listEl.innerHTML = '';
-        
-        libationsList.forEach(item => {
-            if (typeof item === 'string') {
-                item = { id: Date.now() + Math.random(), name: item, type: 'Legacy Offering', note: '', deity: 'General', status: 'active' };
-            }
-            
-            const div = document.createElement('div');
-            div.className = `libation-card ${item.status === 'cleared' ? 'libation-cleared' : ''}`;
-            
-            div.innerHTML = `
-                <div class="libation-header">
-                    <span>${item.name}</span>
-                    <div class="libation-actions">
-                        <button class="action-icon-btn toggle-btn" data-id="${item.id}" title="Toggle Active/Cleared">${item.status === 'active' ? '✅' : '🔄'}</button>
-                        <button class="action-icon-btn delete-btn" data-id="${item.id}" title="Delete">❌</button>
-                    </div>
-                </div>
-                <div class="libation-tags">
-                    <span class="libation-tag">To: ${item.deity}</span>
-                    <span class="libation-tag">${item.type}</span>
-                </div>
-                ${item.note ? `<div class="libation-note">"${item.note}"</div>` : ''}
-            `;
-            listEl.appendChild(div);
-        });
-        
-        document.querySelectorAll('#libation-list .delete-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const id = parseFloat(e.target.getAttribute('data-id'));
-                libationsList = libationsList.filter(l => l.id !== id && l !== e.target.getAttribute('data-id')); 
-                await saveToCloud('libationsList', libationsList);
-                renderLibations();
-            });
-        });
-        
-        document.querySelectorAll('#libation-list .toggle-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const id = parseFloat(e.target.getAttribute('data-id'));
-                const item = libationsList.find(l => l.id === id);
-                if (item) {
-                    item.status = item.status === 'active' ? 'cleared' : 'active';
-                    await saveToCloud('libationsList', libationsList);
-                    renderLibations();
+                // 4. Tick Kharis tracker automatically
+                kharisCount++;
+                if (kharisCountSpan) kharisCountSpan.innerText = kharisCount;
+                await saveToCloud('kharisCount', kharisCount);
+
+                // 5. Clear Inputs from screen immediately
+                newLibationName.value = '';
+                if(newLibationNote) newLibationNote.value = '';
+                
+                // 6. Give visual feedback
+                const container = document.getElementById('libation-sparkle-container');
+                if(container) {
+                    const sparkle = document.createElement('div');
+                    sparkle.innerText = `Logged to ${currentShrine}'s Archive! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧`;
+                    sparkle.className = 'sparkle-anim';
+                    container.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 2500);
                 }
-            });
+            }
         });
     }
 
@@ -438,31 +371,59 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.classList.remove('hidden');
 
             try {
-                const res = await fetch(`/api/archive?deity=${encodeURIComponent(deity)}`);
-                let records = [];
-                if(res.ok) {
-                    const data = await res.json();
-                    if(data.success && data.records) records = data.records;
-                }
+                // Fetch the archives using our perfectly working /api/storage method
+                let records = await loadFromCloud('archive_' + deity, []);
                 
                 if(records.length === 0) {
                     content.innerHTML = '<p class="center-text" style="font-size:0.85rem; color:var(--text-muted);">No records found for this deity yet. Log an offering to start building your ledger!</p>';
                 } else {
                     content.innerHTML = '';
-                    records.forEach(rec => {
+                    records.forEach(item => {
                         const div = document.createElement('div');
-                        div.className = 'libation-item';
-                        div.style.flexDirection = 'column';
-                        div.style.alignItems = 'flex-start';
+                        div.className = `libation-card ${item.status === 'cleared' ? 'libation-cleared' : ''}`;
                         div.innerHTML = `
-                            <div style="display:flex; justify-content:space-between; width:100%; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">
-                                <span><strong>${rec.type}</strong></span>
-                                <span>${rec.date}</span>
+                            <div class="libation-header">
+                                <span>${item.name}</span>
+                                <div class="libation-actions">
+                                    <button class="action-icon-btn toggle-btn" data-id="${item.id}" data-deity="${deity}" title="Toggle Active/Cleared">${item.status === 'active' ? '✅' : '🔄'}</button>
+                                    <button class="action-icon-btn delete-btn" data-id="${item.id}" data-deity="${deity}" title="Delete">❌</button>
+                                </div>
                             </div>
-                            <div style="font-size:0.85rem; font-weight:700;">${rec.name}</div>
-                            ${rec.note ? `<div style="font-size:0.8rem; font-style:italic; margin-top:4px; color:var(--text-dark);">"${rec.note}"</div>` : ''}
+                            <div class="libation-tags">
+                                <span class="libation-tag">${item.date}</span>
+                                <span class="libation-tag">${item.type}</span>
+                            </div>
+                            ${item.note ? `<div class="libation-note">"${item.note}"</div>` : ''}
                         `;
                         content.appendChild(div);
+                    });
+
+                    // Add Event Listeners for the Toggles inside the Modal
+                    content.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            if(confirm("Delete this record permanently?")) {
+                                const id = parseFloat(e.currentTarget.getAttribute('data-id'));
+                                const d = e.currentTarget.getAttribute('data-deity');
+                                let recs = await loadFromCloud('archive_' + d, []);
+                                recs = recs.filter(r => r.id !== id);
+                                await saveToCloud('archive_' + d, recs);
+                                openDeityArchiveModal(d); // Re-render instantly
+                            }
+                        });
+                    });
+
+                    content.querySelectorAll('.toggle-btn').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            const id = parseFloat(e.currentTarget.getAttribute('data-id'));
+                            const d = e.currentTarget.getAttribute('data-deity');
+                            let recs = await loadFromCloud('archive_' + d, []);
+                            const item = recs.find(r => r.id === id);
+                            if(item) {
+                                item.status = item.status === 'active' ? 'cleared' : 'active';
+                                await saveToCloud('archive_' + d, recs);
+                                openDeityArchiveModal(d); // Re-render instantly
+                            }
+                        });
                     });
                 }
             } catch (err) {
