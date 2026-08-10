@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Settings Gear Modal Logic
     const settingsModal = document.getElementById('settings-modal');
     document.querySelectorAll('.settings-gear-btn').forEach(gear => {
         gear.addEventListener('click', () => {
@@ -149,19 +148,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 4. MULTI-DEITY SHRINE & GRIMOIRE ARCHIVE
+    // 4. MULTI-DEITY SHRINE, LOGS, & ARCHIVES
     // ==========================================
     let deities = ["Hestia", "Hekate", "Apollo", "Hermes"];
     let shrineData = {};
     let deityGrimoire = {}; 
     let currentShrine = "Hestia";
     let journalArchive = [];
+    
+    // Trackers
+    let khernipsCount = 0;
+    let kharisCount = 0;
+    let libationsList = [];
 
-    async function initDeitiesAndShrines() {
+    async function initApp() {
         deities = await loadFromCloud('customDeitiesList', ["Hestia", "Hekate", "Apollo", "Hermes"]);
         shrineData = await loadFromCloud('shrineData', {});
         deityGrimoire = await loadFromCloud('deityGrimoire', {});
         journalArchive = await loadFromCloud('journalArchive', []);
+        
+        // Load Tracker Data
+        khernipsCount = await loadFromCloud('khernipsCount', 0);
+        kharisCount = await loadFromCloud('kharisCount', 0);
+        libationsList = await loadFromCloud('libationsList', []);
 
         deities.forEach(d => {
             if(!shrineData[d]) shrineData[d] = { offerings: [], sketch: null, petitions: [] };
@@ -171,6 +180,15 @@ document.addEventListener('DOMContentLoaded', () => {
         populateDeityDropdown();
         renderGrimoireArchive();
         renderJournalArchive(); 
+        
+        // Populate Trackers visually on load
+        const kBtn = document.getElementById('khernips-btn');
+        if(kBtn) kBtn.innerText = `Wash Hands (${khernipsCount})`;
+        
+        const kSpan = document.getElementById('kharis-count');
+        if(kSpan) kSpan.innerText = kharisCount;
+        
+        renderLibations();
         
         const deityInput = document.getElementById('deity-focus-input');
         if(deityInput) {
@@ -182,6 +200,65 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         saveAndRenderShrine();
     }
+
+    // --- KHERNIPS LOGIC ---
+    const khernipsBtn = document.getElementById('khernips-btn');
+    if (khernipsBtn) {
+        khernipsBtn.addEventListener('click', async () => {
+            khernipsCount++;
+            khernipsBtn.innerText = `Wash Hands (${khernipsCount})`;
+            await saveToCloud('khernipsCount', khernipsCount);
+        });
+    }
+
+    // --- KHARIS TRACKER LOGIC ---
+    const kharisBtn = document.getElementById('kharis-btn');
+    const kharisCountSpan = document.getElementById('kharis-count');
+    if (kharisBtn) {
+        kharisBtn.addEventListener('click', async () => {
+            kharisCount++;
+            if (kharisCountSpan) kharisCountSpan.innerText = kharisCount;
+            await saveToCloud('kharisCount', kharisCount);
+        });
+    }
+
+    // --- LIBATIONS LOGIC ---
+    const addLibationBtn = document.getElementById('add-libation-btn');
+    const newLibationInput = document.getElementById('new-libation');
+    
+    if (addLibationBtn && newLibationInput) {
+        addLibationBtn.addEventListener('click', async () => {
+            const val = newLibationInput.value.trim();
+            if (val) {
+                libationsList.push({ id: Date.now(), text: val });
+                newLibationInput.value = '';
+                await saveToCloud('libationsList', libationsList);
+                renderLibations();
+            }
+        });
+    }
+
+    function renderLibations() {
+        const listEl = document.getElementById('libation-list');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+        libationsList.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'libation-item';
+            div.innerHTML = `<span>${item.text}</span> <button class="delete-btn" data-id="${item.id}">✕</button>`;
+            listEl.appendChild(div);
+        });
+        
+        document.querySelectorAll('#libation-list .delete-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = parseInt(e.target.getAttribute('data-id'));
+                libationsList = libationsList.filter(l => l.id !== id);
+                await saveToCloud('libationsList', libationsList);
+                renderLibations();
+            });
+        });
+    }
+
 
     function populateDeityDropdown() {
         const select = document.getElementById('deity-focus-input');
@@ -446,7 +523,6 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = function(event) {
                 if(!shrineData[currentShrine]) shrineData[currentShrine] = { offerings: [], sketch: null, petitions: [] };
                 
-                // Calculate center default position for slot 0,0
                 const canvas = document.getElementById("altar-canvas");
                 const cellW = canvas ? (canvas.offsetWidth / 3) : 100;
                 const cellH = canvas ? (canvas.offsetHeight / 3) : 85;
@@ -721,12 +797,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             saveAndRenderShrine();
             
-            const kharisCountSpan = document.getElementById('kharis-count');
-            if(kharisCountSpan) {
-                let count = parseInt(kharisCountSpan.innerText) || 0;
-                kharisCountSpan.innerText = count + 1;
-                saveToCloud('kharisCount', count + 1);
-            }
+            kharisCount++;
+            if(kharisCountSpan) kharisCountSpan.innerText = kharisCount;
+            saveToCloud('kharisCount', kharisCount);
 
             alert("Make sure to clean your physical space as well! ( ˘▽˘)っ🧹");
         });
@@ -896,10 +969,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Initialize modules safely
-    initDeitiesAndShrines();
+    initApp();
     renderLunarEvents();
     loadMoonAndLocationData();
     loadDailyHymn();
 
 });
-
