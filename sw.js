@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hellenic-app-v11';
+const CACHE_NAME = 'hellenic-app-v13';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
