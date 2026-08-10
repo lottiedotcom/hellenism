@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hellenism-cache-v2';
+const CACHE_NAME = 'hellenism-cache-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -6,8 +6,7 @@ const ASSETS_TO_CACHE = [
   '/app.js',
   '/manifest.json',
   '/tarot.json',
-  '/delphic.json',
-  '/homeromancy.json'
+  '/sound.jpg'
 ];
 
 self.addEventListener('install', (event) => {
@@ -37,7 +36,6 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   
-  // Bypass cache completely for API routes so database requests always hit Vercel
   if (url.pathname.startsWith('/api/')) {
     return;
   }
