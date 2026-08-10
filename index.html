@@ -12,6 +12,7 @@
  <body class="theme-pastel">
   <audio id="action-sound" src="sound.mp4" preload="auto"></audio>
   <main id="app">
+   
    <!-- SETTINGS MODAL -->
    <div id="settings-modal" class="settings-modal hidden">
     <div class="settings-content card">
@@ -22,7 +23,10 @@
      <div class="card" style="margin-bottom: 10px;">
       <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Deipnon Prep Checklist</h4>
       <div class="checkbox-group">
-       <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Clear the shrine</label> <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Sweep thresholds</label> <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Dispose of old offerings</label> <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Leave crossroad offering</label>
+       <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Clear the shrine</label> 
+       <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Sweep thresholds</label> 
+       <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Dispose of old offerings</label> 
+       <label class="custom-checkbox"><input type="checkbox"><span class="checkmark"></span>Leave crossroad offering</label>
       </div>
      </div>
      <div class="card" style="margin-bottom: 10px;">
@@ -39,6 +43,20 @@
      </div>
     </div>
    </div>
+
+   <!-- DEITY ARCHIVE MODAL -->
+   <div id="archive-modal" class="settings-modal hidden">
+    <div class="settings-content card">
+     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h3 id="archive-modal-title" style="margin:0;">Devotional Archive</h3>
+      <button id="close-archive-btn" class="cute-btn" style="padding: 4px 10px;">✕</button>
+     </div>
+     <div id="archive-modal-content" style="display: flex; flex-direction: column; gap: 8px;">
+      <!-- Dynamic archive records will load here -->
+     </div>
+    </div>
+   </div>
+
    <!-- 1. MOON TAB (HOMEPAGE) -->
    <section id="moon-view" class="view active">
     <header class="hero" style="position: relative;">
@@ -168,7 +186,6 @@
      <button id="send-petition-btn" class="cute-btn full-width margin-top">Send to the Gods</button>
     </div>
     
-    <!-- NEW IN-DEPTH OFFERINGS SECTION -->
     <div class="card">
      <h3>Libations &amp; Offerings</h3>
      <div id="libation-list"></div>
