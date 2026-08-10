@@ -188,8 +188,7 @@
     
     <div class="card">
      <h3>Libations &amp; Offerings</h3>
-     <div id="libation-list"></div>
-     <div class="input-group" style="flex-direction: column; gap: 8px; margin-top: 14px;">
+     <div class="input-group" style="flex-direction: column; gap: 8px; margin-top: 6px; position: relative;">
       <input type="text" id="new-libation-name" placeholder="Offering (e.g., Honey, Bath)..." class="cute-input">
       <select id="new-libation-type" class="cute-input">
         <option value="Liquid Libation">💧 Liquid Libation</option>
@@ -199,6 +198,7 @@
       </select>
       <input type="text" id="new-libation-note" placeholder="Intention / Note (Optional)..." class="cute-input">
       <button id="add-libation-btn" class="cute-btn full-width">Log Offering</button>
+      <div id="libation-sparkle-container"></div>
      </div>
     </div>
     
@@ -280,3 +280,4 @@
 </script>
  </body>
 </html>
+
