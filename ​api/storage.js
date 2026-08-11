@@ -1,6 +1,6 @@
-import { sql } from '@vercel/postgres';
+const { sql } = require('@vercel/postgres');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // 1. Create the database table if it doesn't exist yet
   try {
     await sql`
@@ -53,5 +53,6 @@ export default async function handler(req, res) {
     }
   }
 
+  // If the request isn't GET or POST
   res.status(405).json({ error: "METHOD_NOT_ALLOWED", details: "Only GET and POST are allowed" });
-}
+};
