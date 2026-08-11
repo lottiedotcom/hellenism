@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ==========================================
-    // 1. VERCEL CLOUD DB / PERSISTENCE LAYER (RAW ERROR LOGGING + IMAGE FILTER)
+    // 1. VERCEL CLOUD DB / PERSISTENCE LAYER (IMAGE FILTER ACTIVE)
     // ==========================================
     async function saveToCloud(key, value) {
         // 1. ALWAYS save everything directly to local phone memory first.
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- REBUILT EXPORT LOGIC: PULLS STRICTLY FROM LOCAL MEMORY ---
+    // --- RESTORED EXPORT/IMPORT BACKUP LOGIC ---
     const exportBtn = document.getElementById('export-backup-btn');
     const importBtn = document.getElementById('import-backup-btn');
     const importFileInput = document.getElementById('import-file-input');
