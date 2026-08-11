@@ -38,9 +38,13 @@
       <button id="save-schedule-btn" class="cute-btn full-width margin-top">Save Schedule ᯓ⌲</button>
      </div>
      
+     <!-- RESTORED DATA MANAGEMENT BACKUP BUTTONS -->
      <div class="card" style="margin-bottom: 10px;">
       <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Data Management</h4>
-      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0;">Manual backups are temporarily disabled for cloud testing.</p>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0; margin-bottom: 8px;">Export a hard-copy backup file to your phone before major updates.</p>
+      <button id="export-backup-btn" class="cute-btn full-width" style="margin-bottom: 6px;">⋆｡°✩ Export Backup</button>
+      <button id="import-backup-btn" class="cute-btn full-width" style="background: #fbf9ff;">Import Backup File 📂</button>
+      <input type="file" id="import-file-input" accept=".json" style="display:none;">
      </div>
 
      <div class="card" style="margin-bottom: 0;">
@@ -343,7 +347,7 @@
      <h2>Grimoire &amp; Archive ÏīīīīīÏ</h2>
     </header>
     <div class="card" style="background: #fbf9ff; border: 2px solid var(--border-blue);">
-     <h3 style="margin-bottom: 4px;">‧₊˚📜₊˚⊹🕯️𖥔 ݁ ˖ Grimoire</h3>
+     <h3 style="margin-bottom: 4px;">‧₊˚📜₊˚⊹🕯️𖥔 ݁ ˖ Illuminated Grimoire</h3>
      <p class="center-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Your quick-reference sacred associations synced with your shrines.</p>
      <div id="archive-grid" class="card-grid"></div>
     </div>
