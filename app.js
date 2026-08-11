@@ -1285,8 +1285,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 hestiaDisplay.classList.remove('hidden');
                 hestiaDisplay.innerHTML = `
                     <strong>𓍢ִ໋🀦 Hearth of Hestia Lit</strong><br>
-                    <em>"First and last to Hestia we pour the sacred honey-sweet libation."</em><br>
-                    Your sacred space is now opened and protected by the First Goddess.
+                    <em>First and last to Hestia we pour the sacred honey-sweet libation.</em>
                 `;
                 hestiaToggleBtn.textContent = "Extinguish / Close Hearth 🇽";
             } else {
@@ -1576,14 +1575,14 @@ document.addEventListener('DOMContentLoaded', () => {
         let illumination = (1 - Math.cos(elongation * rad)) / 2 * 100;
         
         let phase = "";
-        if (elongation < 3 || elongation > 357) phase = "[New Moon]";
-        else if (elongation >= 3 && elongation < 87) phase = "[Waxing Crescent]";
-        else if (elongation >= 87 && elongation < 93) phase = "[First Quarter]";
-        else if (elongation >= 93 && elongation < 177) phase = "[Waxing Gibbous]";
-        else if (elongation >= 177 && elongation < 183) phase = "[Full Moon]";
-        else if (elongation >= 183 && elongation < 267) phase = "[Waning Gibbous]";
-        else if (elongation >= 267 && elongation < 273) phase = "[Third Quarter]";
-        else phase = "[Waning Crescent]";
+        if (elongation < 3 || elongation > 357) phase = "New Moon 🌑";
+        else if (elongation >= 3 && elongation < 87) phase = "Waxing Crescent 🌒";
+        else if (elongation >= 87 && elongation < 93) phase = "First Quarter 🌓";
+        else if (elongation >= 93 && elongation < 177) phase = "Waxing Gibbous 🌔";
+        else if (elongation >= 177 && elongation < 183) phase = "Full Moon 🌕";
+        else if (elongation >= 183 && elongation < 267) phase = "Waning Gibbous 🌖";
+        else if (elongation >= 267 && elongation < 273) phase = "Third Quarter 🌗";
+        else phase = "Waning Crescent 🌘";
 
         let moonAgeDays = (elongation / 360) * 29.530588;
 
@@ -1595,7 +1594,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(percentEl) percentEl.innerText = illumination.toFixed(1) + "%";
         if(ageEl) ageEl.innerText = moonAgeDays.toFixed(1) + " days";
 
-        const zodiacSigns = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+        const zodiacSigns = ["Aries ♈", "Taurus ♉", "Gemini ♊", "Cancer ♋", "Leo ♌", "Virgo ♍", "Libra ♎", "Scorpio ♏", "Sagittarius ♐", "Capricorn ♑", "Aquarius ♒", "Pisces ♓"];
         const energies = [
             "Initiation & Action", "Grounding & Senses", "Communication & Ideas", 
             "Home & Intuition", "Creativity & Passion", "Organization & Healing", 
