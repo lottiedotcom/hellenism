@@ -1,12 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ==========================================
-    // 1. VERCEL CLOUD DB / PERSISTENCE LAYER (RAW ERROR LOGGING)
+    // 1. VERCEL CLOUD DB / PERSISTENCE LAYER (RAW ERROR LOGGING + IMAGE FILTER)
     // ==========================================
     async function saveToCloud(key, value) {
+        // 1. ALWAYS save everything directly to local phone memory first.
         localStorage.setItem(key, JSON.stringify(value));
-        const targetRoute = '/api/storage';
         
+        // 2. THE FILTER: If the data is the Shrine (which holds images), STOP HERE. 
+        // Do not send it to the cloud to prevent server crashing.
+        if (key === 'shrineData') {
+            return; 
+        }
+
+        // 3. Otherwise, send the lightweight text to Vercel!
+        const targetRoute = '/api/storage';
         try {
             const res = await fetch(targetRoute, {
                 method: 'POST',
@@ -15,12 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             if (!res.ok) {
-                // Read the exact raw text returned by Vercel
                 const rawText = await res.text();
-                // Strip out the HTML tags so it's readable in an alert box
                 const cleanText = rawText.replace(/<[^>]*>?/gm, '').trim().substring(0, 400);
-                
-                alert(`EXACT CLOUD ERROR:\n\nROUTE: ${targetRoute}\nSTATUS CODE: ${res.status}\n\nRAW SERVER OUTPUT:\n${cleanText}`);
+                alert(`EXACT CLOUD ERROR:\n\nROUTE: ${targetRoute}\nSTATUS CODE: ${res.status}\n\nRAW OUTPUT:\n${cleanText}`);
             }
         } catch (err) {
             alert(`EXACT NETWORK ERROR:\n\nROUTE: ${targetRoute}\nDETAILS: ${err.message}`);
@@ -72,6 +77,97 @@ document.addEventListener('DOMContentLoaded', () => {
     if(closeSettings && settingsModal) {
         closeSettings.addEventListener('click', () => {
             settingsModal.classList.add('hidden');
+        });
+    }
+
+    // --- REBUILT EXPORT LOGIC: PULLS STRICTLY FROM LOCAL MEMORY ---
+    const exportBtn = document.getElementById('export-backup-btn');
+    const importBtn = document.getElementById('import-backup-btn');
+    const importFileInput = document.getElementById('import-file-input');
+
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            const keysToBackup = [
+                'customDeitiesList', 
+                'shrineData', 
+                'deityGrimoire', 
+                'journalArchive', 
+                'oneiroiArchive', 
+                'associationJournal', 
+                'khernipsCount', 
+                'kharisCount',
+                'libationsList'
+            ];
+            
+            let backupData = {};
+            exportBtn.innerText = "Gathering local data... ⋆｡°✩";
+            
+            for (const key of keysToBackup) {
+                const localData = localStorage.getItem(key);
+                if (localData) {
+                    backupData[key] = JSON.parse(localData);
+                }
+            }
+            
+            const deitiesToBackup = backupData['customDeitiesList'] || [];
+            for (const deity of deitiesToBackup) {
+                const archiveKey = 'archive_' + deity;
+                const localArchive = localStorage.getItem(archiveKey);
+                if (localArchive) {
+                    backupData[archiveKey] = JSON.parse(localArchive);
+                }
+            }
+
+            if (Object.keys(backupData).length === 0) {
+                alert("There is no local data found to backup yet!");
+                exportBtn.innerText = "⋆｡°✩ Export Backup";
+                return;
+            }
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "hellenic_backup_" + Date.now() + ".json");
+            document.body.appendChild(downloadAnchorNode); 
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            
+            exportBtn.innerText = "⋆｡°✩ Export Backup";
+        });
+    }
+
+    if (importBtn && importFileInput) {
+        importBtn.addEventListener('click', () => importFileInput.click());
+
+        importFileInput.addEventListener('change', async (e) => {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            
+            importBtn.innerText = "Importing... Please wait.";
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = async (event) => {
+                        try {
+                            const importedData = JSON.parse(event.target.result);
+                            for (const [key, value] of Object.entries(importedData)) {
+                                if (value !== null && value !== undefined) {
+                                    await saveToCloud(key, value);
+                                }
+                            }
+                            resolve();
+                        } catch (err) {
+                            resolve(); 
+                        }
+                    };
+                    reader.readAsText(file);
+                });
+            }
+            
+            alert(`Backup imported locally! Reloading app... ˙⋆✮⋆˚࿔`);
+            location.reload();
         });
     }
 
