@@ -823,7 +823,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('assoc-name').value = '';
             document.getElementById('assoc-category').value = 'Flora & Herbs';
             document.getElementById('assoc-deities').value = '';
-            document.getElementById('assoc-elements').value = '';
+            
+            // --- NEW: Reset all three fields individually ---
+            document.getElementById('assoc-element').value = '';
+            document.getElementById('assoc-planet').value = '';
+            document.getElementById('assoc-zodiac').value = '';
+            
             document.getElementById('assoc-intent').value = '';
             document.getElementById('assoc-notes').value = '';
         });
@@ -841,12 +846,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!name) { alert("Please provide a name for the entry."); return; }
 
             const editId = document.getElementById('edit-assoc-id').value;
+            
+            // --- NEW: Save all three fields individually ---
             const newEntry = {
                 id: editId ? parseInt(editId) : Date.now(),
                 name: name,
                 category: document.getElementById('assoc-category').value,
                 deities: document.getElementById('assoc-deities').value.trim(),
-                elements: document.getElementById('assoc-elements').value.trim(),
+                element: document.getElementById('assoc-element').value.trim(),
+                planet: document.getElementById('assoc-planet').value.trim(),
+                zodiac: document.getElementById('assoc-zodiac').value.trim(),
                 intent: document.getElementById('assoc-intent').value.trim(),
                 notes: document.getElementById('assoc-notes').value.trim()
             };
@@ -882,6 +891,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let displayList = associationJournal;
         
+        // --- NEW: Included the new individual fields in the search filtering ---
         if (filterText.trim() !== '') {
             const term = filterText.toLowerCase();
             displayList = associationJournal.filter(entry => 
@@ -889,7 +899,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 (entry.category && entry.category.toLowerCase().includes(term)) ||
                 (entry.deities && entry.deities.toLowerCase().includes(term)) ||
                 (entry.intent && entry.intent.toLowerCase().includes(term)) ||
-                (entry.elements && entry.elements.toLowerCase().includes(term)) ||
+                (entry.element && entry.element.toLowerCase().includes(term)) ||
+                (entry.planet && entry.planet.toLowerCase().includes(term)) ||
+                (entry.zodiac && entry.zodiac.toLowerCase().includes(term)) ||
                 (entry.notes && entry.notes.toLowerCase().includes(term))
             );
         }
@@ -903,6 +915,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = 'libation-card';
             
+            // --- NEW: HTML rendering individual element, planet, and zodiac lines ---
             card.innerHTML = `
                 <div class="libation-header">
                     <span>${entry.name}</span>
@@ -915,7 +928,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="libation-tag">${entry.category}</span>
                 </div>
                 ${entry.deities ? `<div style="font-size:0.8rem; color:var(--text-dark); margin-bottom:2px;"><strong>Deities:</strong> ${entry.deities}</div>` : ''}
-                ${entry.elements ? `<div style="font-size:0.8rem; color:var(--text-dark); margin-bottom:2px;"><strong>Elemental/Planet:</strong> ${entry.elements}</div>` : ''}
+                ${entry.element ? `<div style="font-size:0.8rem; color:var(--text-dark); margin-bottom:2px;"><strong>Element:</strong> ${entry.element}</div>` : ''}
+                ${entry.planet ? `<div style="font-size:0.8rem; color:var(--text-dark); margin-bottom:2px;"><strong>Planet:</strong> ${entry.planet}</div>` : ''}
+                ${entry.zodiac ? `<div style="font-size:0.8rem; color:var(--text-dark); margin-bottom:2px;"><strong>Zodiac:</strong> ${entry.zodiac}</div>` : ''}
                 ${entry.intent ? `<div style="font-size:0.8rem; color:var(--text-dark); margin-bottom:2px;"><strong>Intent:</strong> ${entry.intent}</div>` : ''}
                 ${entry.notes ? `<div style="font-size:0.85rem; font-style:italic; line-height:1.4; margin-top:6px;">"${entry.notes}"</div>` : ''}
             `;
@@ -946,7 +961,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('assoc-name').value = entry.name;
                     document.getElementById('assoc-category').value = entry.category;
                     document.getElementById('assoc-deities').value = entry.deities || "";
-                    document.getElementById('assoc-elements').value = entry.elements || "";
+                    
+                    // --- NEW: Populate all three individual fields during edit mode ---
+                    document.getElementById('assoc-element').value = entry.element || "";
+                    document.getElementById('assoc-planet').value = entry.planet || "";
+                    document.getElementById('assoc-zodiac').value = entry.zodiac || "";
+                    
                     document.getElementById('assoc-intent').value = entry.intent || "";
                     document.getElementById('assoc-notes').value = entry.notes || "";
                     document.getElementById('assoc-form-container').classList.remove('hidden');
