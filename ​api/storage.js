@@ -1,7 +1,12 @@
-const { sql } = require('@vercel/postgres');
+import { sql } from '@vercel/postgres';
 
-module.exports = async function handler(req, res) {
-  // 1. Create the database table if it doesn't exist yet
+export default async function handler(req, res) {
+  // 🔮 THE PING TEST: If you visit the link directly, it will show this message!
+  if (req.method === 'GET' && !req.query.key) {
+    return res.status(200).json({ message: "The Oracle is listening! Cloud API is alive." });
+  }
+
+  // 1. Create the database table if it doesn't exist
   try {
     await sql`
       CREATE TABLE IF NOT EXISTS hellenic_data (
@@ -13,7 +18,7 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: "TABLE_CREATION_FAILED", details: error.message });
   }
 
-  // 2. Handle POST requests (Saving data to the cloud)
+  // 2. Handle POST requests (Saving data)
   if (req.method === 'POST') {
     const { key, value } = req.body;
     
@@ -33,14 +38,10 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // 3. Handle GET requests (Loading data from the cloud)
+  // 3. Handle GET requests (Loading data)
   if (req.method === 'GET') {
     const { key } = req.query;
     
-    if (!key) {
-      return res.status(400).json({ error: "MISSING_KEY", details: "No key parameter provided" });
-    }
-
     try {
       const { rows } = await sql`SELECT value FROM hellenic_data WHERE key = ${key};`;
       if (rows.length > 0) {
@@ -53,6 +54,5 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // If the request isn't GET or POST
-  res.status(405).json({ error: "METHOD_NOT_ALLOWED", details: "Only GET and POST are allowed" });
-};
+  return res.status(405).json({ error: "METHOD_NOT_ALLOWED", details: "Only GET and POST are allowed" });
+}
