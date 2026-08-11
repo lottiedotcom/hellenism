@@ -89,7 +89,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 'deityGrimoire', 
                 'journalArchive', 
                 'oneiroiArchive', 
-                'associationJournal', 
+                'associationJournal',
+                'omenArchive',
                 'khernipsCount', 
                 'kharisCount',
                 'libationsList'
@@ -257,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 3. EXPANDED DIVINATION
+    // 3. EXPANDED DIVINATION & OMEN LOGGER
     // ==========================================
     const astragaliBtn = document.getElementById("draw-astragali-btn");
     if (astragaliBtn) {
@@ -401,6 +402,201 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const saveJournalBtn = document.getElementById('save-journal-btn');
+    if (saveJournalBtn) {
+        saveJournalBtn.addEventListener('click', async () => {
+            const journalEntry = document.getElementById('journal-entry');
+            if (!journalEntry || journalEntry.value.trim() === '') return;
+
+            journalArchive.unshift({
+                id: Date.now(),
+                type: 'Divination Reading',
+                text: journalEntry.value.trim(),
+                date: new Date().toLocaleString()
+            });
+
+            await saveToCloud('journalArchive', journalArchive);
+            renderJournalArchive(); 
+
+            journalEntry.value = '';
+            alert("Entry saved to your archive! ⋆☀︎.");
+        });
+    }
+
+    // --- OMEN LOGGER LOGIC ---
+    const openInDepthOmenBtn = document.getElementById('open-indepth-omen-btn');
+    const closeInDepthOmenBtn = document.getElementById('close-indepth-omen-btn');
+    const omenInDepthContainer = document.getElementById('omen-indepth-form-container');
+    const saveQuickOmenBtn = document.getElementById('save-quick-omen-btn');
+    const saveInDepthOmenBtn = document.getElementById('save-indepth-omen-btn');
+
+    if(openInDepthOmenBtn && omenInDepthContainer) {
+        openInDepthOmenBtn.addEventListener('click', () => {
+            omenInDepthContainer.classList.remove('hidden');
+            document.getElementById('edit-omen-id').value = '';
+            
+            // Transfer quick text over to in-depth if they typed something
+            const quickText = document.getElementById('quick-omen-text').value;
+            const quickDeity = document.getElementById('quick-omen-deity').value;
+            
+            document.getElementById('omen-manifestation').value = quickText || '';
+            document.getElementById('omen-environment').value = '';
+            document.getElementById('omen-mood').value = '';
+            document.getElementById('omen-deity').value = quickDeity || '';
+            document.getElementById('omen-category').value = 'Animal & Nature';
+            document.getElementById('omen-status').value = '⏳ Pending Clarity';
+            document.getElementById('omen-notes').value = '';
+        });
+    }
+
+    if(closeInDepthOmenBtn && omenInDepthContainer) {
+        closeInDepthOmenBtn.addEventListener('click', () => {
+            omenInDepthContainer.classList.add('hidden');
+        });
+    }
+
+    if(saveQuickOmenBtn) {
+        saveQuickOmenBtn.addEventListener('click', async () => {
+            const text = document.getElementById('quick-omen-text').value.trim();
+            const deityTags = document.getElementById('quick-omen-deity').value.trim();
+            if(!text) return;
+
+            omenArchive.unshift({
+                id: Date.now(),
+                manifestation: text,
+                environment: '',
+                mood: '',
+                deityTags: deityTags ? deityTags.split(',').map(s=>s.trim()).filter(Boolean) : [],
+                category: 'Uncategorized',
+                status: '⏳ Pending Clarity',
+                notes: '',
+                date: new Date().toLocaleString()
+            });
+
+            document.getElementById('quick-omen-text').value = '';
+            document.getElementById('quick-omen-deity').value = '';
+            
+            await saveToCloud('omenArchive', omenArchive);
+            renderOmenArchive();
+            
+            const container = document.getElementById('omen-sparkle-container');
+            if(container) {
+                const sparkle = document.createElement('div');
+                sparkle.innerText = 'Omen Logged! 🪶';
+                sparkle.className = 'sparkle-anim';
+                container.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 2500);
+            }
+        });
+    }
+
+    if(saveInDepthOmenBtn) {
+        saveInDepthOmenBtn.addEventListener('click', async () => {
+            const manifestation = document.getElementById('omen-manifestation').value.trim();
+            if(!manifestation) { alert("Please describe the manifestation."); return; }
+
+            const editId = document.getElementById('edit-omen-id').value;
+            const deityStr = document.getElementById('omen-deity').value;
+
+            const newEntry = {
+                id: editId ? parseInt(editId) : Date.now(),
+                manifestation: manifestation,
+                environment: document.getElementById('omen-environment').value.trim(),
+                mood: document.getElementById('omen-mood').value.trim(),
+                deityTags: deityStr ? deityStr.split(',').map(s=>s.trim()).filter(Boolean) : [],
+                category: document.getElementById('omen-category').value,
+                status: document.getElementById('omen-status').value,
+                notes: document.getElementById('omen-notes').value.trim(),
+                date: new Date().toLocaleString() 
+            };
+
+            if (editId) {
+                const index = omenArchive.findIndex(o => o.id === parseInt(editId));
+                if (index > -1) {
+                    newEntry.date = omenArchive[index].date; 
+                    omenArchive[index] = newEntry;
+                }
+            } else {
+                omenArchive.unshift(newEntry);
+            }
+
+            await saveToCloud('omenArchive', omenArchive);
+            omenInDepthContainer.classList.add('hidden');
+            document.getElementById('quick-omen-text').value = '';
+            document.getElementById('quick-omen-deity').value = '';
+            renderOmenArchive();
+        });
+    }
+
+    function renderOmenArchive() {
+        const list = document.getElementById('omen-archive-list');
+        if(!list) return;
+        list.innerHTML = '';
+        
+        if (omenArchive.length === 0) {
+            list.innerHTML = '<p class="center-text" style="font-size:0.8rem; color:var(--text-muted);">No omens logged yet. 🪶</p>';
+            return;
+        }
+
+        omenArchive.forEach(entry => {
+            const card = document.createElement('div');
+            card.className = 'libation-card';
+            
+            let tagsHtml = (entry.deityTags || []).map(t => `<span class="libation-tag">${t}</span>`).join('');
+            
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; width:100%; font-size:0.65rem; color:var(--text-muted); margin-bottom:6px;">
+                    <span style="font-weight:700; color:var(--text-dark);">${entry.category}</span>
+                    <span>${entry.date}</span>
+                </div>
+                <div class="libation-header" style="margin-bottom: 2px;">
+                    <span style="font-size: 0.95rem;">${entry.status}</span>
+                    <div class="libation-actions">
+                        <button class="action-icon-btn edit-omen-btn" data-id="${entry.id}" title="Edit Entry">≡</button>
+                        <button class="action-icon-btn delete-omen-btn" data-id="${entry.id}" title="Delete">(x.x)</button>
+                    </div>
+                </div>
+                <div style="font-size:0.85rem; line-height:1.4; margin-bottom: 6px;">${entry.manifestation}</div>
+                <div class="libation-tags" style="margin-bottom:4px;">
+                    ${tagsHtml}
+                </div>
+                ${entry.environment ? `<div style="font-size:0.8rem; color:var(--text-dark); margin-bottom:2px;"><strong>Environment:</strong> ${entry.environment}</div>` : ''}
+                ${entry.mood ? `<div style="font-size:0.8rem; color:var(--text-dark); margin-bottom:2px;"><strong>Mood:</strong> ${entry.mood}</div>` : ''}
+                ${entry.notes ? `<div style="font-size:0.85rem; font-style:italic; line-height:1.4; margin-top:6px;">"${entry.notes}"</div>` : ''}
+            `;
+            list.appendChild(card);
+        });
+
+        document.querySelectorAll('.delete-omen-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                if(confirm("Delete this omen record permanently? (x.x)")) {
+                    const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                    omenArchive = omenArchive.filter(a => a.id !== id);
+                    await saveToCloud('omenArchive', omenArchive);
+                    renderOmenArchive();
+                }
+            });
+        });
+
+        document.querySelectorAll('.edit-omen-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                const entry = omenArchive.find(a => a.id === id);
+                if(entry) {
+                    document.getElementById('edit-omen-id').value = entry.id;
+                    document.getElementById('omen-manifestation').value = entry.manifestation;
+                    document.getElementById('omen-environment').value = entry.environment || "";
+                    document.getElementById('omen-mood').value = entry.mood || "";
+                    document.getElementById('omen-deity').value = (entry.deityTags || []).join(', ');
+                    document.getElementById('omen-category').value = entry.category || "Animal & Nature";
+                    document.getElementById('omen-status').value = entry.status || "⏳ Pending Clarity";
+                    document.getElementById('omen-notes').value = entry.notes || "";
+                    document.getElementById('omen-indepth-form-container').classList.remove('hidden');
+                }
+            });
+        });
+    }
+
     // ==========================================
     // 4. MULTI-DEITY SHRINE, LOGS, & ARCHIVES
     // ==========================================
@@ -411,6 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let journalArchive = [];
     let oneiroiArchive = [];
     let associationJournal = []; 
+    let omenArchive = [];
     
     let khernipsCount = 0;
     let kharisCount = 0;
@@ -423,6 +620,7 @@ document.addEventListener('DOMContentLoaded', () => {
         journalArchive = await loadFromCloud('journalArchive', []);
         oneiroiArchive = await loadFromCloud('oneiroiArchive', []);
         associationJournal = await loadFromCloud('associationJournal', []);
+        omenArchive = await loadFromCloud('omenArchive', []);
         
         khernipsCount = await loadFromCloud('khernipsCount', 0);
         kharisCount = await loadFromCloud('kharisCount', 0);
@@ -438,6 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderJournalArchive(); 
         renderOneiroiArchive();
         renderAssociationJournal();
+        renderOmenArchive();
         
         const kBtn = document.getElementById('khernips-btn');
         if(kBtn) kBtn.innerText = `Wash Hands (${khernipsCount})`;
@@ -885,161 +1084,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const saveQuickDreamBtn = document.getElementById('save-quick-dream-btn');
-    if(saveQuickDreamBtn) {
-        saveQuickDreamBtn.addEventListener('click', async () => {
-            const text = document.getElementById('quick-dream-text').value.trim();
-            if(!text) return;
-            oneiroiArchive.unshift({
-                id: Date.now(),
-                title: "Untitled Fragment",
-                raw_notes: text,
-                source: "Uncategorized",
-                deity: "",
-                context: "",
-                tags: [],
-                aftermath: "",
-                date: new Date().toLocaleString()
-            });
-            document.getElementById('quick-dream-text').value = '';
-            await saveToCloud('oneiroiArchive', oneiroiArchive);
-            renderOneiroiArchive();
-            
-            const container = document.getElementById('quick-log-container');
-            if(container) {
-                const sparkle = document.createElement('div');
-                sparkle.innerText = 'Dream Logged! (∩^ω^)⊃━☆ﾟ.*';
-                sparkle.className = 'sparkle-anim';
-                container.appendChild(sparkle);
-                setTimeout(() => sparkle.remove(), 2500);
-            }
-        });
-    }
-
-    function renderOneiroiArchive() {
-        const list = document.getElementById('oneiroi-list');
-        if(!list) return;
-        list.innerHTML = '';
-        
-        if (oneiroiArchive.length === 0) {
-            list.innerHTML = '<p class="center-text" style="font-size:0.8rem; color:var(--text-muted);">No dreams logged yet. ‧₊˚ ☁️⋅𓂃 ࣪</p>';
-            return;
-        }
-
-        oneiroiArchive.forEach(entry => {
-            const card = document.createElement('div');
-            card.className = 'libation-card';
-            
-            let tagsHtml = (entry.tags || []).map(t => `<span class="libation-tag">#${t}</span>`).join('');
-            
-            card.innerHTML = `
-                <div class="libation-header">
-                    <span>${entry.title}</span>
-                    <div class="libation-actions">
-                        <button class="action-icon-btn edit-dream-btn" data-id="${entry.id}" title="Deep-Dive Analysis">✎</button>
-                        <button class="action-icon-btn delete-dream-btn" data-id="${entry.id}" title="Delete">(x.x)</button>
-                    </div>
-                </div>
-                <div style="font-size:0.85rem; font-style:italic; margin-bottom: 6px;">"${entry.raw_notes}"</div>
-                <div class="libation-tags">
-                    <span class="libation-tag">Source: ${entry.source}</span>
-                    ${entry.deity ? `<span class="libation-tag">Deity: ${entry.deity}</span>` : ''}
-                    ${tagsHtml}
-                </div>
-                ${entry.context ? `<div class="libation-note">Context: ${entry.context}</div>` : ''}
-                ${entry.aftermath ? `<div class="libation-note">Aftermath: ${entry.aftermath}</div>` : ''}
-                <div style="font-size:0.65rem; color:var(--text-muted); margin-top:4px; text-align:right;">${entry.date}</div>
-            `;
-            list.appendChild(card);
-        });
-
-        document.querySelectorAll('.delete-dream-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                if(confirm("Delete this dream log? (x.x)")) {
-                    const id = parseInt(e.currentTarget.getAttribute('data-id'));
-                    oneiroiArchive = oneiroiArchive.filter(d => d.id !== id);
-                    await saveToCloud('oneiroiArchive', oneiroiArchive);
-                    renderOneiroiArchive();
-                }
-            });
-        });
-
-        document.querySelectorAll('.edit-dream-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(e.currentTarget.getAttribute('data-id'));
-                const dream = oneiroiArchive.find(d => d.id === id);
-                if(dream) {
-                    document.getElementById('edit-dream-id').value = dream.id;
-                    document.getElementById('edit-dream-title').value = dream.title === "Untitled Fragment" ? "" : dream.title;
-                    document.getElementById('edit-dream-notes').value = dream.raw_notes;
-                    document.getElementById('edit-dream-source').value = dream.source || "Theoi / Daimonic";
-                    document.getElementById('edit-dream-deity').value = dream.deity || "";
-                    document.getElementById('edit-dream-context').value = dream.context || "";
-                    document.getElementById('edit-dream-tags').value = (dream.tags || []).join(', ');
-                    document.getElementById('edit-dream-aftermath').value = dream.aftermath || "";
-                    
-                    document.getElementById('oneiroi-modal').classList.remove('hidden');
-                }
-            });
-        });
-    }
-
-    function renderJournalArchive() {
-        const list = document.getElementById('journal-archive-list');
-        if(!list) return;
-        list.innerHTML = '';
-        
-        if (journalArchive.length === 0) {
-            list.innerHTML = '<p class="center-text" style="font-size:0.8rem; color:var(--text-muted);">No entries yet. Cast a reading or send a petition to see it here!</p>';
-            return;
-        }
-
-        journalArchive.forEach(entry => {
-            const card = document.createElement('div');
-            card.className = 'libation-item';
-            card.style.flexDirection = 'column';
-            card.style.alignItems = 'flex-start';
-            card.style.position = 'relative'; 
-            card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; width:100%; font-size:0.75rem; color:var(--text-muted); margin-bottom:6px; padding-right:30px;">
-                    <span><strong>${entry.type}</strong></span>
-                    <span>${entry.date}</span>
-                </div>
-                <div style="font-size:0.85rem; font-weight:normal; line-height:1.4;">
-                    ${entry.text}
-                </div>
-                <button class="edit-archive-btn" data-id="${entry.id}">≡</button>
-            `;
-            list.appendChild(card);
-        });
-
-        document.querySelectorAll('.edit-archive-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const id = parseInt(e.target.getAttribute('data-id'));
-                const entryIndex = journalArchive.findIndex(item => item.id === id);
-                if (entryIndex === -1) return;
-
-                const action = prompt("Type 'edit' to change this entry or 'delete' to remove it (u_u):", "edit");
-                if (action === null) return;
-                
-                if (action.toLowerCase() === 'delete') {
-                    if (confirm("Are you sure you want to delete this entry?")) {
-                        journalArchive.splice(entryIndex, 1);
-                        await saveToCloud('journalArchive', journalArchive);
-                        renderJournalArchive();
-                    }
-                } else if (action.toLowerCase() === 'edit') {
-                    const newText = prompt("Update your reading/prayer:", journalArchive[entryIndex].text);
-                    if (newText !== null && newText.trim() !== '') {
-                        journalArchive[entryIndex].text = newText.trim();
-                        await saveToCloud('journalArchive', journalArchive);
-                        renderJournalArchive();
-                    }
-                }
-            });
-        });
-    }
-
     const addDeityBtn = document.getElementById('add-custom-deity-btn');
     const newDeityInput = document.getElementById('new-deity-input');
     const customDeityForm = document.getElementById('custom-deity-form');
@@ -1386,27 +1430,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const saveJournalBtn = document.getElementById('save-journal-btn');
-    if (saveJournalBtn) {
-        saveJournalBtn.addEventListener('click', async () => {
-            const journalEntry = document.getElementById('journal-entry');
-            if (!journalEntry || journalEntry.value.trim() === '') return;
-
-            journalArchive.unshift({
-                id: Date.now(),
-                type: 'Divination Reading',
-                text: journalEntry.value.trim(),
-                date: new Date().toLocaleString()
-            });
-
-            await saveToCloud('journalArchive', journalArchive);
-            renderJournalArchive(); 
-
-            journalEntry.value = '';
-            alert("Entry saved to your archive! ⋆☀︎.");
-        });
-    }
-
     const sweepBtn = document.getElementById('sweep-altar-btn');
     if(sweepBtn) {
         sweepBtn.addEventListener('click', () => {
@@ -1662,4 +1685,3 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDailyHymn();
 
 });
-
