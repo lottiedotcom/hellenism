@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (exportBtn) {
         exportBtn.addEventListener('click', async () => {
-            // Included associationJournal in the backup keys
             const keysToBackup = ['customDeitiesList', 'shrineData', 'deityGrimoire', 'journalArchive', 'oneiroiArchive', 'associationJournal', 'khernipsCount', 'kharisCount'];
             let backupData = {};
             
@@ -174,6 +173,64 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 3. EXPANDED DIVINATION
     // ==========================================
+    
+    // --- NEW: ASTRAGALI DICE ORACLE ---
+    const astragaliBtn = document.getElementById("draw-astragali-btn");
+    if (astragaliBtn) {
+        astragaliBtn.addEventListener("click", () => {
+            const display = document.getElementById("astragali-display");
+            const rollEl = document.getElementById("astragali-roll");
+            const oracleEl = document.getElementById("astragali-oracle");
+
+            if (display) display.classList.remove("hidden");
+            if (rollEl) rollEl.innerText = "Casting the bones... ⋆˚꩜｡";
+            if (oracleEl) oracleEl.innerText = "";
+
+            setTimeout(() => {
+                let rolls = [];
+                let sum = 0;
+                for(let i=0; i<5; i++) {
+                    const r = Math.floor(Math.random() * 6) + 1;
+                    rolls.push(r);
+                    sum += r;
+                }
+                
+                let deity = "";
+                let reading = "";
+
+                if (sum === 5) { 
+                    deity = "The Oracle of Zeus"; 
+                    reading = "All ones. The path is difficult and blocked by thorns. Wait and pray to the King of Olympus before taking action."; 
+                } else if (sum >= 6 && sum <= 9) { 
+                    deity = "The Oracle of Hades"; 
+                    reading = "Shadows gather. Look to what is hidden beneath the surface. Introspection will reveal the truth."; 
+                } else if (sum >= 10 && sum <= 14) { 
+                    deity = "The Oracle of Hermes"; 
+                    reading = "The winds shift in your favor. Swift action, clever words, and movement are required now."; 
+                } else if (sum >= 15 && sum <= 19) { 
+                    deity = "The Oracle of Athena"; 
+                    reading = "Rely not on luck, but on wisdom and strategy. Plan your next steps with a clear, cool mind."; 
+                } else if (sum >= 20 && sum <= 24) { 
+                    deity = "The Oracle of Poseidon"; 
+                    reading = "A great wave comes, but you shall not drown. Trust in the deep currents and hold your course steady."; 
+                } else if (sum >= 25 && sum <= 29) { 
+                    deity = "The Oracle of Aphrodite"; 
+                    reading = "A time of blossoming connection, beauty, and passion. Lean into love and creative joy."; 
+                } else if (sum === 30) { 
+                    deity = "The Oracle of Tyche"; 
+                    reading = "The highest throw! Fortune smiles brightly upon you. Move forward with absolute confidence."; 
+                }
+
+                // Convert numbers to unicode dice symbols for aesthetics
+                const diceSymbols = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+                const visualRolls = rolls.map(r => diceSymbols[r-1]);
+
+                if (rollEl) rollEl.innerText = `[ ${visualRolls.join(" ")} ] (Sum: ${sum})`;
+                if (oracleEl) oracleEl.innerHTML = `<strong>${deity}</strong><br><br>${reading}`;
+            }, 600);
+        });
+    }
+
     const drawBtn = document.getElementById("draw-card-btn");
     if(drawBtn) {
         drawBtn.addEventListener("click", async () => {
@@ -270,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentShrine = "Hestia";
     let journalArchive = [];
     let oneiroiArchive = [];
-    let associationJournal = []; // NEW: Lore Codex Data
+    let associationJournal = []; 
     
     let khernipsCount = 0;
     let kharisCount = 0;
@@ -1344,7 +1401,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- NEW: WHEEL OF THE YEAR / SOLAR THRESHOLDS LOGIC ---
+    // --- NEW: WHEEL OF THE YEAR / SABBAT LOGIC ---
     const toggleWheelEvents = document.getElementById('toggle-wheel-events');
     if(toggleWheelEvents) {
         toggleWheelEvents.addEventListener('click', () => {
@@ -1355,31 +1412,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderWheelOfYear() {
         const now = new Date();
-        const solsticesAndEquinoxes = [
+        
+        // 1. Hellenic Solar Thresholds
+        const solarThresholds = [
             { name: "Autumnal Equinox (Pyanopsia / Thesmophoria)", date: new Date(2026, 8, 22), focus: "Gratitude, harvest offerings to Demeter & Persephone, and preparation for the dark half of the year." },
             { name: "Winter Solstice (Poseideia / Lenaia)", date: new Date(2026, 11, 21), focus: "The hearth fire (Hestia), honoring ancestral spirits, introspection, and welcoming the returning sun." },
             { name: "Vernal Equinox (Megalesia / Elaphebolion)", date: new Date(2027, 2, 20), focus: "Renewal, planting seeds, honoring Artemis & Dionysus, and the celebration of initial growth." },
             { name: "Summer Solstice (Skira / Thargelia)", date: new Date(2027, 5, 21), focus: "Peak light, thanking Apollo & Helios, mid-summer protection, and purification rites." }
         ];
 
-        // Find the next upcoming threshold
-        let nextEvent = solsticesAndEquinoxes.find(e => e.date > now);
-        if(!nextEvent) nextEvent = solsticesAndEquinoxes[0]; // fallback 
+        let nextSolar = solarThresholds.find(e => e.date > now);
+        if(!nextSolar) nextSolar = solarThresholds[0]; 
 
-        const nameEl = document.getElementById('next-solar-name');
-        const focusEl = document.getElementById('next-solar-focus');
-        const dateEl = document.getElementById('next-solar-date');
-        const countdownEl = document.getElementById('next-solar-countdown');
+        const nameSolarEl = document.getElementById('next-solar-name');
+        const focusSolarEl = document.getElementById('next-solar-focus');
+        const dateSolarEl = document.getElementById('next-solar-date');
+        const countSolarEl = document.getElementById('next-solar-countdown');
 
-        if(nameEl) nameEl.innerText = nextEvent.name;
-        if(focusEl) focusEl.innerText = nextEvent.focus;
+        if(nameSolarEl) nameSolarEl.innerText = nextSolar.name;
+        if(focusSolarEl) focusSolarEl.innerText = nextSolar.focus;
         
         const options = { month: 'long', day: 'numeric', year: 'numeric' };
-        if(dateEl) dateEl.innerText = nextEvent.date.toLocaleDateString(undefined, options);
+        if(dateSolarEl) dateSolarEl.innerText = nextSolar.date.toLocaleDateString(undefined, options);
 
-        const diffTime = Math.abs(nextEvent.date - now);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-        if(countdownEl) countdownEl.innerText = `${diffDays} days away`;
+        const diffTimeSolar = Math.abs(nextSolar.date - now);
+        const diffDaysSolar = Math.ceil(diffTimeSolar / (1000 * 60 * 60 * 24)); 
+        if(countSolarEl) countSolarEl.innerText = `${diffDaysSolar} days away`;
+
+        // 2. Wiccan Sabbat Syncretism (Perpetual Calculation)
+        const sabbats = [
+            { name: "Samhain", month: 9, date: 31, focus: "Chthonic Descent & Ancestor Veneration. Honor the Progonoi, Hekate, Hades, and Persephone." },
+            { name: "Yule", month: 11, date: 21, focus: "The Sun's Rebirth. Honor Apollo, Helios, and the eternal flame of Hestia." },
+            { name: "Imbolc", month: 1, date: 1, focus: "Hearth Flames & Purification. Cleanse the home with Khernips and honor Hestia." },
+            { name: "Ostara", month: 2, date: 21, focus: "Vernal Awakening. Celebrate Persephone's return from the Underworld and Demeter's joy." },
+            { name: "Beltane", month: 4, date: 1, focus: "Festival of Blossoms & Passion. Honor Aphrodite, Eros, and Dionysus with floral crowns and sweet wine." },
+            { name: "Litha", month: 5, date: 21, focus: "Zenith of the Sun. Honor Apollo and Zeus. A time for great bonfires and protection magic." },
+            { name: "Lammas", month: 7, date: 1, focus: "The First Harvest. Offerings of grain and bread to Demeter and Athena." },
+            { name: "Mabon", month: 8, date: 21, focus: "The Second Harvest. A time of balance and wine, honoring Dionysus and giving thanks." }
+        ];
+
+        let nextSabbat = null;
+        let minDiffSabbat = Infinity;
+
+        sabbats.forEach(s => {
+            let sDate = new Date(now.getFullYear(), s.month, s.date);
+            if (sDate < now) {
+                sDate = new Date(now.getFullYear() + 1, s.month, s.date);
+            }
+            const diff = sDate - now;
+            if (diff < minDiffSabbat) {
+                minDiffSabbat = diff;
+                nextSabbat = { ...s, parsedDate: sDate };
+            }
+        });
+
+        const nameSabbatEl = document.getElementById('next-sabbat-name');
+        const focusSabbatEl = document.getElementById('next-sabbat-focus');
+        const dateSabbatEl = document.getElementById('next-sabbat-date');
+        const countSabbatEl = document.getElementById('next-sabbat-countdown');
+
+        if(nameSabbatEl) nameSabbatEl.innerText = nextSabbat.name;
+        if(focusSabbatEl) focusSabbatEl.innerText = nextSabbat.focus;
+        if(dateSabbatEl) dateSabbatEl.innerText = nextSabbat.parsedDate.toLocaleDateString(undefined, options);
+
+        const diffDaysSabbat = Math.ceil(minDiffSabbat / (1000 * 60 * 60 * 24));
+        if(countSabbatEl) countSabbatEl.innerText = `${diffDaysSabbat} days away`;
     }
 
     function loadMoonAndLocationData() {
