@@ -57,29 +57,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- EXPORT & IMPORT BACKUP LOGIC ---
+    // --- CLEAN, TARGETED EXPORT & IMPORT BACKUP LOGIC ---
     const exportBtn = document.getElementById('export-backup-btn');
     const importBtn = document.getElementById('import-backup-btn');
     const importFileInput = document.getElementById('import-file-input');
 
     if (exportBtn) {
         exportBtn.addEventListener('click', async () => {
-            const keysToBackup = ['customDeitiesList', 'shrineData', 'deityGrimoire', 'journalArchive', 'oneiroiArchive', 'associationJournal', 'khernipsCount', 'kharisCount'];
-            let backupData = {};
+            // Strictly gather only the app's sacred data keys to avoid browser bloat
+            const keysToBackup = [
+                'customDeitiesList', 
+                'shrineData', 
+                'deityGrimoire', 
+                'journalArchive', 
+                'oneiroiArchive', 
+                'associationJournal', 
+                'khernipsCount', 
+                'kharisCount',
+                'libationsList'
+            ];
             
+            let backupData = {};
             exportBtn.innerText = "Gathering data... ⋆｡°✩";
             
             for (const key of keysToBackup) {
-                backupData[key] = await loadFromCloud(key, null);
+                const val = await loadFromCloud(key, null);
+                if (val !== null) backupData[key] = val;
             }
             
+            // Loop through custom deities to dynamically grab their specific archives
             const deitiesToBackup = backupData['customDeitiesList'] || [];
             for (const deity of deitiesToBackup) {
                 const archiveKey = 'archive_' + deity;
-                backupData[archiveKey] = await loadFromCloud(archiveKey, []);
+                const val = await loadFromCloud(archiveKey, null);
+                if (val !== null) backupData[archiveKey] = val;
             }
-            
-            backupData['libationsList'] = await loadFromCloud('libationsList', []);
 
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
             const downloadAnchorNode = document.createElement('a');
@@ -173,8 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 3. EXPANDED DIVINATION
     // ==========================================
-    
-    // --- NEW: ASTRAGALI DICE ORACLE ---
     const astragaliBtn = document.getElementById("draw-astragali-btn");
     if (astragaliBtn) {
         astragaliBtn.addEventListener("click", () => {
@@ -221,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     reading = "The highest throw! Fortune smiles brightly upon you. Move forward with absolute confidence."; 
                 }
 
-                // Convert numbers to unicode dice symbols for aesthetics
                 const diceSymbols = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
                 const visualRolls = rolls.map(r => diceSymbols[r-1]);
 
@@ -660,11 +669,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- ASSOCIATION JOURNAL & LORE CODEX LOGIC ---
+    // --- CORRESPONDENCE JOURNAL & LORE CODEX LOGIC ---
     const toggleAssocBtn = document.getElementById('toggle-assoc-form-btn');
     const assocForm = document.getElementById('assoc-form-container');
     const saveAssocBtn = document.getElementById('save-assoc-btn');
     const cancelAssocBtn = document.getElementById('cancel-assoc-btn');
+    const searchCorrInput = document.getElementById('search-corr-input');
 
     if(toggleAssocBtn && assocForm) {
         toggleAssocBtn.addEventListener('click', () => {
@@ -710,21 +720,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
             await saveToCloud('associationJournal', associationJournal);
             assocForm.classList.add('hidden');
-            renderAssociationJournal();
+            
+            if(searchCorrInput) {
+                renderAssociationJournal(searchCorrInput.value);
+            } else {
+                renderAssociationJournal();
+            }
         });
     }
 
-    function renderAssociationJournal() {
+    if (searchCorrInput) {
+        searchCorrInput.addEventListener('input', (e) => {
+            renderAssociationJournal(e.target.value);
+        });
+    }
+
+    function renderAssociationJournal(filterText = '') {
         const list = document.getElementById('association-list');
         if(!list) return;
         list.innerHTML = '';
         
-        if (associationJournal.length === 0) {
-            list.innerHTML = '<p class="center-text" style="font-size:0.8rem; color:var(--text-muted);">Your codex is empty. Add your first lore entry!</p>';
+        let displayList = associationJournal;
+        
+        if (filterText.trim() !== '') {
+            const term = filterText.toLowerCase();
+            displayList = associationJournal.filter(entry => 
+                (entry.name && entry.name.toLowerCase().includes(term)) ||
+                (entry.category && entry.category.toLowerCase().includes(term)) ||
+                (entry.deities && entry.deities.toLowerCase().includes(term)) ||
+                (entry.intent && entry.intent.toLowerCase().includes(term)) ||
+                (entry.elements && entry.elements.toLowerCase().includes(term)) ||
+                (entry.notes && entry.notes.toLowerCase().includes(term))
+            );
+        }
+
+        if (displayList.length === 0) {
+            list.innerHTML = '<p class="center-text" style="font-size:0.8rem; color:var(--text-muted);">No entries found. ‧₊˚ ☁️⋅𓂃 ࣪</p>';
             return;
         }
 
-        associationJournal.forEach(entry => {
+        displayList.forEach(entry => {
             const card = document.createElement('div');
             card.className = 'libation-card';
             
@@ -753,7 +788,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const id = parseInt(e.currentTarget.getAttribute('data-id'));
                     associationJournal = associationJournal.filter(a => a.id !== id);
                     await saveToCloud('associationJournal', associationJournal);
-                    renderAssociationJournal();
+                    if(searchCorrInput) {
+                        renderAssociationJournal(searchCorrInput.value);
+                    } else {
+                        renderAssociationJournal();
+                    }
                 }
             });
         });
@@ -1401,7 +1440,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- NEW: WHEEL OF THE YEAR / SABBAT LOGIC ---
     const toggleWheelEvents = document.getElementById('toggle-wheel-events');
     if(toggleWheelEvents) {
         toggleWheelEvents.addEventListener('click', () => {
@@ -1413,7 +1451,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderWheelOfYear() {
         const now = new Date();
         
-        // 1. Hellenic Solar Thresholds
         const solarThresholds = [
             { name: "Autumnal Equinox (Pyanopsia / Thesmophoria)", date: new Date(2026, 8, 22), focus: "Gratitude, harvest offerings to Demeter & Persephone, and preparation for the dark half of the year." },
             { name: "Winter Solstice (Poseideia / Lenaia)", date: new Date(2026, 11, 21), focus: "The hearth fire (Hestia), honoring ancestral spirits, introspection, and welcoming the returning sun." },
@@ -1439,7 +1476,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const diffDaysSolar = Math.ceil(diffTimeSolar / (1000 * 60 * 60 * 24)); 
         if(countSolarEl) countSolarEl.innerText = `${diffDaysSolar} days away`;
 
-        // 2. Wiccan Sabbat Syncretism (Perpetual Calculation)
         const sabbats = [
             { name: "Samhain", month: 9, date: 31, focus: "Chthonic Descent & Ancestor Veneration. Honor the Progonoi, Hekate, Hades, and Persephone." },
             { name: "Yule", month: 11, date: 21, focus: "The Sun's Rebirth. Honor Apollo, Helios, and the eternal flame of Hestia." },
