@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hellenic-app-v23';
+const CACHE_NAME = 'hellenic-app-v25';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -27,9 +27,8 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // 🚨 CRITICAL PWA FIX: Never intercept the database! 🚨
   if (event.request.url.includes('/api/')) {
-    return; // Let the browser talk directly to Vercel
+    return; 
   }
 
   if (!event.request.url.startsWith(self.location.origin)) return;
@@ -38,7 +37,6 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) return cachedResponse;
       return fetch(event.request).then((response) => {
-        // Only cache GET requests (HTML, CSS, JS), not POSTs!
         if (event.request.method !== 'GET') return response;
 
         return caches.open(CACHE_NAME).then((cache) => {
