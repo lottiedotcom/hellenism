@@ -64,7 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (exportBtn) {
         exportBtn.addEventListener('click', async () => {
-            const keysToBackup = ['customDeitiesList', 'shrineData', 'deityGrimoire', 'journalArchive', 'oneiroiArchive', 'khernipsCount', 'kharisCount'];
+            // Included associationJournal in the backup keys
+            const keysToBackup = ['customDeitiesList', 'shrineData', 'deityGrimoire', 'journalArchive', 'oneiroiArchive', 'associationJournal', 'khernipsCount', 'kharisCount'];
             let backupData = {};
             
             exportBtn.innerText = "Gathering data... ⋆｡°✩";
@@ -269,6 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentShrine = "Hestia";
     let journalArchive = [];
     let oneiroiArchive = [];
+    let associationJournal = []; // NEW: Lore Codex Data
     
     let khernipsCount = 0;
     let kharisCount = 0;
@@ -280,6 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
         deityGrimoire = await loadFromCloud('deityGrimoire', {});
         journalArchive = await loadFromCloud('journalArchive', []);
         oneiroiArchive = await loadFromCloud('oneiroiArchive', []);
+        associationJournal = await loadFromCloud('associationJournal', []);
         
         khernipsCount = await loadFromCloud('khernipsCount', 0);
         kharisCount = await loadFromCloud('kharisCount', 0);
@@ -294,6 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderGrimoireArchive();
         renderJournalArchive(); 
         renderOneiroiArchive();
+        renderAssociationJournal();
         
         const kBtn = document.getElementById('khernips-btn');
         if(kBtn) kBtn.innerText = `Wash Hands (${khernipsCount})`;
@@ -598,6 +602,123 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
+
+    // --- ASSOCIATION JOURNAL & LORE CODEX LOGIC ---
+    const toggleAssocBtn = document.getElementById('toggle-assoc-form-btn');
+    const assocForm = document.getElementById('assoc-form-container');
+    const saveAssocBtn = document.getElementById('save-assoc-btn');
+    const cancelAssocBtn = document.getElementById('cancel-assoc-btn');
+
+    if(toggleAssocBtn && assocForm) {
+        toggleAssocBtn.addEventListener('click', () => {
+            assocForm.classList.remove('hidden');
+            document.getElementById('edit-assoc-id').value = '';
+            document.getElementById('assoc-name').value = '';
+            document.getElementById('assoc-category').value = 'Flora & Herbs';
+            document.getElementById('assoc-deities').value = '';
+            document.getElementById('assoc-elements').value = '';
+            document.getElementById('assoc-intent').value = '';
+            document.getElementById('assoc-notes').value = '';
+        });
+    }
+
+    if(cancelAssocBtn && assocForm) {
+        cancelAssocBtn.addEventListener('click', () => {
+            assocForm.classList.add('hidden');
+        });
+    }
+
+    if(saveAssocBtn) {
+        saveAssocBtn.addEventListener('click', async () => {
+            const name = document.getElementById('assoc-name').value.trim();
+            if(!name) { alert("Please provide a name for the entry."); return; }
+
+            const editId = document.getElementById('edit-assoc-id').value;
+            const newEntry = {
+                id: editId ? parseInt(editId) : Date.now(),
+                name: name,
+                category: document.getElementById('assoc-category').value,
+                deities: document.getElementById('assoc-deities').value.trim(),
+                elements: document.getElementById('assoc-elements').value.trim(),
+                intent: document.getElementById('assoc-intent').value.trim(),
+                notes: document.getElementById('assoc-notes').value.trim()
+            };
+
+            if (editId) {
+                const index = associationJournal.findIndex(a => a.id === parseInt(editId));
+                if (index > -1) associationJournal[index] = newEntry;
+            } else {
+                associationJournal.unshift(newEntry);
+            }
+
+            await saveToCloud('associationJournal', associationJournal);
+            assocForm.classList.add('hidden');
+            renderAssociationJournal();
+        });
+    }
+
+    function renderAssociationJournal() {
+        const list = document.getElementById('association-list');
+        if(!list) return;
+        list.innerHTML = '';
+        
+        if (associationJournal.length === 0) {
+            list.innerHTML = '<p class="center-text" style="font-size:0.8rem; color:var(--text-muted);">Your codex is empty. Add your first lore entry!</p>';
+            return;
+        }
+
+        associationJournal.forEach(entry => {
+            const card = document.createElement('div');
+            card.className = 'libation-card';
+            
+            card.innerHTML = `
+                <div class="libation-header">
+                    <span>${entry.name}</span>
+                    <div class="libation-actions">
+                        <button class="action-icon-btn edit-assoc-btn" data-id="${entry.id}" title="Edit Entry">≡</button>
+                        <button class="action-icon-btn delete-assoc-btn" data-id="${entry.id}" title="Delete">(x.x)</button>
+                    </div>
+                </div>
+                <div class="libation-tags" style="margin-bottom:6px;">
+                    <span class="libation-tag">${entry.category}</span>
+                </div>
+                ${entry.deities ? `<div style="font-size:0.8rem; color:var(--text-dark); margin-bottom:2px;"><strong>Deities:</strong> ${entry.deities}</div>` : ''}
+                ${entry.elements ? `<div style="font-size:0.8rem; color:var(--text-dark); margin-bottom:2px;"><strong>Elemental/Planet:</strong> ${entry.elements}</div>` : ''}
+                ${entry.intent ? `<div style="font-size:0.8rem; color:var(--text-dark); margin-bottom:2px;"><strong>Intent:</strong> ${entry.intent}</div>` : ''}
+                ${entry.notes ? `<div style="font-size:0.85rem; font-style:italic; line-height:1.4; margin-top:6px;">"${entry.notes}"</div>` : ''}
+            `;
+            list.appendChild(card);
+        });
+
+        document.querySelectorAll('.delete-assoc-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                if(confirm("Delete this lore entry permanently? (x.x)")) {
+                    const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                    associationJournal = associationJournal.filter(a => a.id !== id);
+                    await saveToCloud('associationJournal', associationJournal);
+                    renderAssociationJournal();
+                }
+            });
+        });
+
+        document.querySelectorAll('.edit-assoc-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                const entry = associationJournal.find(a => a.id === id);
+                if(entry) {
+                    document.getElementById('edit-assoc-id').value = entry.id;
+                    document.getElementById('assoc-name').value = entry.name;
+                    document.getElementById('assoc-category').value = entry.category;
+                    document.getElementById('assoc-deities').value = entry.deities || "";
+                    document.getElementById('assoc-elements').value = entry.elements || "";
+                    document.getElementById('assoc-intent').value = entry.intent || "";
+                    document.getElementById('assoc-notes').value = entry.notes || "";
+                    document.getElementById('assoc-form-container').classList.remove('hidden');
+                }
+            });
+        });
+    }
+
 
     // --- ONEIROI ARCHIVE LOGIC ---
     const saveQuickDreamBtn = document.getElementById('save-quick-dream-btn');
@@ -1223,6 +1344,44 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- NEW: WHEEL OF THE YEAR / SOLAR THRESHOLDS LOGIC ---
+    const toggleWheelEvents = document.getElementById('toggle-wheel-events');
+    if(toggleWheelEvents) {
+        toggleWheelEvents.addEventListener('click', () => {
+            const content = document.getElementById('wheel-of-year-content');
+            if(content) content.classList.toggle('hidden');
+        });
+    }
+
+    function renderWheelOfYear() {
+        const now = new Date();
+        const solsticesAndEquinoxes = [
+            { name: "Autumnal Equinox (Pyanopsia / Thesmophoria)", date: new Date(2026, 8, 22), focus: "Gratitude, harvest offerings to Demeter & Persephone, and preparation for the dark half of the year." },
+            { name: "Winter Solstice (Poseideia / Lenaia)", date: new Date(2026, 11, 21), focus: "The hearth fire (Hestia), honoring ancestral spirits, introspection, and welcoming the returning sun." },
+            { name: "Vernal Equinox (Megalesia / Elaphebolion)", date: new Date(2027, 2, 20), focus: "Renewal, planting seeds, honoring Artemis & Dionysus, and the celebration of initial growth." },
+            { name: "Summer Solstice (Skira / Thargelia)", date: new Date(2027, 5, 21), focus: "Peak light, thanking Apollo & Helios, mid-summer protection, and purification rites." }
+        ];
+
+        // Find the next upcoming threshold
+        let nextEvent = solsticesAndEquinoxes.find(e => e.date > now);
+        if(!nextEvent) nextEvent = solsticesAndEquinoxes[0]; // fallback 
+
+        const nameEl = document.getElementById('next-solar-name');
+        const focusEl = document.getElementById('next-solar-focus');
+        const dateEl = document.getElementById('next-solar-date');
+        const countdownEl = document.getElementById('next-solar-countdown');
+
+        if(nameEl) nameEl.innerText = nextEvent.name;
+        if(focusEl) focusEl.innerText = nextEvent.focus;
+        
+        const options = { month: 'long', day: 'numeric', year: 'numeric' };
+        if(dateEl) dateEl.innerText = nextEvent.date.toLocaleDateString(undefined, options);
+
+        const diffTime = Math.abs(nextEvent.date - now);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        if(countdownEl) countdownEl.innerText = `${diffDays} days away`;
+    }
+
     function loadMoonAndLocationData() {
         const now = new Date();
         const jd = (now.getTime() / 86400000) + 2440587.5;
@@ -1334,6 +1493,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize modules safely
     initApp();
     renderLunarEvents();
+    renderWheelOfYear();
     loadMoonAndLocationData();
     loadDailyHymn();
 
