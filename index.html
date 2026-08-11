@@ -110,7 +110,7 @@
    <section id="moon-view" class="view active">
     <header class="hero" style="position: relative;">
      <button class="settings-gear-btn" title="Settings">(≡)</button>
-     <h1 id="user-greeting">𝐖𝐄𝐋𝐂𝐎𝐌𝐄 .ᐟ ౨ৎ</h1>
+     <h1 id="user-greeting">𝐖𝐄𝐋𝐂𝐎𝐌𝐄 𝐏𝐋𝐔𝐌 .ᐟ ౨ৎ</h1>
      <div class="moon-display">
       <div id="moon-phase-kaomoji" class="moon-kaomoji">☽◯☾</div>
      </div>
@@ -150,11 +150,13 @@
      <div id="lunar-events-list" class="hidden margin-top"></div>
     </div>
 
-    <!-- NEW: WHEEL OF THE YEAR / SOLAR THRESHOLDS -->
+    <!-- WHEEL OF THE YEAR / SABBAT SYNCRETISM -->
     <div class="card">
      <h3 id="toggle-wheel-events" class="cute-summary">*:･ﾟ✧ Wheel of the Year *:･ﾟ✧</h3>
      <div id="wheel-of-year-content" class="hidden margin-top">
-      <div class="libation-item" style="flex-direction: column; align-items: flex-start;">
+      
+      <!-- Hellenic Solar Threshold -->
+      <div class="libation-item" style="flex-direction: column; align-items: flex-start; background: transparent; border: 1px dashed var(--border-blue); padding: 12px; margin-bottom: 8px;">
        <div style="display:flex; justify-content:space-between; width:100%; font-size:0.75rem; color:var(--text-muted);">
         <span id="next-solar-date">Calculating...</span>
         <span id="next-solar-countdown" style="font-weight:700;"></span>
@@ -162,6 +164,17 @@
        <div id="next-solar-name" style="font-size:0.95rem; font-weight:700; margin: 4px 0;">Loading Threshold...</div>
        <div id="next-solar-focus" style="font-size:0.85rem; font-style:italic; line-height: 1.4; color:var(--text-dark);"></div>
       </div>
+
+      <!-- Wiccan Sabbat Syncretism -->
+      <div class="libation-item" style="flex-direction: column; align-items: flex-start; background: var(--accent-blue); padding: 12px;">
+       <div style="display:flex; justify-content:space-between; width:100%; font-size:0.75rem; color:var(--text-muted);">
+        <span id="next-sabbat-date">Calculating...</span>
+        <span id="next-sabbat-countdown" style="font-weight:700;"></span>
+       </div>
+       <div id="next-sabbat-name" style="font-size:0.95rem; font-weight:700; margin: 4px 0;">Loading Sabbat...</div>
+       <div id="next-sabbat-focus" style="font-size:0.85rem; font-style:italic; line-height: 1.4; color:var(--text-dark);"></div>
+      </div>
+
      </div>
     </div>
 
@@ -285,6 +298,17 @@
      <button class="settings-gear-btn" title="Settings">(≡)</button>
      <h2>Divination ˖𓍢ִ໋ 🀢🀦 ྀ.⊹</h2>
     </header>
+
+    <!-- NEW: ASTRAGALI DICE ORACLE -->
+    <div class="card center-text">
+     <h3>[⚄] Astragali Dice Oracle [⚄]</h3>
+     <button id="draw-astragali-btn" class="cute-btn">Cast the Astragali</button>
+     <div id="astragali-display" class="hidden card-result">
+      <h4 id="astragali-roll" style="letter-spacing: 2px;"></h4>
+      <p id="astragali-oracle" style="margin-top: 8px;"></p>
+     </div>
+    </div>
+
     <div class="card center-text">
      <h3>Daily Tarot Draw</h3>
      <button id="draw-card-btn" class="cute-btn">Draw Single Card</button>
@@ -328,7 +352,7 @@
      <div id="archive-grid" class="card-grid"></div>
     </div>
 
-    <!-- NEW: ASSOCIATION JOURNAL & LORE CODEX -->
+    <!-- ASSOCIATION JOURNAL & LORE CODEX -->
     <div class="card margin-top">
      <h3 style="margin-bottom: 4px;">𓍢ִ໋❁˚ Association Journal &amp; Lore Codex</h3>
      <p class="center-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Your infinite encyclopedia of sacred tools, herbs, and symbols.</p>
