@@ -1,30 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ==========================================
-    // 1. VERCEL CLOUD DB / PERSISTENCE LAYER
+    // 1. VERCEL CLOUD DB / PERSISTENCE LAYER (RAW ERROR LOGGING)
     // ==========================================
     async function saveToCloud(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
+        const targetRoute = '/api/storage';
+        
         try {
-            const res = await fetch('/api/storage', {
+            const res = await fetch(targetRoute, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key, value })
             });
             
             if (!res.ok) {
-                const errText = await res.text();
-                let errMsg = errText;
-                try {
-                    const errJson = JSON.parse(errText);
-                    errMsg = `[${errJson.error}] \nDetails: ${errJson.details}`;
-                } catch(e) {
-                    errMsg = "Server returned an HTML error page. The API route is crashing or missing.";
-                }
-                alert(`CLOUD ERROR: ${errMsg}`);
+                // Read the exact raw text returned by Vercel
+                const rawText = await res.text();
+                // Strip out the HTML tags so it's readable in an alert box
+                const cleanText = rawText.replace(/<[^>]*>?/gm, '').trim().substring(0, 400);
+                
+                alert(`EXACT CLOUD ERROR:\n\nROUTE: ${targetRoute}\nSTATUS CODE: ${res.status}\n\nRAW SERVER OUTPUT:\n${cleanText}`);
             }
         } catch (err) {
-            alert(`NETWORK ERROR: Could not reach Vercel server. \nDetails: ${err.message}`);
+            alert(`EXACT NETWORK ERROR:\n\nROUTE: ${targetRoute}\nDETAILS: ${err.message}`);
         }
     }
 
@@ -318,7 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
         saveAndRenderShrine();
     }
 
-    // --- KHERNIPS LOGIC ---
     const khernipsBtn = document.getElementById('khernips-btn');
     if (khernipsBtn) {
         khernipsBtn.addEventListener('click', async () => {
@@ -328,7 +326,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- KHARIS TRACKER LOGIC ---
     const kharisBtn = document.getElementById('kharis-btn');
     const kharisCountSpan = document.getElementById('kharis-count');
     if (kharisBtn) {
@@ -339,7 +336,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LIBATIONS LOGIC ---
     const addLibationBtn = document.getElementById('add-libation-btn');
     const newLibationName = document.getElementById('new-libation-name');
     const newLibationType = document.getElementById('new-libation-type');
@@ -603,7 +599,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- CORRESPONDENCE JOURNAL & LORE CODEX LOGIC ---
     const toggleAssocBtn = document.getElementById('toggle-assoc-form-btn');
     const assocForm = document.getElementById('assoc-form-container');
     const saveAssocBtn = document.getElementById('save-assoc-btn');
@@ -749,8 +744,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-    // --- ONEIROI ARCHIVE LOGIC ---
     const saveQuickDreamBtn = document.getElementById('save-quick-dream-btn');
     if(saveQuickDreamBtn) {
         saveQuickDreamBtn.addEventListener('click', async () => {
@@ -1163,9 +1156,6 @@ document.addEventListener('DOMContentLoaded', () => {
         el.addEventListener('touchstart', dragStart, {passive: false});
     }
 
-    // ==========================================
-    // 5. HEARTH OF HESTIA RITUAL TOGGLE
-    // ==========================================
     const hestiaToggleBtn = document.getElementById('hestia-ritual-btn');
     const hestiaDisplay = document.getElementById('hestia-ritual-display');
 
@@ -1194,9 +1184,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // 6. MULTI-PROMPT GENERATOR & PETITIONS
-    // ==========================================
     const promptLibrary = {
         morning: [
             "Morning Reflection: What intentions are you setting for today's daylight?",
@@ -1319,9 +1306,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // 7. DAILY HYMNS LOADER
-    // ==========================================
     const dailyHymns = {
         0: { title: "Orphic Hymn to Helios (Sunday)", text: "Hear, golden Helios, whose blessed light shines across the boundless earth... Bringer of daylight, eternal sun, guide our steps with radiant grace." },
         1: { title: "Homeric Hymn to Selene (Monday)", text: "Sing of the Moon, sweet-voiced Muses! From her immortal head a glow is shown from heaven and embraces earth... Queen of the night, shining Selene." },
@@ -1341,9 +1325,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ==========================================
-    // 8. ASTRONOMICAL MOON & LOCATION DATA
-    // ==========================================
     const upcomingLunarEvents = [
         { date: "Aug 12, 2026", event: "Total Solar Eclipse 𑣲☾" },
         { date: "Aug 28, 2026", event: "Partial Lunar Eclipse ⋆" },
@@ -1557,7 +1538,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Initialize modules safely
     initApp();
     renderLunarEvents();
     renderWheelOfYear();
