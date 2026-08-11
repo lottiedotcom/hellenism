@@ -12,14 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ key, value })
             });
             
-            const data = await res.json();
-            
-            // IF THE CLOUD FAILS, SHOW A MASSIVE POPUP
             if (!res.ok) {
-                alert(`CLOUD ERROR: [${data.error}] \nDetails: ${data.details}`);
+                const errText = await res.text();
+                let errMsg = errText;
+                try {
+                    const errJson = JSON.parse(errText);
+                    errMsg = `[${errJson.error}] \nDetails: ${errJson.details}`;
+                } catch(e) {
+                    errMsg = "Server returned an HTML error page. The API route is crashing or missing.";
+                }
+                alert(`CLOUD ERROR: ${errMsg}`);
             }
         } catch (err) {
-            // IF THE NETWORK FAILS, SHOW A MASSIVE POPUP
             alert(`NETWORK ERROR: Could not reach Vercel server. \nDetails: ${err.message}`);
         }
     }
@@ -28,10 +32,15 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const res = await fetch(`/api/storage?key=${encodeURIComponent(key)}`);
             if (res.ok) {
-                const data = await res.json();
-                if (data && data.value !== undefined) {
-                    localStorage.setItem(key, JSON.stringify(data.value));
-                    return data.value;
+                const text = await res.text();
+                try {
+                    const data = JSON.parse(text);
+                    if (data && data.value !== undefined) {
+                        localStorage.setItem(key, JSON.stringify(data.value));
+                        return data.value;
+                    }
+                } catch (e) {
+                    console.warn(`JSON parse error on loadFromCloud for ${key}`);
                 }
             }
         } catch (err) {}
@@ -89,7 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let backupData = {};
             exportBtn.innerText = "Gathering local data... ⋆｡°✩";
             
-            // Bypass the cloud completely for backups to guarantee it works
             for (const key of keysToBackup) {
                 const localData = localStorage.getItem(key);
                 if (localData) {
