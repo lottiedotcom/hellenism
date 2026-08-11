@@ -4,16 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. VERCEL CLOUD DB / PERSISTENCE LAYER (IMAGE FILTER ACTIVE)
     // ==========================================
     async function saveToCloud(key, value) {
-        // 1. ALWAYS save everything directly to local phone memory first.
         localStorage.setItem(key, JSON.stringify(value));
         
-        // 2. THE FILTER: If the data is the Shrine (which holds images), STOP HERE. 
-        // Do not send it to the cloud to prevent server crashing.
         if (key === 'shrineData') {
             return; 
         }
 
-        // 3. Otherwise, send the lightweight text to Vercel!
         const targetRoute = '/api/storage';
         try {
             const res = await fetch(targetRoute, {
@@ -80,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- RESTORED EXPORT/IMPORT BACKUP LOGIC ---
+    // --- EXPORT/IMPORT BACKUP LOGIC ---
     const exportBtn = document.getElementById('export-backup-btn');
     const importBtn = document.getElementById('import-backup-btn');
     const importFileInput = document.getElementById('import-file-input');
@@ -208,6 +204,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderOneiroiArchive();
                 oneiroiModal.classList.add('hidden');
             }
+        });
+    }
+
+    // ==========================================
+    // UNIFIED GRIMOIRE MODAL EDITOR LOGIC
+    // ==========================================
+    const grimoireEditModal = document.getElementById('grimoire-edit-modal');
+    const closeGrimoireModalBtn = document.getElementById('close-grimoire-modal-btn');
+    const saveGrimoireModalBtn = document.getElementById('save-grimoire-modal-btn');
+
+    if (closeGrimoireModalBtn && grimoireEditModal) {
+        closeGrimoireModalBtn.addEventListener('click', () => {
+            grimoireEditModal.classList.add('hidden');
+        });
+    }
+
+    function openGrimoireEditor(deity) {
+        const currentData = deityGrimoire[deity] || { plants: [], animals: [], offerings: [], colors: [], symbols: [] };
+        
+        document.getElementById('grimoire-modal-title').innerText = `Edit ${deity}'s Associations`;
+        document.getElementById('edit-grimoire-deity-name').value = deity;
+        
+        document.getElementById('edit-grimoire-colors').value = (currentData.colors || []).join(', ');
+        document.getElementById('edit-grimoire-symbols').value = (currentData.symbols || []).join(', ');
+        document.getElementById('edit-grimoire-plants').value = (currentData.plants || []).join(', ');
+        document.getElementById('edit-grimoire-animals').value = (currentData.animals || []).join(', ');
+        document.getElementById('edit-grimoire-offerings').value = (currentData.offerings || []).join(', ');
+
+        grimoireEditModal.classList.remove('hidden');
+    }
+
+    if (saveGrimoireModalBtn) {
+        saveGrimoireModalBtn.addEventListener('click', async () => {
+            const deity = document.getElementById('edit-grimoire-deity-name').value;
+            if (!deity) return;
+
+            const parseInput = (id) => document.getElementById(id).value.split(',').map(s => s.trim()).filter(Boolean);
+
+            deityGrimoire[deity] = {
+                colors: parseInput('edit-grimoire-colors'),
+                symbols: parseInput('edit-grimoire-symbols'),
+                plants: parseInput('edit-grimoire-plants'),
+                animals: parseInput('edit-grimoire-animals'),
+                offerings: parseInput('edit-grimoire-offerings')
+            };
+
+            await saveToCloud('deityGrimoire', deityGrimoire);
+            renderGrimoireArchive();
+            grimoireEditModal.classList.add('hidden');
         });
     }
 
@@ -993,29 +1038,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
-    }
-
-    function openGrimoireEditor(deity) {
-        const currentData = deityGrimoire[deity] || { plants: [], animals: [], offerings: [], colors: [], symbols: [] };
-        
-        const colInput = prompt(`Enter sacred colors for ${deity} (comma separated):`, (currentData.colors || []).join(', '));
-        if(colInput !== null) currentData.colors = colInput.split(',').map(s => s.trim()).filter(Boolean);
-
-        const symInput = prompt(`Enter sacred symbols for ${deity} (comma separated):`, (currentData.symbols || []).join(', '));
-        if(symInput !== null) currentData.symbols = symInput.split(',').map(s => s.trim()).filter(Boolean);
-
-        const pInput = prompt(`Enter sacred plants for ${deity} (comma separated):`, currentData.plants.join(', '));
-        if(pInput !== null) currentData.plants = pInput.split(',').map(s => s.trim()).filter(Boolean);
-
-        const aInput = prompt(`Enter sacred animals for ${deity} (comma separated):`, currentData.animals.join(', '));
-        if(aInput !== null) currentData.animals = aInput.split(',').map(s => s.trim()).filter(Boolean);
-
-        const oInput = prompt(`Enter standard offerings for ${deity} (comma separated):`, currentData.offerings.join(', '));
-        if(oInput !== null) currentData.offerings = oInput.split(',').map(s => s.trim()).filter(Boolean);
-
-        deityGrimoire[deity] = currentData;
-        saveToCloud('deityGrimoire', deityGrimoire);
-        renderGrimoireArchive();
     }
 
     const addDeityBtn = document.getElementById('add-custom-deity-btn');
