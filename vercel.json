@@ -1,0 +1,13 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/storage",
+      "destination": "/api/storage.js"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
+  ]
+}
+
