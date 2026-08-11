@@ -40,10 +40,7 @@
      
      <div class="card" style="margin-bottom: 10px;">
       <h4 style="margin:0 0 8px 0; font-size:0.95rem;">Data Management</h4>
-      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0;">Backup your archives, shrines, and settings to a file.</p>
-      <button id="export-backup-btn" class="cute-btn full-width">⋆｡°✩ Export Backup</button>
-      <button id="import-backup-btn" class="cute-btn full-width margin-top">˙⋆✮⋆˚࿔ Import Files/Backups</button>
-      <input type="file" id="import-file-input" accept=".json" multiple style="display:none;">
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0;">Manual backups are temporarily disabled for cloud testing.</p>
      </div>
 
      <div class="card" style="margin-bottom: 0;">
@@ -299,7 +296,6 @@
      <h2>Divination ˖𓍢ִ໋ 🀢🀦 ྀ.⊹</h2>
     </header>
 
-    <!-- NEW: ASTRAGALI DICE ORACLE -->
     <div class="card center-text">
      <h3>[⚄] Astragali Dice Oracle [⚄]</h3>
      <button id="draw-astragali-btn" class="cute-btn">Cast the Astragali</button>
@@ -347,18 +343,19 @@
      <h2>Grimoire &amp; Archive ÏīīīīīÏ</h2>
     </header>
     <div class="card" style="background: #fbf9ff; border: 2px solid var(--border-blue);">
-     <h3 style="margin-bottom: 4px;">‧₊˚📜₊˚⊹🕯️𖥔 ݁ ˖ Illuminated Grimoire</h3>
+     <h3 style="margin-bottom: 4px;">‧₊˚📜₊˚⊹🕯️𖥔 ݁ ˖ Grimoire</h3>
      <p class="center-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Your quick-reference sacred associations synced with your shrines.</p>
      <div id="archive-grid" class="card-grid"></div>
     </div>
 
-    <!-- ASSOCIATION JOURNAL & LORE CODEX -->
+    <!-- CORRESPONDENCE JOURNAL -->
     <div class="card margin-top">
-     <h3 style="margin-bottom: 4px;">𓍢ִ໋❁˚ Association Journal &amp; Lore Codex</h3>
+     <h3 style="margin-bottom: 4px;">𓍢ִ໋❁˚ Correspondence Journal</h3>
      <p class="center-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Your infinite encyclopedia of sacred tools, herbs, and symbols.</p>
      
      <button id="toggle-assoc-form-btn" class="cute-btn full-width">✚ Add Lore Entry</button>
-     
+     <input type="text" id="search-corr-input" class="cute-input margin-top" placeholder="Search by name, category, intent, or deity...">
+
      <div id="assoc-form-container" class="hidden margin-top" style="display:flex; flex-direction:column; gap:8px;">
       <input type="hidden" id="edit-assoc-id">
       <input type="text" id="assoc-name" class="cute-input" placeholder="Entry Name (e.g., Bay Laurel, Honey)">
