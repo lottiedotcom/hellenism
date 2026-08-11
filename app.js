@@ -6,12 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
     async function saveToCloud(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
         try {
-            await fetch('/api/storage', {
+            const res = await fetch('/api/storage', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key, value })
             });
-        } catch (err) {}
+            
+            const data = await res.json();
+            
+            // IF THE CLOUD FAILS, SHOW A MASSIVE POPUP
+            if (!res.ok) {
+                alert(`CLOUD ERROR: [${data.error}] \nDetails: ${data.details}`);
+            }
+        } catch (err) {
+            // IF THE NETWORK FAILS, SHOW A MASSIVE POPUP
+            alert(`NETWORK ERROR: Could not reach Vercel server. \nDetails: ${err.message}`);
+        }
     }
 
     async function loadFromCloud(key, defaultValue) {
@@ -57,14 +67,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- CLEAN, TARGETED EXPORT & IMPORT BACKUP LOGIC ---
+    // --- REBUILT EXPORT LOGIC: PULLS STRICTLY FROM LOCAL MEMORY ---
     const exportBtn = document.getElementById('export-backup-btn');
     const importBtn = document.getElementById('import-backup-btn');
     const importFileInput = document.getElementById('import-file-input');
 
     if (exportBtn) {
-        exportBtn.addEventListener('click', async () => {
-            // Strictly gather only the app's sacred data keys to avoid browser bloat
+        exportBtn.addEventListener('click', () => {
             const keysToBackup = [
                 'customDeitiesList', 
                 'shrineData', 
@@ -78,19 +87,29 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
             
             let backupData = {};
-            exportBtn.innerText = "Gathering data... ⋆｡°✩";
+            exportBtn.innerText = "Gathering local data... ⋆｡°✩";
             
+            // Bypass the cloud completely for backups to guarantee it works
             for (const key of keysToBackup) {
-                const val = await loadFromCloud(key, null);
-                if (val !== null) backupData[key] = val;
+                const localData = localStorage.getItem(key);
+                if (localData) {
+                    backupData[key] = JSON.parse(localData);
+                }
             }
             
-            // Loop through custom deities to dynamically grab their specific archives
             const deitiesToBackup = backupData['customDeitiesList'] || [];
             for (const deity of deitiesToBackup) {
                 const archiveKey = 'archive_' + deity;
-                const val = await loadFromCloud(archiveKey, null);
-                if (val !== null) backupData[archiveKey] = val;
+                const localArchive = localStorage.getItem(archiveKey);
+                if (localArchive) {
+                    backupData[archiveKey] = JSON.parse(localArchive);
+                }
+            }
+
+            if (Object.keys(backupData).length === 0) {
+                alert("There is no local data found to backup yet!");
+                exportBtn.innerText = "⋆｡°✩ Export Backup";
+                return;
             }
 
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
@@ -137,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
             
-            alert(`Backup imported securely! Loaded ${successCount} file(s) to the cloud. Reloading app... ˙⋆✮⋆˚࿔`);
+            alert(`Backup imported locally! Reloading app... ˙⋆✮⋆˚࿔`);
             location.reload();
         });
     }
