@@ -368,6 +368,65 @@
      <textarea id="journal-entry" class="cute-input" rows="4" placeholder="Type reflections here..."></textarea>
      <button id="save-journal-btn" class="cute-btn full-width margin-top">Save to Cloud</button>
     </div>
+
+    <!-- OMEN & SIGN LOGGER -->
+    <div class="card margin-top">
+     <h3 style="margin-bottom: 4px;">·—̳͟͞͞♡ Quick Log</h3>
+     
+     <div id="omen-quick-log-container">
+      <textarea id="quick-omen-text" class="cute-input" rows="2" placeholder="Quick sign note (e.g., Crow crossing the path, flickering candle)..."></textarea>
+      <input type="text" id="quick-omen-deity" class="cute-input margin-top" placeholder="Deity / Spirit tags (comma separated)">
+      
+      <div style="display: flex; gap: 8px; margin-top: 8px;">
+       <button id="save-quick-omen-btn" class="cute-btn full-width">Quick-Log Sign 🪶</button>
+       <button id="open-indepth-omen-btn" class="cute-btn full-width" style="background:#fbf9ff;">In Depth Log ₊˚⊹</button>
+      </div>
+      <div id="omen-sparkle-container"></div>
+     </div>
+
+     <div id="omen-indepth-form-container" class="hidden margin-top" style="display:flex; flex-direction:column; gap:8px; border-top: 1px dashed var(--border-blue); padding-top: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+       <h4 style="margin:0;">In Depth Log ₊˚⊹</h4>
+       <button id="close-indepth-omen-btn" class="cute-btn" style="padding: 2px 8px;">(x.x)</button>
+      </div>
+      
+      <input type="hidden" id="edit-omen-id">
+      
+      <label style="font-size:0.8rem; font-weight:700;">Manifestation ·♡</label>
+      <input type="text" id="omen-manifestation" class="cute-input" placeholder="Describe the sign, symbol, or synchronicity in detail...">
+
+      <label style="font-size:0.8rem; font-weight:700;">Environment ·♡</label>
+      <input type="text" id="omen-environment" class="cute-input" placeholder="Where were you?">
+
+      <label style="font-size:0.8rem; font-weight:700;">Current mood ·♡</label>
+      <input type="text" id="omen-mood" class="cute-input" placeholder="e.g., Grounded, startled, awe, contemplative...">
+
+      <label style="font-size:0.8rem; font-weight:700;">Deity / Spirit ·♡</label>
+      <input type="text" id="omen-deity" class="cute-input" placeholder="Tags (comma separated)">
+
+      <label style="font-size:0.8rem; font-weight:700;">Sign Category ·♡</label>
+      <select id="omen-category" class="cute-input">
+        <option value="Animal & Nature">Animal &amp; Nature</option>
+        <option value="Synchronicity & Numbers">Synchronicity &amp; Numbers</option>
+        <option value="Physical Sensations">Physical Sensations</option>
+        <option value="Dreams & Auspicious Events">Dreams &amp; Auspicious Events</option>
+      </select>
+
+      <label style="font-size:0.8rem; font-weight:700;">Interpretation Status</label>
+      <select id="omen-status" class="cute-input">
+        <option value="⏳ Pending Clarity">⏳ Pending Clarity</option>
+        <option value="✨ Understood">✨ Understood</option>
+      </select>
+
+      <label style="font-size:0.8rem; font-weight:700;">Notes ·♡</label>
+      <textarea id="omen-notes" class="cute-input" rows="3" placeholder="Your raw, immediate instinctual interpretation..."></textarea>
+
+      <button id="save-indepth-omen-btn" class="cute-btn full-width margin-top">Save Omen Record to Cloud ෆ</button>
+     </div>
+
+     <div id="omen-archive-list" class="card-grid margin-top"></div>
+    </div>
+
    </section>
 
    <!-- 4. GRIMOIRE & ARCHIVE TAB -->
