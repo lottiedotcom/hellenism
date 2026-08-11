@@ -10,8 +10,7 @@ export default async function handler(req, res) {
       );
     `;
   } catch (error) {
-    console.error("Table creation error:", error);
-    return res.status(500).json({ error: "Failed to initialize database table." });
+    return res.status(500).json({ error: "TABLE_CREATION_FAILED", details: error.message });
   }
 
   // 2. Handle POST requests (Saving data to the cloud)
@@ -19,11 +18,10 @@ export default async function handler(req, res) {
     const { key, value } = req.body;
     
     if (!key || value === undefined) {
-      return res.status(400).json({ error: "Missing key or value" });
+      return res.status(400).json({ error: "MISSING_DATA", details: "Key or value is missing" });
     }
 
     try {
-      // This inserts the data, or updates it if that key already exists
       await sql`
         INSERT INTO hellenic_data (key, value)
         VALUES (${key}, ${JSON.stringify(value)})
@@ -31,7 +29,7 @@ export default async function handler(req, res) {
       `;
       return res.status(200).json({ success: true });
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: "INSERT_FAILED", details: error.message });
     }
   }
 
@@ -40,7 +38,7 @@ export default async function handler(req, res) {
     const { key } = req.query;
     
     if (!key) {
-      return res.status(400).json({ error: "Missing key parameter" });
+      return res.status(400).json({ error: "MISSING_KEY", details: "No key parameter provided" });
     }
 
     try {
@@ -48,13 +46,12 @@ export default async function handler(req, res) {
       if (rows.length > 0) {
         return res.status(200).json({ value: rows[0].value });
       } else {
-        return res.status(404).json({ error: "No data found for this key" });
+        return res.status(404).json({ error: "NOT_FOUND", details: "No data found for this key" });
       }
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: "SELECT_FAILED", details: error.message });
     }
   }
 
-  // If the request isn't GET or POST
-  res.status(405).json({ error: "Method not allowed" });
+  res.status(405).json({ error: "METHOD_NOT_ALLOWED", details: "Only GET and POST are allowed" });
 }
