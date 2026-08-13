@@ -421,6 +421,17 @@
       <p id="homer-omen"></p>
      </div>
     </div>
+    
+    <!-- ONEIROI ARCHIVE SECTION -->
+    <div class="card">
+     <h3>Dream Journal ‧₊˚ ☁️⋅𓂃 ࣪</h3>
+     <div id="quick-log-container">
+      <textarea id="quick-dream-text" class="cute-input" rows="2" placeholder="Quick dream notes before they fade..."></textarea>
+      <button id="save-quick-dream-btn" class="cute-btn full-width margin-top">Quick-Log Dream (∩^ω^)⊃━☆ﾟ.*</button>
+     </div>
+     <div id="oneiroi-list" class="card-grid margin-top"></div>
+    </div>
+    
     <div class="card">
      <h3>Reading Journal</h3>
      <textarea id="journal-entry" class="cute-input" rows="4" placeholder="Type reflections here..."></textarea>
@@ -440,55 +451,51 @@
      <div id="archive-grid" class="card-grid"></div>
     </div>
 
-    <!-- CORRESPONDENCE JOURNAL -->
-    <div class="card margin-top">
-     <h3 style="margin-bottom: 4px;">𓍢ִ໋❁˚ Correspondence Journal</h3>
-     <p class="center-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Your infinite encyclopedia of sacred tools, herbs, and symbols.</p>
-     
-     <button id="toggle-assoc-form-btn" class="cute-btn full-width">✚ Add Lore Entry</button>
-     <input type="text" id="search-corr-input" class="cute-input margin-top" placeholder="Search by name, category, intent, or deity...">
-
-     <div id="assoc-form-container" class="hidden margin-top" style="display:flex; flex-direction:column; gap:8px;">
-      <input type="hidden" id="edit-assoc-id">
-      <input type="text" id="assoc-name" class="cute-input" placeholder="Entry Name (e.g., Bay Laurel, Honey)">
-      <select id="assoc-category" class="cute-input">
-        <option value="Flora & Herbs">Flora &amp; Herbs</option>
-        <option value="Foods & Offerings">Foods &amp; Offerings</option>
-        <option value="Symbols & Icons">Symbols &amp; Icons</option>
-        <option value="Stones & Crystals">Stones &amp; Crystals</option>
-        <option value="Aromas & Resins">Aromas &amp; Resins</option>
-        <option value="Other">Other Elements</option>
-      </select>
-      <input type="text" id="assoc-deities" class="cute-input" placeholder="Associated Deities (e.g., Apollo, Persephone)">
-      <input type="text" id="assoc-element" class="cute-input" placeholder="Element (e.g., Fire, Water)">
-      <input type="text" id="assoc-planet" class="cute-input" placeholder="Planet (e.g., Sun, Venus)">
-      <input type="text" id="assoc-zodiac" class="cute-input" placeholder="Zodiac (e.g., Leo, Scorpio)">
-      <input type="text" id="assoc-intent" class="cute-input" placeholder="Ritual Intent (e.g., Purification, Healing)">
-      <textarea id="assoc-notes" class="cute-input" rows="3" placeholder="Personal notes, historical lore, or myths..."></textarea>
-      
-      <div style="display: flex; gap: 8px;">
-        <button id="save-assoc-btn" class="cute-btn full-width">ᶻ 𝘇 𐰁 Save Lore</button>
-        <button id="cancel-assoc-btn" class="cute-btn" style="background:#f0f0f5;">(x.x)</button>
-      </div>
-     </div>
-
-     <div id="association-list" class="card-grid margin-top"></div>
-    </div>
-
-    <!-- ONEIROI ARCHIVE SECTION -->
-    <div class="card margin-top">
-     <h3>Dream Journal ‧₊˚ ☁️⋅𓂃 ࣪</h3>
-     <div id="quick-log-container">
-      <textarea id="quick-dream-text" class="cute-input" rows="2" placeholder="Quick dream notes before they fade..."></textarea>
-      <button id="save-quick-dream-btn" class="cute-btn full-width margin-top">Quick-Log Dream (∩^ω^)⊃━☆ﾟ.*</button>
-     </div>
-     <div id="oneiroi-list" class="card-grid margin-top"></div>
-    </div>
-    
+    <!-- READINGS & PRAYERS ARCHIVE -->
     <div class="card margin-top">
      <h3>𓇢𓆸 Readings &amp; Prayers Archive</h3>
-     <div id="journal-archive-list" class="card-grid"></div>
+     <div id="journal-archive-list" class="card-grid margin-top"></div>
     </div>
+
+    <!-- CORRESPONDENCE JOURNAL -->
+    <div class="card margin-top">
+     <details>
+      <summary class="cute-summary" style="font-size: 1.1em; font-weight: 700;">𓍢ִ໋❁˚ Correspondence Journal</summary>
+      <div style="padding-top: 10px;">
+       <p class="center-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Your infinite encyclopedia of sacred tools, herbs, and symbols.</p>
+       
+       <button id="toggle-assoc-form-btn" class="cute-btn full-width">✚ Add Lore Entry</button>
+       <input type="text" id="search-corr-input" class="cute-input margin-top" placeholder="Search by name, category, intent, or deity...">
+
+       <div id="assoc-form-container" class="hidden margin-top" style="display:flex; flex-direction:column; gap:8px;">
+        <input type="hidden" id="edit-assoc-id">
+        <input type="text" id="assoc-name" class="cute-input" placeholder="Entry Name (e.g., Bay Laurel, Honey)">
+        <select id="assoc-category" class="cute-input">
+          <option value="Flora & Herbs">Flora &amp; Herbs</option>
+          <option value="Foods & Offerings">Foods &amp; Offerings</option>
+          <option value="Symbols & Icons">Symbols &amp; Icons</option>
+          <option value="Stones & Crystals">Stones &amp; Crystals</option>
+          <option value="Aromas & Resins">Aromas &amp; Resins</option>
+          <option value="Other">Other Elements</option>
+        </select>
+        <input type="text" id="assoc-deities" class="cute-input" placeholder="Associated Deities (e.g., Apollo, Persephone)">
+        <input type="text" id="assoc-element" class="cute-input" placeholder="Element (e.g., Fire, Water)">
+        <input type="text" id="assoc-planet" class="cute-input" placeholder="Planet (e.g., Sun, Venus)">
+        <input type="text" id="assoc-zodiac" class="cute-input" placeholder="Zodiac (e.g., Leo, Scorpio)">
+        <input type="text" id="assoc-intent" class="cute-input" placeholder="Ritual Intent (e.g., Purification, Healing)">
+        <textarea id="assoc-notes" class="cute-input" rows="3" placeholder="Personal notes, historical lore, or myths..."></textarea>
+        
+        <div style="display: flex; gap: 8px;">
+          <button id="save-assoc-btn" class="cute-btn full-width">ᶻ 𝘇 𐰁 Save Lore</button>
+          <button id="cancel-assoc-btn" class="cute-btn" style="background:#f0f0f5;">(x.x)</button>
+        </div>
+       </div>
+
+       <div id="association-list" class="card-grid margin-top"></div>
+      </div>
+     </details>
+    </div>
+
    </section>
   </main>
   <nav class="bottom-nav">
