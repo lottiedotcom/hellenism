@@ -429,7 +429,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const fallbacks = [
                     { maxim: "Know Thyself", advice: "Look inward before seeking answers from the outside world." },
                     { maxim: "Nothing in Excess", advice: "Seek balance and moderation in all things today." },
-                    { maxim: "Pledge Surety and Ruin is Near", advice: "Exercise caution in commitments and contracts." }
+                    { maxim: "Pledge Surety and Ruin is Near", advice: "Exercise caution in commitments and contracts." },
+                    { maxim: "Observe the Limit", advice: "Recognize your boundaries and do not overstep them." },
+                    { maxim: "Shun Hubris", advice: "Remain humble and avoid arrogance in your successes." },
+                    { maxim: "Keep a Deep Secret", advice: "Not everything needs to be shared; guard your plans closely." },
+                    { maxim: "Reverence the Divine", advice: "Take a moment to give thanks to the gods and spirits." },
+                    { maxim: "Control the Eye", advice: "Be mindful of envy and what you let your gaze linger upon." },
+                    { maxim: "Pursue Harmony", advice: "Seek to resolve conflicts and restore peace in your environment." },
+                    { maxim: "Be Grateful", advice: "Acknowledge the gifts you have received, no matter how small." },
+                    { maxim: "Look to the Future", advice: "Do not dwell on the past; fix your gaze on what is ahead." }
                 ];
                 const fb = fallbacks[Math.floor(Math.random() * fallbacks.length)];
                 if(maximEl) maximEl.innerText = fb.maxim;
@@ -459,7 +467,12 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 const fallbacks = [
                     { verse: "Even a fool is wise after the event.", source: "Iliad", omen: "Learn from past missteps without carrying regret." },
-                    { verse: "Endure my heart, even worse have you endured.", source: "Odyssey", omen: "Resilience will see you through your present trials." }
+                    { verse: "Endure my heart, even worse have you endured.", source: "Odyssey", omen: "Resilience will see you through your present trials." },
+                    { verse: "There is a time for many words, and there is also a time for sleep.", source: "Odyssey", omen: "Rest is required before making your next move." },
+                    { verse: "Hateful to me as the gates of Hades is that man who hides one thing in his heart and speaks another.", source: "Iliad", omen: "Seek out the truth and be wary of deceit around you." },
+                    { verse: "The gods do not give all their gifts at once.", source: "Odyssey", omen: "Patience is a virtue; your blessings will come in due time." },
+                    { verse: "For a friend with an understanding heart is worth no less than a brother.", source: "Odyssey", omen: "Lean on your chosen family and closest companions today." },
+                    { verse: "It is entirely unseemly to glory over slain men.", source: "Odyssey", omen: "Show grace in your victories and mercy to those you defeat." }
                 ];
                 const fb = fallbacks[Math.floor(Math.random() * fallbacks.length)];
                 if(verseEl) verseEl.innerText = `"${fb.verse}" — ${fb.source}`;
@@ -823,12 +836,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('assoc-name').value = '';
             document.getElementById('assoc-category').value = 'Flora & Herbs';
             document.getElementById('assoc-deities').value = '';
-            
-            // --- NEW: Reset all three fields individually ---
             document.getElementById('assoc-element').value = '';
             document.getElementById('assoc-planet').value = '';
             document.getElementById('assoc-zodiac').value = '';
-            
             document.getElementById('assoc-intent').value = '';
             document.getElementById('assoc-notes').value = '';
         });
@@ -846,8 +856,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!name) { alert("Please provide a name for the entry."); return; }
 
             const editId = document.getElementById('edit-assoc-id').value;
-            
-            // --- NEW: Save all three fields individually ---
             const newEntry = {
                 id: editId ? parseInt(editId) : Date.now(),
                 name: name,
@@ -891,7 +899,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let displayList = associationJournal;
         
-        // --- NEW: Included the new individual fields in the search filtering ---
         if (filterText.trim() !== '') {
             const term = filterText.toLowerCase();
             displayList = associationJournal.filter(entry => 
@@ -915,7 +922,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = 'libation-card';
             
-            // --- NEW: HTML rendering individual element, planet, and zodiac lines ---
             card.innerHTML = `
                 <div class="libation-header">
                     <span>${entry.name}</span>
@@ -961,12 +967,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('assoc-name').value = entry.name;
                     document.getElementById('assoc-category').value = entry.category;
                     document.getElementById('assoc-deities').value = entry.deities || "";
-                    
-                    // --- NEW: Populate all three individual fields during edit mode ---
                     document.getElementById('assoc-element').value = entry.element || "";
                     document.getElementById('assoc-planet').value = entry.planet || "";
                     document.getElementById('assoc-zodiac').value = entry.zodiac || "";
-                    
                     document.getElementById('assoc-intent').value = entry.intent || "";
                     document.getElementById('assoc-notes').value = entry.notes || "";
                     document.getElementById('assoc-form-container').classList.remove('hidden');
@@ -1621,19 +1624,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- NEW: Added alternative hymns so it chooses between a few for each day ---
     const dailyHymns = {
-        0: { title: "Orphic Hymn to Helios (Sunday)", text: "Hear, golden Helios, whose blessed light shines across the boundless earth... Bringer of daylight, eternal sun, guide our steps with radiant grace." },
-        1: { title: "Homeric Hymn to Selene (Monday)", text: "Sing of the Moon, sweet-voiced Muses! From her immortal head a glow is shown from heaven and embraces earth... Queen of the night, shining Selene." },
-        2: { title: "Orphic Hymn to Ares & Aphrodite (Tuesday)", text: "Magnanimous Ares, shield-bearer and strength of mortals... paired with Aphrodite's gentle grace, bring courage, passion, and harmony to our hearth." },
-        3: { title: "Homeric Hymn to Hermes (Wednesday)", text: "Sing, Muse, of Hermes, the guide and messenger! Swift-footed lord of paths and speech, watcher by night, bringer of luck, and friend to mortals." },
-        4: { title: "Orphic Hymn to Zeus (Thursday)", text: "Zeus, father of gods and mortals, thunderer high on Olympos! Dispenser of justice and order, grant us wisdom, strength, and shelter." },
-        5: { title: "Orphic Hymn to Aphrodite (Friday)", text: "Sea-born Aphrodite, queen of beauty and love! Weaver of joy, gentlest goddess, bless our shrine and hearth with unity and kindness." },
-        6: { title: "Homeric Hymn to Hestia & Apollo (Saturday)", text: "Hestia, keeper of the eternal flame in sacred Pytho and high Olympos... alongside Far-Shooting Apollo, bring light and warmth to our sacred sanctuary." }
+        0: [ 
+            { title: "Orphic Hymn to Helios (Sunday)", text: "Hear, golden Helios, whose blessed light shines across the boundless earth... Bringer of daylight, eternal sun, guide our steps with radiant grace." },
+            { title: "Homeric Hymn to Apollo (Sunday)", text: "I will remember and not be unmindful of Apollo who shoots afar... whose presence commands the very foundations of the world." }
+        ],
+        1: [
+            { title: "Homeric Hymn to Selene (Monday)", text: "Sing of the Moon, sweet-voiced Muses! From her immortal head a glow is shown from heaven and embraces earth... Queen of the night, shining Selene." },
+            { title: "Orphic Hymn to Selene (Monday)", text: "Hear, Goddess queen, diffusing silver light, bull-horned and wandering through the gloom of night. Torch-bearing virgin, guide our secret paths." }
+        ],
+        2: [
+            { title: "Orphic Hymn to Ares & Aphrodite (Tuesday)", text: "Magnanimous Ares, shield-bearer and strength of mortals... paired with Aphrodite's gentle grace, bring courage, passion, and harmony to our hearth." },
+            { title: "Homeric Hymn to Ares (Tuesday)", text: "Ares, exceeding in strength, chariot-rider, golden-helmed, father of warlike Victory... shed down a kindly ray from above upon our lives." }
+        ],
+        3: [
+            { title: "Homeric Hymn to Hermes (Wednesday)", text: "Sing, Muse, of Hermes, the guide and messenger! Swift-footed lord of paths and speech, watcher by night, bringer of luck, and friend to mortals." },
+            { title: "Orphic Hymn to Hermes (Wednesday)", text: "Hear me, Hermes, messenger of Zeus, son of Maia; almighty heart, presider over competitions, guide of the living and the dead." }
+        ],
+        4: [
+            { title: "Orphic Hymn to Zeus (Thursday)", text: "Zeus, father of gods and mortals, thunderer high on Olympos! Dispenser of justice and order, grant us wisdom, strength, and shelter." },
+            { title: "Homeric Hymn to Zeus (Thursday)", text: "I will sing of Zeus, chiefest among the gods and greatest, all-seeing, the lord of all, the fulfiller who whispers words of wisdom." }
+        ],
+        5: [
+            { title: "Orphic Hymn to Aphrodite (Friday)", text: "Sea-born Aphrodite, queen of beauty and love! Weaver of joy, gentlest goddess, bless our shrine and hearth with unity and kindness." },
+            { title: "Homeric Hymn to Aphrodite (Friday)", text: "Muse, tell me the deeds of golden Aphrodite the Cyprian, who stirs up sweet passion in the gods and subdues the tribes of mortal men." }
+        ],
+        6: [
+            { title: "Homeric Hymn to Hestia & Apollo (Saturday)", text: "Hestia, in the high dwellings of all, both deathless gods and men who walk on earth... alongside Far-Shooting Apollo, bring light and warmth to our sacred sanctuary." },
+            { title: "Orphic Hymn to Hestia (Saturday)", text: "Daughter of Kronos, venerable dame, who dwells amidst great fire's eternal flame. In sacred rites these ministers are thine, mystics much blessed, holy and divine." }
+        ]
     };
 
     function loadDailyHymn() {
         const day = new Date().getDay();
-        const hymn = dailyHymns[day];
+        const hymnsForDay = dailyHymns[day];
+        const hymn = hymnsForDay[Math.floor(Math.random() * hymnsForDay.length)];
         const hymnEl = document.getElementById('daily-hymn');
         if (hymnEl && hymn) {
             hymnEl.innerHTML = `<strong>${hymn.title}</strong><br><br>"${hymn.text}"`;
