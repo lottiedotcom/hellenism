@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // Global variable to hold moon phase for rituals
+    let currentGlobalMoonPhase = "Unknown";
+
     // ==========================================
     // 1. VERCEL CLOUD DB / PERSISTENCE LAYER (IMAGE FILTER ACTIVE)
     // ==========================================
@@ -91,6 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 'oneiroiArchive', 
                 'associationJournal', 
                 'omenArchive',
+                'ritualsLibrary',
+                'ritualLogs',
                 'khernipsCount', 
                 'kharisCount',
                 'libationsList'
@@ -324,6 +329,288 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
+    // RITUAL & SPELL SYSTEM (GRIMOIRE + DIVINATION LOG)
+    // ==========================================
+    let ritualsLibrary = [];
+    let ritualLogs = [];
+    let currentActiveRitual = null;
+
+    const ritualCreatorModal = document.getElementById('ritual-creator-modal');
+    const openRitualCreatorBtn = document.getElementById('open-ritual-creator-btn');
+    const closeRitualCreatorBtn = document.getElementById('close-ritual-creator-btn');
+    const saveRitualTemplateBtn = document.getElementById('save-ritual-template-btn');
+
+    if(openRitualCreatorBtn) {
+        openRitualCreatorBtn.addEventListener('click', () => {
+            document.getElementById('edit-ritual-id').value = '';
+            document.getElementById('ritual-title').value = '';
+            document.getElementById('ritual-intent').value = 'Devotional & Kharis';
+            document.getElementById('ritual-deity').value = '';
+            document.getElementById('ritual-tools').value = '';
+            document.getElementById('ritual-timing').value = '';
+            document.getElementById('ritual-steps').value = '';
+            if(ritualCreatorModal) ritualCreatorModal.classList.remove('hidden');
+        });
+    }
+
+    if(closeRitualCreatorBtn) {
+        closeRitualCreatorBtn.addEventListener('click', () => {
+            if(ritualCreatorModal) ritualCreatorModal.classList.add('hidden');
+        });
+    }
+
+    if(saveRitualTemplateBtn) {
+        saveRitualTemplateBtn.addEventListener('click', async () => {
+            const title = document.getElementById('ritual-title').value.trim();
+            if(!title) { alert("Please provide a title for the ritual."); return; }
+
+            const editId = document.getElementById('edit-ritual-id').value;
+            const newRitual = {
+                id: editId ? parseInt(editId) : Date.now(),
+                title: title,
+                intent: document.getElementById('ritual-intent').value,
+                deity: document.getElementById('ritual-deity').value.trim(),
+                tools: document.getElementById('ritual-tools').value.trim(),
+                timing: document.getElementById('ritual-timing').value.trim(),
+                steps: document.getElementById('ritual-steps').value.trim()
+            };
+
+            if (editId) {
+                const index = ritualsLibrary.findIndex(r => r.id === parseInt(editId));
+                if (index > -1) ritualsLibrary[index] = newRitual;
+            } else {
+                ritualsLibrary.push(newRitual);
+            }
+
+            await saveToCloud('ritualsLibrary', ritualsLibrary);
+            renderRitualsLibrary();
+            populateRitualDropdown();
+            if(ritualCreatorModal) ritualCreatorModal.classList.add('hidden');
+        });
+    }
+
+    function renderRitualsLibrary() {
+        const list = document.getElementById('rituals-library-list');
+        if(!list) return;
+        list.innerHTML = '';
+        
+        if (ritualsLibrary.length === 0) {
+            list.innerHTML = '<p class="center-text" style="font-size:0.8rem; color:var(--text-muted);">No rituals added yet. Create one to launch it later!</p>';
+            return;
+        }
+
+        ritualsLibrary.forEach(ritual => {
+            const card = document.createElement('div');
+            card.className = 'libation-card';
+            
+            card.innerHTML = `
+                <div class="libation-header">
+                    <span>${ritual.title}</span>
+                    <div class="libation-actions">
+                        <button class="action-icon-btn edit-ritual-btn" data-id="${ritual.id}" title="Edit Template">≡</button>
+                        <button class="action-icon-btn delete-ritual-btn" data-id="${ritual.id}" title="Delete">(x.x)</button>
+                    </div>
+                </div>
+                <div class="libation-tags" style="margin-bottom:6px;">
+                    <span class="libation-tag">${ritual.intent}</span>
+                    ${ritual.deity ? `<span class="libation-tag">To: ${ritual.deity}</span>` : ''}
+                </div>
+                ${ritual.timing ? `<div style="font-size:0.75rem; color:var(--text-dark); margin-bottom:2px;"><strong>Timing:</strong> ${ritual.timing}</div>` : ''}
+                ${ritual.tools ? `<div style="font-size:0.75rem; color:var(--text-dark); margin-bottom:2px;"><strong>Tools:</strong> ${ritual.tools}</div>` : ''}
+            `;
+            list.appendChild(card);
+        });
+
+        document.querySelectorAll('.delete-ritual-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                if(confirm("Delete this ritual template permanently?")) {
+                    const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                    ritualsLibrary = ritualsLibrary.filter(r => r.id !== id);
+                    await saveToCloud('ritualsLibrary', ritualsLibrary);
+                    renderRitualsLibrary();
+                    populateRitualDropdown();
+                }
+            });
+        });
+
+        document.querySelectorAll('.edit-ritual-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                const ritual = ritualsLibrary.find(r => r.id === id);
+                if(ritual) {
+                    document.getElementById('edit-ritual-id').value = ritual.id;
+                    document.getElementById('ritual-title').value = ritual.title;
+                    document.getElementById('ritual-intent').value = ritual.intent;
+                    document.getElementById('ritual-deity').value = ritual.deity || "";
+                    document.getElementById('ritual-tools').value = ritual.tools || "";
+                    document.getElementById('ritual-timing').value = ritual.timing || "";
+                    document.getElementById('ritual-steps').value = ritual.steps || "";
+                    if(ritualCreatorModal) ritualCreatorModal.classList.remove('hidden');
+                }
+            });
+        });
+    }
+
+    function populateRitualDropdown() {
+        const select = document.getElementById('ritual-launcher-select');
+        if(!select) return;
+        select.innerHTML = '<option value="">-- Select a Ritual --</option>';
+        ritualsLibrary.forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.id;
+            opt.textContent = r.title;
+            select.appendChild(opt);
+        });
+    }
+
+    const launchRitualBtn = document.getElementById('launch-ritual-btn');
+    const activeRitualModal = document.getElementById('active-ritual-modal');
+    const closeActiveRitualBtn = document.getElementById('close-active-ritual-btn');
+    const completeRitualBtn = document.getElementById('complete-ritual-btn');
+
+    if(closeActiveRitualBtn) {
+        closeActiveRitualBtn.addEventListener('click', () => {
+            if(activeRitualModal) activeRitualModal.classList.add('hidden');
+        });
+    }
+
+    if(launchRitualBtn) {
+        launchRitualBtn.addEventListener('click', () => {
+            const select = document.getElementById('ritual-launcher-select');
+            if(!select || !select.value) {
+                alert("Please select a ritual from the Grimoire to initiate.");
+                return;
+            }
+            
+            const rId = parseInt(select.value);
+            const ritual = ritualsLibrary.find(r => r.id === rId);
+            if(!ritual) return;
+
+            currentActiveRitual = ritual;
+
+            document.getElementById('active-ritual-title').innerText = ritual.title;
+            document.getElementById('active-ritual-meta').innerHTML = `
+                <strong>Moon:</strong> ${currentGlobalMoonPhase}<br>
+                ${ritual.deity ? `<strong>Deity:</strong> ${ritual.deity}` : ''}
+            `;
+            
+            const toolsBox = document.getElementById('active-ritual-tools-box');
+            if(ritual.tools) {
+                toolsBox.style.display = 'block';
+                toolsBox.innerHTML = `<strong>Required Tools:</strong><br>${ritual.tools}`;
+            } else {
+                toolsBox.style.display = 'none';
+            }
+
+            const checkListDiv = document.getElementById('active-ritual-checklist');
+            checkListDiv.innerHTML = '';
+            
+            const steps = ritual.steps.split('\n').map(s => s.trim()).filter(Boolean);
+            if(steps.length > 0) {
+                steps.forEach((step, idx) => {
+                    const lbl = document.createElement('label');
+                    lbl.className = 'custom-checkbox';
+                    lbl.style.display = 'flex';
+                    lbl.style.alignItems = 'flex-start';
+                    lbl.style.marginBottom = '6px';
+                    
+                    lbl.innerHTML = `
+                        <input type="checkbox" id="step-chk-${idx}">
+                        <span class="checkmark" style="flex-shrink:0;"></span>
+                        <span style="font-size:0.9rem; line-height:1.3;">${step}</span>
+                    `;
+                    checkListDiv.appendChild(lbl);
+                });
+            } else {
+                checkListDiv.innerHTML = '<p style="font-size:0.8rem; color:var(--text-muted);">No structured liturgy provided. Proceed intuitively!</p>';
+            }
+
+            document.getElementById('active-ritual-mood').value = '';
+            document.getElementById('active-ritual-notes').value = '';
+
+            if(activeRitualModal) activeRitualModal.classList.remove('hidden');
+        });
+    }
+
+    if(completeRitualBtn) {
+        completeRitualBtn.addEventListener('click', async () => {
+            if(!currentActiveRitual) return;
+
+            const mood = document.getElementById('active-ritual-mood').value.trim();
+            const notes = document.getElementById('active-ritual-notes').value.trim();
+
+            const checkBoxes = document.querySelectorAll('#active-ritual-checklist input[type="checkbox"]');
+            let completedCount = 0;
+            checkBoxes.forEach(cb => { if(cb.checked) completedCount++; });
+            const totalSteps = checkBoxes.length;
+
+            const logEntry = {
+                id: Date.now(),
+                ritualId: currentActiveRitual.id,
+                title: currentActiveRitual.title,
+                deity: currentActiveRitual.deity,
+                date: new Date().toLocaleString(),
+                moonPhase: currentGlobalMoonPhase,
+                mood: mood,
+                notes: notes,
+                completionStatus: totalSteps > 0 ? `${completedCount}/${totalSteps} Steps` : 'Completed'
+            };
+
+            ritualLogs.unshift(logEntry);
+            await saveToCloud('ritualLogs', ritualLogs);
+            renderRitualLogs();
+
+            if(activeRitualModal) activeRitualModal.classList.add('hidden');
+            currentActiveRitual = null;
+            document.getElementById('ritual-launcher-select').value = '';
+        });
+    }
+
+    function renderRitualLogs() {
+        const list = document.getElementById('ritual-working-logs');
+        if(!list) return;
+        list.innerHTML = '';
+        
+        if (ritualLogs.length === 0) {
+            list.innerHTML = '<p class="center-text" style="font-size:0.8rem; color:var(--text-muted);">No ritual workings logged yet.</p>';
+            return;
+        }
+
+        ritualLogs.forEach(log => {
+            const card = document.createElement('div');
+            card.className = 'libation-item';
+            card.style.flexDirection = 'column';
+            card.style.alignItems = 'flex-start';
+            
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:4px;">
+                    <span style="font-weight:700; font-size:0.9rem;">${log.title}</span>
+                    <button class="action-icon-btn delete-rituallog-btn" data-id="${log.id}" title="Delete Record" style="padding:0;">(x.x)</button>
+                </div>
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">
+                    ${log.date} | ${log.moonPhase}
+                </div>
+                ${log.mood ? `<div style="font-size:0.8rem; margin-bottom:4px;"><strong>Mood:</strong> ${log.mood}</div>` : ''}
+                ${log.completionStatus ? `<div style="font-size:0.8rem; margin-bottom:4px;"><strong>Liturgy:</strong> ${log.completionStatus}</div>` : ''}
+                ${log.notes ? `<div style="font-size:0.85rem; font-style:italic; line-height:1.3; margin-top:4px; padding:6px; background:#f0f0f5; border-radius:4px;">"${log.notes}"</div>` : ''}
+            `;
+            list.appendChild(card);
+        });
+
+        document.querySelectorAll('.delete-rituallog-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                if(confirm("Delete this ritual log?")) {
+                    const id = parseInt(e.currentTarget.getAttribute('data-id'));
+                    ritualLogs = ritualLogs.filter(r => r.id !== id);
+                    await saveToCloud('ritualLogs', ritualLogs);
+                    renderRitualLogs();
+                }
+            });
+        });
+    }
+
+
+    // ==========================================
     // 3. EXPANDED DIVINATION
     // ==========================================
     const astragaliBtn = document.getElementById("draw-astragali-btn");
@@ -505,6 +792,8 @@ document.addEventListener('DOMContentLoaded', () => {
         oneiroiArchive = await loadFromCloud('oneiroiArchive', []);
         associationJournal = await loadFromCloud('associationJournal', []);
         omenArchive = await loadFromCloud('omenArchive', []);
+        ritualsLibrary = await loadFromCloud('ritualsLibrary', []);
+        ritualLogs = await loadFromCloud('ritualLogs', []);
         
         khernipsCount = await loadFromCloud('khernipsCount', 0);
         kharisCount = await loadFromCloud('kharisCount', 0);
@@ -521,6 +810,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderOneiroiArchive();
         renderAssociationJournal();
         renderOmenArchive();
+        renderRitualsLibrary();
+        renderRitualLogs();
+        populateRitualDropdown();
         
         const kBtn = document.getElementById('khernips-btn');
         if(kBtn) kBtn.innerText = `Wash Hands (${khernipsCount})`;
@@ -1624,48 +1916,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- NEW: Added alternative hymns so it chooses between a few for each day ---
-    const dailyHymns = {
-        0: [ 
-            { title: "Orphic Hymn to Helios (Sunday)", text: "Hear, golden Helios, whose blessed light shines across the boundless earth... Bringer of daylight, eternal sun, guide our steps with radiant grace." },
-            { title: "Homeric Hymn to Apollo (Sunday)", text: "I will remember and not be unmindful of Apollo who shoots afar... whose presence commands the very foundations of the world." }
-        ],
-        1: [
-            { title: "Homeric Hymn to Selene (Monday)", text: "Sing of the Moon, sweet-voiced Muses! From her immortal head a glow is shown from heaven and embraces earth... Queen of the night, shining Selene." },
-            { title: "Orphic Hymn to Selene (Monday)", text: "Hear, Goddess queen, diffusing silver light, bull-horned and wandering through the gloom of night. Torch-bearing virgin, guide our secret paths." }
-        ],
-        2: [
-            { title: "Orphic Hymn to Ares & Aphrodite (Tuesday)", text: "Magnanimous Ares, shield-bearer and strength of mortals... paired with Aphrodite's gentle grace, bring courage, passion, and harmony to our hearth." },
-            { title: "Homeric Hymn to Ares (Tuesday)", text: "Ares, exceeding in strength, chariot-rider, golden-helmed, father of warlike Victory... shed down a kindly ray from above upon our lives." }
-        ],
-        3: [
-            { title: "Homeric Hymn to Hermes (Wednesday)", text: "Sing, Muse, of Hermes, the guide and messenger! Swift-footed lord of paths and speech, watcher by night, bringer of luck, and friend to mortals." },
-            { title: "Orphic Hymn to Hermes (Wednesday)", text: "Hear me, Hermes, messenger of Zeus, son of Maia; almighty heart, presider over competitions, guide of the living and the dead." }
-        ],
-        4: [
-            { title: "Orphic Hymn to Zeus (Thursday)", text: "Zeus, father of gods and mortals, thunderer high on Olympos! Dispenser of justice and order, grant us wisdom, strength, and shelter." },
-            { title: "Homeric Hymn to Zeus (Thursday)", text: "I will sing of Zeus, chiefest among the gods and greatest, all-seeing, the lord of all, the fulfiller who whispers words of wisdom." }
-        ],
-        5: [
-            { title: "Orphic Hymn to Aphrodite (Friday)", text: "Sea-born Aphrodite, queen of beauty and love! Weaver of joy, gentlest goddess, bless our shrine and hearth with unity and kindness." },
-            { title: "Homeric Hymn to Aphrodite (Friday)", text: "Muse, tell me the deeds of golden Aphrodite the Cyprian, who stirs up sweet passion in the gods and subdues the tribes of mortal men." }
-        ],
-        6: [
-            { title: "Homeric Hymn to Hestia & Apollo (Saturday)", text: "Hestia, in the high dwellings of all, both deathless gods and men who walk on earth... alongside Far-Shooting Apollo, bring light and warmth to our sacred sanctuary." },
-            { title: "Orphic Hymn to Hestia (Saturday)", text: "Daughter of Kronos, venerable dame, who dwells amidst great fire's eternal flame. In sacred rites these ministers are thine, mystics much blessed, holy and divine." }
-        ]
-    };
-
-    function loadDailyHymn() {
-        const day = new Date().getDay();
-        const hymnsForDay = dailyHymns[day];
-        const hymn = hymnsForDay[Math.floor(Math.random() * hymnsForDay.length)];
-        const hymnEl = document.getElementById('daily-hymn');
-        if (hymnEl && hymn) {
-            hymnEl.innerHTML = `<strong>${hymn.title}</strong><br><br>"${hymn.text}"`;
-        }
-    }
-
     const upcomingLunarEvents = [
         { date: "Aug 12, 2026", event: "Total Solar Eclipse 𑣲☾" },
         { date: "Aug 28, 2026", event: "Partial Lunar Eclipse ⋆" },
@@ -1808,6 +2058,8 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (elongation >= 267 && elongation < 273) phase = "Third Quarter 🌗";
         else phase = "Waning Crescent 🌘";
 
+        currentGlobalMoonPhase = phase; 
+
         let moonAgeDays = (elongation / 360) * 29.530588;
 
         const phaseEl = document.getElementById('moon-phase-name');
@@ -1886,4 +2138,3 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDailyHymn();
 
 });
-
