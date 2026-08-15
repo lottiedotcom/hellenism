@@ -181,6 +181,73 @@
     </div>
    </div>
 
+   <!-- RITUAL & SPELL CREATOR MODAL -->
+   <div id="ritual-creator-modal" class="settings-modal hidden">
+    <div class="settings-content card">
+     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h3 style="margin:0;">Create Spell / Ritual 𓇢𓆸</h3>
+      <button id="close-ritual-creator-btn" class="cute-btn" style="padding: 4px 10px;">(x.x)</button>
+     </div>
+     <div style="display: flex; flex-direction: column; gap: 8px;">
+      <input type="hidden" id="edit-ritual-id">
+      
+      <label style="font-size:0.8rem; font-weight:700;">Ritual Title:</label>
+      <input type="text" id="ritual-title" class="cute-input" placeholder="e.g. The Threshold Cleansing">
+
+      <label style="font-size:0.8rem; font-weight:700;">Primary Intent:</label>
+      <select id="ritual-intent" class="cute-input">
+        <option value="Devotional & Kharis">Devotional &amp; Kharis</option>
+        <option value="Protection & Warding">Protection &amp; Warding</option>
+        <option value="Divination Prep">Divination Prep</option>
+        <option value="Alignment & Healing">Alignment &amp; Healing</option>
+        <option value="Other">Other Rite</option>
+      </select>
+
+      <label style="font-size:0.8rem; font-weight:700;">Associated Deity / Spirit:</label>
+      <input type="text" id="ritual-deity" class="cute-input" placeholder="e.g. Hekate, Apollo">
+
+      <label style="font-size:0.8rem; font-weight:700;">Required Tools (comma separated):</label>
+      <input type="text" id="ritual-tools" class="cute-input" placeholder="e.g. Bay Laurel, Salt, Black Candle">
+
+      <label style="font-size:0.8rem; font-weight:700;">Ideal Timing / Moon Phase:</label>
+      <input type="text" id="ritual-timing" class="cute-input" placeholder="e.g. Dark Moon, Dawn">
+
+      <label style="font-size:0.8rem; font-weight:700;">Step-by-Step Liturgy (One step per line):</label>
+      <textarea id="ritual-steps" class="cute-input" rows="5" placeholder="Light the black candle&#10;Wash hands with Khernips&#10;Recite the Orphic hymn..."></textarea>
+
+      <button id="save-ritual-template-btn" class="cute-btn full-width margin-top">Save to Grimoire 🪷</button>
+     </div>
+    </div>
+   </div>
+
+   <!-- ACTIVE RITUAL / LAUNCHER MODAL -->
+   <div id="active-ritual-modal" class="settings-modal hidden">
+    <div class="settings-content card" style="border: 2px solid var(--border-blue);">
+     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h3 id="active-ritual-title" style="margin:0;">Active Working...</h3>
+      <button id="close-active-ritual-btn" class="cute-btn" style="padding: 4px 10px;">(x.x)</button>
+     </div>
+     <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div id="active-ritual-meta" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;"></div>
+      
+      <div id="active-ritual-tools-box" class="quote-box" style="margin-bottom:10px; font-size:0.85rem;"></div>
+
+      <h4 style="margin:0 0 6px 0;">Liturgy Checklist</h4>
+      <div id="active-ritual-checklist" class="checkbox-group" style="margin-bottom: 12px;">
+       <!-- Dynamic checkboxes go here -->
+      </div>
+
+      <label style="font-size:0.8rem; font-weight:700;">Energy / Mood During Rite:</label>
+      <input type="text" id="active-ritual-mood" class="cute-input" placeholder="e.g. Grounded, focused, buzzing...">
+
+      <label style="font-size:0.8rem; font-weight:700;">Post-Ritual Notes / Omens:</label>
+      <textarea id="active-ritual-notes" class="cute-input" rows="3" placeholder="Flickering flame, felt a sudden chill..."></textarea>
+
+      <button id="complete-ritual-btn" class="cute-btn full-width margin-top" style="background: var(--accent-blue);">Complete &amp; Log Working 🪶</button>
+     </div>
+    </div>
+   </div>
+
    <!-- 1. MOON TAB (HOMEPAGE) -->
    <section id="moon-view" class="view active">
     <header class="hero" style="position: relative;">
@@ -374,9 +441,26 @@
      <h2>Divination ˖𓍢ִ໋ 🀢🀦 ྀ.⊹</h2>
     </header>
 
+    <!-- LIVE RITUAL WORKING LOG -->
+    <div class="card" style="border: 2px solid var(--accent-blue);">
+     <h3>𓇢𓆸 Active Ritual Log</h3>
+     <p class="center-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Launch a working from your Grimoire to begin.</p>
+     
+     <div class="input-group">
+      <select id="ritual-launcher-select" class="cute-input" style="flex:1;">
+       <option value="">-- Select a Ritual --</option>
+      </select>
+      <button id="launch-ritual-btn" class="cute-btn">Initiate</button>
+     </div>
+     
+     <div id="ritual-working-logs" class="margin-top" style="display:flex; flex-direction:column; gap:8px;">
+        <!-- Completed Ritual logs will render here -->
+     </div>
+    </div>
+
     <!-- OMEN & SIGN LOG -->
     <div class="card">
-     <h3>·—̳͟͞͞♡ Quick Log</h3>
+     <h3>·—̳͟͞͞♡ Quick Sign Log</h3>
      <div id="quick-omen-container">
       <textarea id="quick-omen-text" class="cute-input" rows="2" placeholder="Quick sign note (e.g., Crow crossing the path, flickering candle)..."></textarea>
       <input type="text" id="quick-omen-deity" class="cute-input margin-top" placeholder="Deity tags (e.g., Hekate, Apollo)...">
@@ -405,6 +489,7 @@
       <p id="card-meaning"></p>
      </div>
     </div>
+    
     <div class="card center-text">
      <h3>🀚⋆˚꩜｡ Delphic Oracle Maxim</h3>
      <button id="draw-delphic-btn" class="cute-btn">Consult the Oracle</button>
@@ -413,6 +498,7 @@
       <p id="delphic-advice"></p>
      </div>
     </div>
+    
     <div class="card center-text">
      <h3>𓏢 ོ☼ Homeromancy Epic Omen</h3>
      <button id="draw-homer-btn" class="cute-btn">Draw Homeric Verse</button>
@@ -455,6 +541,22 @@
     <div class="card margin-top">
      <h3>𓇢𓆸 Readings &amp; Prayers Archive</h3>
      <div id="journal-archive-list" class="card-grid margin-top"></div>
+    </div>
+
+    <!-- RITUALS & SPELLS LIBRARY -->
+    <div class="card margin-top">
+     <details>
+      <summary class="cute-summary" style="font-size: 1.1em; font-weight: 700;">𓇢𓆸 Rituals &amp; Spells Library</summary>
+      <div style="padding-top: 10px;">
+       <p class="center-text" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Curate your spell templates and liturgy here. Launch them from the Divination tab.</p>
+       
+       <button id="open-ritual-creator-btn" class="cute-btn full-width">✚ Craft New Spell / Rite</button>
+
+       <div id="rituals-library-list" class="card-grid margin-top">
+        <!-- Saved templates load here -->
+       </div>
+      </div>
+     </details>
     </div>
 
     <!-- CORRESPONDENCE JOURNAL -->
@@ -516,4 +618,3 @@
 </script>
  </body>
 </html>
-
